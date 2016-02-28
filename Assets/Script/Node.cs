@@ -1,43 +1,50 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+using System;
+using System.IO;
+using System.Xml.Serialization;
 
-[ExecuteInEditMode]
-public class Node : MonoBehaviour
+[XmlRoot("Node")]
+public class Node
 {
-
-    // <FriendNode,EdgeToNode>
-    public Hashtable friendsNodes = new Hashtable(10);
-    public List<Node> listOfNode = new List<Node>(10);
-    public float numberOfNodes = 0;
+    [XmlAttribute("positionX")]
+    public float positionX;
+    [XmlAttribute("positionY")]
+    public float positionY;
+    [XmlAttribute("positionZ")]
+    public float positionZ;
+    public float distance = 9999;
+    public float heurystic = 9999;
+    public Node previousNode = null;
+    public float cumule = 0;
     // Use this for initialization
-    void Start()
+
+    public Node()
     {
+        positionX = 0;
+        positionY = 0;
+        positionZ = 0;
     }
 
-    void OnDrawGizmosSelected()
+    public Node(Vector3 position)
     {
-        Gizmos.color = Color.red;
-        Gizmos.DrawSphere(transform.position, 1);
+        positionX = position.x;
+        positionY = position.y;
+        positionZ = position.z;
     }
 
-   
-    public void ConnectTo(Node node, Edge edge)
+    public void Serialize(string path)
     {
-        if (!friendsNodes.ContainsKey(node) && node != this)
-        {
-            friendsNodes.Add(node, edge);
-            if (!listOfNode.Contains(node))
-                listOfNode.Add(node);
-            numberOfNodes++;
-        }
-        if (!node.friendsNodes.ContainsKey(this))
-        {
-            node.friendsNodes.Add(this, edge);
-            if (!node.listOfNode.Contains(this))
-                node.listOfNode.Add(this);
-            node.numberOfNodes++;
-        }
+
+        XmlSerializer serializer = new XmlSerializer(typeof(Node));
+        FileStream stream = new FileStream(path, FileMode.Append);
+        serializer.Serialize(stream, this);
+        stream.Close();
+        Debug.Log("saved");
+    }
+
+    public Vector3 getPosition()
+    {
+        return new Vector3(positionX, positionY, positionZ);
     }
 
 }

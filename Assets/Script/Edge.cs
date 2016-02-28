@@ -1,26 +1,34 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+using System;
+using System.IO;
+using System.Xml.Serialization;
 
-[ExecuteInEditMode]
-public class Edge : MonoBehaviour {
+[XmlRoot("Edge")]
+public class Edge {
 
+    [XmlAttribute("firstNode")]
     public Node firstNode;
+    [XmlAttribute("secondNode")]
     public Node secondNode;
-    public float distance;
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
-    void OnDrawGizmosSelected()
+    public Edge()
     {
-        Gizmos.color = Color.blue;
-        Gizmos.DrawLine(firstNode.gameObject.transform.position, secondNode.gameObject.transform.position);
+        firstNode = null;
+        secondNode = null;
+    }
+
+    public Edge(Node n1, Node n2)
+    {
+        firstNode = n1;
+        secondNode = n2;
+    }
+
+    public void Serialize(string path)
+    {
+        XmlSerializer serializer = new XmlSerializer(typeof(Edge));
+        FileStream stream = new FileStream(path, FileMode.Append);
+        serializer.Serialize(stream, this);
+        stream.Close();
+        Debug.Log("saved");
     }
 }

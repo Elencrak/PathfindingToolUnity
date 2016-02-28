@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<Edge xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" firstNode="Node" secondNode="Node" />5" positionZ="-19.85388">
+  <distance>9999</distance>
+  <heurystic>9999</heurystic>
+  <cumule>0</cumule>
+</Node>>>
