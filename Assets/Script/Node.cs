@@ -12,6 +12,8 @@ public class Node
     public float positionY;
     [XmlAttribute("positionZ")]
     public float positionZ;
+    [XmlAttribute("nodeId")]
+    public int nodeId;
     public float distance = 9999;
     public float heurystic = 9999;
     public Node previousNode = null;
@@ -25,11 +27,12 @@ public class Node
         positionZ = 0;
     }
 
-    public Node(Vector3 position)
+    public Node(Vector3 position,int Id)
     {
         positionX = position.x;
         positionY = position.y;
         positionZ = position.z;
+        nodeId = Id;
     }
 
     public void Serialize(string path)
@@ -40,6 +43,23 @@ public class Node
         serializer.Serialize(stream, this);
         stream.Close();
         Debug.Log("saved");
+    }
+    public void Deserialize(string path)
+    {
+
+        XmlSerializer serializer = new XmlSerializer(typeof(Node));
+        FileStream stream = new FileStream(path, FileMode.Open);
+        copy(serializer.Deserialize(stream) as Node);
+        stream.Close();
+        Debug.Log("saved");
+    }
+
+    void copy(Node nodeToCopy)
+    {
+        positionX = nodeToCopy.positionX;
+        positionY = nodeToCopy.positionY;
+        positionZ = nodeToCopy.positionZ;
+        nodeId = nodeToCopy.nodeId;
     }
 
     public Vector3 getPosition()

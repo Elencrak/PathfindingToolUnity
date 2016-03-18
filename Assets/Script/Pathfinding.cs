@@ -21,7 +21,6 @@ public class Pathfinding {
     {
         string path = Application.dataPath + "/Save/" + name + ".txt";
 
-        Debug.Log(path);
         FileStream stream = new FileStream(path, FileMode.CreateNew);
         stream.Close();
         foreach (Node node in nodes)
@@ -31,6 +30,21 @@ public class Pathfinding {
         foreach (Edge edge in edges)
         {
             edge.Serialize(path);
+        }
+    }
+    public void Load(string name)
+    {
+        string path = Application.dataPath + "/Save/" + name + ".txt";
+        
+        FileStream stream = new FileStream(path, FileMode.Open);
+        stream.Close();
+        foreach (Node node in nodes)
+        {
+            node.Deserialize(path);
+        }
+        foreach (Edge edge in edges)
+        {
+            edge.Deserialize(path);
         }
     }
 }

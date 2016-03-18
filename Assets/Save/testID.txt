@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<Node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" positionX="-2.61315918" positionY="0.5" positionZ="-10.4583435" nodeId="0">
+  <distance>9999</distance>
+  <heurystic>9999</heurystic>
+  <cumule>0</cumule>
+</Node><?xml version="1.0" encoding="Windows-1252"?>
+<Node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" positionX="2.239962" positionY="0.5" positionZ="-6.671594" nodeId="0">
+  <distance>9999</distance>
+  <heurystic>9999</heurystic>
+  <cumule>0</cumule>
+</Node><?xml version="1.0" encoding="Windows-1252"?>
+<Node xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" positionX="0.09787196" positionY="0.5" positionZ="-19.0107861" nodeId="0">
+  <distance>9999</distance>
+  <heurystic>9999</heurystic>
+  <cumule>0</cumule>
+</Node><?xml version="1.0" encoding="Windows-1252"?>
+<Edge xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" firstNodeId="0" secondNodeId="0">
+  <firstNode positionX="-2.61315918" positionY="0.5" positionZ="-10.4583435" nodeId="0">
+    <distance>9999</distance>
+    <heurystic>9999</heurystic>
+    <cumule>0</cumule>
+  </firstNode>
+  <secondNode positionX="0.09787196" positionY="0.5" positionZ="-19.0107861" nodeId="0">
+    <distance>9999</distance>
+    <heurystic>9999</heurystic>
+    <cumule>0</cumule>
+  </secondNode>
+</Edge><?xml version="1.0" encoding="Windows-1252"?>
+<Edge xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" firstNodeId="0" secondNodeId="0">
+  <firstNode positionX="0.09787196" positionY="0.5" positionZ="-19.0107861" nodeId="0">
+    <distance>9999</distance>
+    <heurystic>9999</heurystic>
+    <cumule>0</cumule>
+  </firstNode>
+  <secondNode positionX="2.239962" positionY="0.5" positionZ="-6.671594" nodeId="0">
+    <distance>9999</distance>
+    <heurystic>9999</heurystic>
+    <cumule>0</cumule>
+  </secondNode>
+</Edge><?xml version="1.0" encoding="Windows-1252"?>
+<Edge xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" firstNodeId="0" secondNodeId="0">
+  <firstNode positionX="2.239962" positionY="0.5" positionZ="-6.671594" nodeId="0">
+    <distance>9999</distance>
+    <heurystic>9999</heurystic>
+    <cumule>0</cumule>
+  </firstNode>
+  <secondNode positionX="-2.61315918" positionY="0.5" positionZ="-10.4583435" nodeId="0">
+    <distance>9999</distance>
+    <heurystic>9999</heurystic>
+    <cumule>0</cumule>
+  </secondNode>
+</Edge>

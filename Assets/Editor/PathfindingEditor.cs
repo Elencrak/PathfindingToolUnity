@@ -28,6 +28,10 @@ public class PathfindingEditor : EditorWindow
         {
             SavePathfinding();
         }
+        if (GUILayout.Button("New Pathfinding"))
+        {
+            newPath();
+        }
     }
     void OnEnable()
     {
@@ -148,12 +152,19 @@ public class PathfindingEditor : EditorWindow
         if (Physics.Raycast(ray, out hit))
         {
             GameObject instance = Instantiate(nodeRepresentation, hit.point, Quaternion.identity) as GameObject;
-            instance.GetComponent<NodeRepresentation>().node = new Node(hit.point);
+            instance.GetComponent<NodeRepresentation>().node = new Node(hit.point,currentPathfinding.nodes.Count);
             currentPathfinding.nodes.Add(instance.GetComponent<NodeRepresentation>().node);
+            Debug.Log("Node list length = "+currentPathfinding.nodes.Count);
             instance.transform.parent = GameObject.Find("Nodes").transform;
             Selection.activeGameObject = instance.transform.parent.parent.gameObject;
         }
 
+    }
+
+    void newPath()
+    {
+        Reset();
+        currentPathfinding = new Pathfinding();
     }
 
 }

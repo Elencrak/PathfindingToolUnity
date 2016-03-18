@@ -6,10 +6,13 @@ using System.Xml.Serialization;
 [XmlRoot("Edge")]
 public class Edge {
 
-    [XmlAttribute("firstNode")]
     public Node firstNode;
-    [XmlAttribute("secondNode")]
+    [XmlAttribute("firstNodeId")]
+    public int firstNodeId;
+  
     public Node secondNode;
+    [XmlAttribute("secondNodeId")]
+    public int secondNodeId;
 
     public Edge()
     {
@@ -20,7 +23,10 @@ public class Edge {
     public Edge(Node n1, Node n2)
     {
         firstNode = n1;
+        firstNodeId = n1.nodeId;
         secondNode = n2;
+        secondNodeId = n2.nodeId;
+
     }
 
     public void Serialize(string path)
