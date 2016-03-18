@@ -37,4 +37,19 @@ public class Edge {
         stream.Close();
         Debug.Log("saved");
     }
+
+    public void Deserialize(string path)
+    {
+        XmlSerializer serializer = new XmlSerializer(typeof(Edge));
+        FileStream stream = new FileStream(path, FileMode.Open);
+        copy(serializer.Deserialize(stream) as Edge);
+        stream.Close();
+        Debug.Log("saved");
+    }
+
+    void copy(Edge edgeToCopy)
+    {
+        firstNodeId = edgeToCopy.firstNodeId;
+        secondNodeId = edgeToCopy.secondNodeId;
+    }
 }

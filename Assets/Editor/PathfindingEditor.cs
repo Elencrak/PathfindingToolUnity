@@ -7,13 +7,13 @@ public class PathfindingEditor : EditorWindow
     bool addNode = false;
     bool createEdge = false;
     GameObject FirstNodeOfEdge;
-    string pathfindingName;
-    Pathfinding currentPathfinding;
+    string pathfindingNameToSave;
+    string pathfindingNameToLoad;
     // Add menu item named "My Window" to the Window menu
     [MenuItem("AI/PathfindingEditor")]
     public static void ShowWindow()
     {
-        //Show existing window instance. If one doesn't exist, make one.
+        //Show existing window GetInstance(). If one doesn't exist, make one.
         EditorWindow.GetWindow(typeof(PathfindingEditor));
     }
 
@@ -23,14 +23,19 @@ public class PathfindingEditor : EditorWindow
         nodeRepresentation = (GameObject)EditorGUILayout.ObjectField("Node prefab", nodeRepresentation, typeof(GameObject), true);
         edgeRepresentation = (GameObject)EditorGUILayout.ObjectField("Edge prefab", edgeRepresentation, typeof(GameObject), true);
         addNode = EditorGUILayout.Toggle("AddNodeMode", addNode);
-        pathfindingName = EditorGUILayout.TextField("Pathfinding save name : ", pathfindingName);
-        if (GUILayout.Button("Build Object"))
+        pathfindingNameToSave = EditorGUILayout.TextField("Pathfinding save name : ", pathfindingNameToSave);
+        if (GUILayout.Button("Save pathfinding"))
         {
-            SavePathfinding();
+            SavePathfinding(pathfindingNameToSave);
         }
         if (GUILayout.Button("New Pathfinding"))
         {
             newPath();
+        }
+        pathfindingNameToLoad = EditorGUILayout.TextField("Pathfinding load name : ", pathfindingNameToLoad);
+        if (GUILayout.Button("Load Pathfinding"))
+        {
+            LoadPathfinding(pathfindingNameToLoad);
         }
     }
     void OnEnable()
@@ -38,6 +43,7 @@ public class PathfindingEditor : EditorWindow
         SceneView.onSceneGUIDelegate += SceneGUI;
         nodeRepresentation = EditorGUIUtility.Load("Prefabs/Node.prefab") as GameObject;
         edgeRepresentation = EditorGUIUtility.Load("Prefabs/Edge.prefab") as GameObject;
+        
     }
     void SceneGUI(SceneView sceneView)
     {
@@ -99,9 +105,19 @@ public class PathfindingEditor : EditorWindow
         createEdge = false;
     }
 
-    private void SavePathfinding()
+    private void SavePathfinding(string pathName)
     {
-        currentPathfinding.Save(pathfindingName);
+        PathfindingManager.GetInstance().currentPathfinding.Save(pathName);
+    }
+
+    private void LoadPathfinding(string pathName)
+    {
+        PathfindingManager.GetInstance().currentPathfinding = new Pathfinding();
+        PathfindingManager.GetInstance().currentPathfinding.Load(pathName);
+
+        Reset();
+        RebuildPath();
+
     }
 
     private void Reset()
@@ -117,10 +133,31 @@ public class PathfindingEditor : EditorWindow
             DestroyImmediate(obj);
         }
     }
+
+    private void RebuildPath()
+    {
+        Pathfinding current = PathfindingManager.GetInstance().currentPathfinding;
+        foreach(Node node in current.nodes)
+        {
+            GameObject instance = Instantiate(nodeRepresentation, node.getPosition(), Quaternion.identity) as GameObject;
+            instance.GetComponent<NodeRepresentation>().node = node;
+            instance.transform.parent = GameObject.Find("Nodes").transform;
+        }
+        foreach (Edge edge in current.edges)
+        {
+            GameObject instance = Instantiate(edgeRepresentation, edge.firstNode.getPosition(), Quaternion.identity) as GameObject;
+            instance.transform.parent = GameObject.Find("Edges").transform;
+            instance.GetComponent<EdgeRepresentation>().firstNode = edge.firstNode;
+            instance.GetComponent<EdgeRepresentation>().secondNode = edge.secondNode;
+        }
+        Selection.activeGameObject = GameObject.Find("Nodes").transform.parent.gameObject;
+    }
+
+
     private void AddEdge(GameObject FirstNode, GameObject SecondNode)
     {
-        if (currentPathfinding == null)
-            currentPathfinding = new Pathfinding();
+        if (PathfindingManager.GetInstance().currentPathfinding == null)
+            PathfindingManager.GetInstance().currentPathfinding = new Pathfinding();
         RaycastHit hit = new RaycastHit();
         if (Physics.Raycast(FirstNode.transform.position, (SecondNode.transform.position - FirstNode.transform.position), out hit))
         {
@@ -133,7 +170,7 @@ public class PathfindingEditor : EditorWindow
                 instance.GetComponent<EdgeRepresentation>().firstNode = firstNode;
                 instance.GetComponent<EdgeRepresentation>().secondNode = secondNode;
                 Edge currentEdge = new Edge(firstNode, secondNode);
-                currentPathfinding.edges.Add(currentEdge);
+                PathfindingManager.GetInstance().currentPathfinding.edges.Add(currentEdge);
                 Selection.activeGameObject = instance.transform.parent.parent.gameObject;
             }
         }
@@ -144,17 +181,17 @@ public class PathfindingEditor : EditorWindow
 
     void AddNode()
     {
-        if (currentPathfinding == null)
-            currentPathfinding = new Pathfinding();
+        if (PathfindingManager.GetInstance().currentPathfinding == null)
+            PathfindingManager.GetInstance().currentPathfinding = new Pathfinding();
         Debug.Log("addNode");
         Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
         RaycastHit hit = new RaycastHit();
         if (Physics.Raycast(ray, out hit))
         {
             GameObject instance = Instantiate(nodeRepresentation, hit.point, Quaternion.identity) as GameObject;
-            instance.GetComponent<NodeRepresentation>().node = new Node(hit.point,currentPathfinding.nodes.Count);
-            currentPathfinding.nodes.Add(instance.GetComponent<NodeRepresentation>().node);
-            Debug.Log("Node list length = "+currentPathfinding.nodes.Count);
+            instance.GetComponent<NodeRepresentation>().node = new Node(hit.point,PathfindingManager.GetInstance().currentPathfinding.nodes.Count);
+            PathfindingManager.GetInstance().currentPathfinding.nodes.Add(instance.GetComponent<NodeRepresentation>().node);
+            Debug.Log("Node list length = "+PathfindingManager.GetInstance().currentPathfinding.nodes.Count);
             instance.transform.parent = GameObject.Find("Nodes").transform;
             Selection.activeGameObject = instance.transform.parent.parent.gameObject;
         }
@@ -164,7 +201,8 @@ public class PathfindingEditor : EditorWindow
     void newPath()
     {
         Reset();
-        currentPathfinding = new Pathfinding();
+        PathfindingManager.GetInstance().currentPathfinding = new Pathfinding();
     }
+
 
 }
