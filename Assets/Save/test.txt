@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<Pathfinding xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Nodes>
+    <Node positionX="-4.008795" positionY="0.5" positionZ="-8.238904" nodeId="0" />
+    <Node positionX="2.17578459" positionY="0.5" positionZ="-3.52185154" nodeId="1" />
+    <Node positionX="-0.444800377" positionY="0.5" positionZ="-16.939249" nodeId="2" />
+    <Node positionX="-5.161854" positionY="0.5" positionZ="-14.633131" nodeId="3" />
+  </Nodes>
+  <Edges>
+    <Edge firstNodeId="0" secondNodeId="2">
+      <firstNode positionX="-4.008795" positionY="0.5" positionZ="-8.238904" nodeId="0" />
+      <secondNode positionX="-0.444800377" positionY="0.5" positionZ="-16.939249" nodeId="2" />
+    </Edge>
+    <Edge firstNodeId="2" secondNodeId="1">
+      <firstNode positionX="-0.444800377" positionY="0.5" positionZ="-16.939249" nodeId="2" />
+      <secondNode positionX="2.17578459" positionY="0.5" positionZ="-3.52185154" nodeId="1" />
+    </Edge>
+    <Edge firstNodeId="1" secondNodeId="0">
+      <firstNode positionX="2.17578459" positionY="0.5" positionZ="-3.52185154" nodeId="1" />
+      <secondNode positionX="-4.008795" positionY="0.5" positionZ="-8.238904" nodeId="0" />
+    </Edge>
+    <Edge firstNodeId="0" secondNodeId="3">
+      <firstNode positionX="-4.008795" positionY="0.5" positionZ="-8.238904" nodeId="0" />
+      <secondNode positionX="-5.161854" positionY="0.5" positionZ="-14.633131" nodeId="3" />
+    </Edge>
+  </Edges>
+</Pathfinding>

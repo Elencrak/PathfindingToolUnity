@@ -31,7 +31,7 @@ public class Pathfinding {
         FileStream stream = new FileStream(path, FileMode.OpenOrCreate);
         serializer.Serialize(stream, this);
         stream.Close();
-        Debug.Log("saved");
+        Debug.Log("saved at "+path);
     }
     public void Load(string name)
     {
@@ -40,7 +40,7 @@ public class Pathfinding {
         FileStream stream = new FileStream(path, FileMode.Open);
         copy(serializer.Deserialize(stream) as Pathfinding);
         stream.Close();
-        Debug.Log("saved");
+        setNeighbors();
         
     }
 
@@ -48,5 +48,16 @@ public class Pathfinding {
     {
         nodes = pathToCopy.nodes;
         edges = pathToCopy.edges;
+    }
+
+    void setNeighbors()
+    {
+        foreach(Edge edge in edges)
+        {
+            if (!edge.firstNode.neighborsNode.Contains(edge.secondNode))
+                edge.firstNode.neighborsNode.Add(edge.secondNode);
+            if (!edge.secondNode.neighborsNode.Contains(edge.firstNode))
+                edge.secondNode.neighborsNode.Add(edge.firstNode);
+        }
     }
 }

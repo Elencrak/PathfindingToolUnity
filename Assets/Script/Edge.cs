@@ -35,7 +35,6 @@ public class Edge {
         FileStream stream = new FileStream(path, FileMode.Append);
         serializer.Serialize(stream, this);
         stream.Close();
-        Debug.Log("saved");
     }
 
     public void Deserialize(string path)
@@ -44,7 +43,6 @@ public class Edge {
         FileStream stream = new FileStream(path, FileMode.Open);
         copy(serializer.Deserialize(stream) as Edge);
         stream.Close();
-        Debug.Log("saved");
     }
 
     void copy(Edge edgeToCopy)

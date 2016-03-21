@@ -1,11 +1,23 @@
 ﻿using UnityEngine;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Xml.Serialization;
 
 [XmlRoot("Node")]
 public class Node
 {
+    [XmlIgnore]
+    public float distance = 9999;
+    [XmlIgnore]
+    public float heurystic = 9999;
+    [XmlIgnore]
+    public Node previousNode = null;
+    [XmlIgnore]
+    public float cumule = 0;
+    [XmlIgnore]
+    public List<Node> neighborsNode = new List<Node>();
+
     [XmlAttribute("positionX")]
     public float positionX;
     [XmlAttribute("positionY")]
@@ -14,10 +26,6 @@ public class Node
     public float positionZ;
     [XmlAttribute("nodeId")]
     public int nodeId;
-    public float distance = 9999;
-    public float heurystic = 9999;
-    public Node previousNode = null;
-    public float cumule = 0;
     // Use this for initialization
 
     public Node()
@@ -25,6 +33,7 @@ public class Node
         positionX = 0;
         positionY = 0;
         positionZ = 0;
+       
     }
 
     public Node(Vector3 position,int Id)
@@ -42,7 +51,6 @@ public class Node
         FileStream stream = new FileStream(path, FileMode.Append);
         serializer.Serialize(stream, this);
         stream.Close();
-        Debug.Log("saved");
     }
     public void Deserialize(string path)
     {
@@ -51,7 +59,6 @@ public class Node
         FileStream stream = new FileStream(path, FileMode.Open);
         copy(serializer.Deserialize(stream) as Node);
         stream.Close();
-        Debug.Log("saved");
     }
 
     void copy(Node nodeToCopy)
