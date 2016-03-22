@@ -1,27 +1,31 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <Pathfinding xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Nodes>
-    <Node positionX="-4.008795" positionY="0.5" positionZ="-8.238904" nodeId="0" />
-    <Node positionX="2.17578459" positionY="0.5" positionZ="-3.52185154" nodeId="1" />
-    <Node positionX="-0.444800377" positionY="0.5" positionZ="-16.939249" nodeId="2" />
-    <Node positionX="-5.161854" positionY="0.5" positionZ="-14.633131" nodeId="3" />
+    <Node positionX="12.4911222" positionY="0.5" positionZ="-21.0688763" nodeId="0" />
+    <Node positionX="1.52053928" positionY="0.5" positionZ="-21.577446" nodeId="1" />
+    <Node positionX="-2.91128826" positionY="0.5" positionZ="-14.966033" nodeId="2" />
+    <Node positionX="-3.63781643" positionY="0.5" positionZ="-10.2435951" nodeId="3" />
+    <Node positionX="-4.00108147" positionY="0.5" positionZ="-5.15789461" nodeId="4" />
+    <Node positionX="-4.65495729" positionY="0.5" positionZ="-1.52525115" nodeId="5" />
+    <Node positionX="-8.868824" positionY="0.5" positionZ="-1.01668239" nodeId="6" />
+    <Node positionX="-12.0655518" positionY="0.5" positionZ="1.30820966" nodeId="7" />
+    <Node positionX="-14.7537069" positionY="0.5" positionZ="3.70575547" nodeId="8" />
+    <Node positionX="-15.33493" positionY="0.5" positionZ="8.864107" nodeId="9" />
+    <Node positionX="-6.34792757" positionY="0.5" positionZ="-11.8869877" nodeId="10" />
+    <Node positionX="-9.526896" positionY="0.5" positionZ="-7.20219" nodeId="11" />
   </Nodes>
   <Edges>
-    <Edge firstNodeId="0" secondNodeId="2">
-      <firstNode positionX="-4.008795" positionY="0.5" positionZ="-8.238904" nodeId="0" />
-      <secondNode positionX="-0.444800377" positionY="0.5" positionZ="-16.939249" nodeId="2" />
-    </Edge>
-    <Edge firstNodeId="2" secondNodeId="1">
-      <firstNode positionX="-0.444800377" positionY="0.5" positionZ="-16.939249" nodeId="2" />
-      <secondNode positionX="2.17578459" positionY="0.5" positionZ="-3.52185154" nodeId="1" />
-    </Edge>
-    <Edge firstNodeId="1" secondNodeId="0">
-      <firstNode positionX="2.17578459" positionY="0.5" positionZ="-3.52185154" nodeId="1" />
-      <secondNode positionX="-4.008795" positionY="0.5" positionZ="-8.238904" nodeId="0" />
-    </Edge>
-    <Edge firstNodeId="0" secondNodeId="3">
-      <firstNode positionX="-4.008795" positionY="0.5" positionZ="-8.238904" nodeId="0" />
-      <secondNode positionX="-5.161854" positionY="0.5" positionZ="-14.633131" nodeId="3" />
-    </Edge>
+    <Edge firstNodeId="1" secondNodeId="0" />
+    <Edge firstNodeId="1" secondNodeId="2" />
+    <Edge firstNodeId="2" secondNodeId="3" />
+    <Edge firstNodeId="4" secondNodeId="3" />
+    <Edge firstNodeId="5" secondNodeId="4" />
+    <Edge firstNodeId="5" secondNodeId="6" />
+    <Edge firstNodeId="6" secondNodeId="7" />
+    <Edge firstNodeId="7" secondNodeId="8" />
+    <Edge firstNodeId="8" secondNodeId="9" />
+    <Edge firstNodeId="2" secondNodeId="10" />
+    <Edge firstNodeId="11" secondNodeId="10" />
+    <Edge firstNodeId="11" secondNodeId="6" />
   </Edges>
 </Pathfinding>

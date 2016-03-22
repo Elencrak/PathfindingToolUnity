@@ -7,14 +7,14 @@ using System.Collections.Generic;
 [ExecuteInEditMode]
 public class EdgeRepresentation : MonoBehaviour
 {
-
-    public Node firstNode;
-    public Node secondNode;
+    public Edge edge;
 
    
     void OnDrawGizmosSelected()
     {
+        if (Application.isPlaying)
+            return;
         Gizmos.color = Color.blue;
-        Gizmos.DrawLine(firstNode.getPosition(), secondNode.getPosition());
+        Gizmos.DrawLine(edge.firstNode.getPosition(), edge.secondNode.getPosition());
     }
 }

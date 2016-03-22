@@ -5,11 +5,11 @@ using System.Xml.Serialization;
 
 [XmlRoot("Edge")]
 public class Edge {
-
+    [XmlIgnore]
     public Node firstNode;
     [XmlAttribute("firstNodeId")]
     public int firstNodeId;
-  
+    [XmlIgnore]
     public Node secondNode;
     [XmlAttribute("secondNodeId")]
     public int secondNodeId;
@@ -43,6 +43,7 @@ public class Edge {
         FileStream stream = new FileStream(path, FileMode.Open);
         copy(serializer.Deserialize(stream) as Edge);
         stream.Close();
+        
     }
 
     void copy(Edge edgeToCopy)

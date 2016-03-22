@@ -40,7 +40,7 @@ public class Pathfinding {
         FileStream stream = new FileStream(path, FileMode.Open);
         copy(serializer.Deserialize(stream) as Pathfinding);
         stream.Close();
-        setNeighbors();
+        SetNodesOnEdge();
         
     }
 
@@ -50,14 +50,25 @@ public class Pathfinding {
         edges = pathToCopy.edges;
     }
 
-    void setNeighbors()
+    public void setNeighbors()
+    {
+        for(int i = 0;i<edges.Count;++i)
+        {
+            if (!edges[i].firstNode.neighborsNode.Contains(edges[i].secondNode))
+                edges[i].firstNode.neighborsNode.Add(edges[i].secondNode);
+            if (!edges[i].secondNode.neighborsNode.Contains(edges[i].firstNode))
+                edges[i].secondNode.neighborsNode.Add(edges[i].firstNode);
+
+        }
+
+    }
+
+    void SetNodesOnEdge()
     {
         foreach(Edge edge in edges)
         {
-            if (!edge.firstNode.neighborsNode.Contains(edge.secondNode))
-                edge.firstNode.neighborsNode.Add(edge.secondNode);
-            if (!edge.secondNode.neighborsNode.Contains(edge.firstNode))
-                edge.secondNode.neighborsNode.Add(edge.firstNode);
+            edge.firstNode = nodes[edge.firstNodeId];
+            edge.secondNode = nodes[edge.secondNodeId];
         }
     }
 }

@@ -107,6 +107,7 @@ public class PathfindingEditor : EditorWindow
     private void SavePathfinding(string pathName)
     {
         PathfindingManager.GetInstance().currentPathfinding.Save(pathName);
+        PlayerPrefs.SetString("CurrentPath", pathName);
     }
 
     private void LoadPathfinding(string pathName)
@@ -116,6 +117,7 @@ public class PathfindingEditor : EditorWindow
 
         Reset();
         RebuildPath();
+        PathfindingManager.GetInstance().currentPathfinding.setNeighbors();
 
     }
 
@@ -146,8 +148,7 @@ public class PathfindingEditor : EditorWindow
         {
             GameObject instance = Instantiate(edgeRepresentation, edge.firstNode.getPosition(), Quaternion.identity) as GameObject;
             instance.transform.parent = GameObject.Find("Edges").transform;
-            instance.GetComponent<EdgeRepresentation>().firstNode = edge.firstNode;
-            instance.GetComponent<EdgeRepresentation>().secondNode = edge.secondNode;
+            instance.GetComponent<EdgeRepresentation>().edge = edge;
         }
         Selection.activeGameObject = GameObject.Find("Nodes").transform.parent.gameObject;
     }
@@ -166,9 +167,8 @@ public class PathfindingEditor : EditorWindow
                 instance.transform.parent = GameObject.Find("Edges").transform;
                 Node firstNode = FirstNode.GetComponent<NodeRepresentation>().node;
                 Node secondNode = SecondNode.GetComponent<NodeRepresentation>().node;
-                instance.GetComponent<EdgeRepresentation>().firstNode = firstNode;
-                instance.GetComponent<EdgeRepresentation>().secondNode = secondNode;
                 Edge currentEdge = new Edge(firstNode, secondNode);
+                instance.GetComponent<EdgeRepresentation>().edge = currentEdge;
                 PathfindingManager.GetInstance().currentPathfinding.edges.Add(currentEdge);
                 Selection.activeGameObject = instance.transform.parent.parent.gameObject;
 
@@ -202,6 +202,8 @@ public class PathfindingEditor : EditorWindow
             instance.transform.parent = GameObject.Find("Nodes").transform;
             Selection.activeGameObject = instance.transform.parent.parent.gameObject;
         }
+        PathfindingManager.GetInstance().test++;
+        Debug.Log(PathfindingManager.GetInstance().test);
 
     }
 
