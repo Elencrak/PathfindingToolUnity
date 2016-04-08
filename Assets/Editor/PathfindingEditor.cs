@@ -1,5 +1,6 @@
 ﻿using UnityEditor;
 using UnityEngine;
+
 public class PathfindingEditor : EditorWindow
 {
     GameObject nodeRepresentation;
@@ -17,13 +18,19 @@ public class PathfindingEditor : EditorWindow
         EditorWindow.GetWindow(typeof(PathfindingEditor));
     }
 
+    // fonction qui permet l'affichage de la fenêtre du tool
     void OnGUI()
     {
+        // Pour faire un Label
         GUILayout.Label("Base Settings", EditorStyles.boldLabel);
+        // Pour faire un champ de selection ( de GameObject ici)
         nodeRepresentation = (GameObject)EditorGUILayout.ObjectField("Node prefab", nodeRepresentation, typeof(GameObject), true);
         edgeRepresentation = (GameObject)EditorGUILayout.ObjectField("Edge prefab", edgeRepresentation, typeof(GameObject), true);
+        // Pour faire une checkbox ( Boolean )
         addNode = EditorGUILayout.Toggle("AddNodeMode", addNode);
+        // Pour faire un champ de texte
         pathfindingNameToSave = EditorGUILayout.TextField("Pathfinding save name : ", pathfindingNameToSave);
+        // Pour faire des boutons
         if (GUILayout.Button("Save pathfinding"))
         {
             SavePathfinding(pathfindingNameToSave);
@@ -38,21 +45,31 @@ public class PathfindingEditor : EditorWindow
             LoadPathfinding(pathfindingNameToLoad);
         }
     }
+
+    // Fonction qui s'exécute comme le Awake() ou le Start()
     void OnEnable()
     {
+        // Ajoute la fonction SceneGUI au fonction appelé chaque frame 
         SceneView.onSceneGUIDelegate += SceneGUI;
+        // Load Resources pour l'éditor dans le dossier "Editor Default Resources"
         nodeRepresentation = EditorGUIUtility.Load("Prefabs/Node.prefab") as GameObject;
         edgeRepresentation = EditorGUIUtility.Load("Prefabs/Edge.prefab") as GameObject;
         
     }
+
+    // Fonction qui sert d'update
     void SceneGUI(SceneView sceneView)
     {
         if(addNode)
         {
+            // petite ligne pour modifier le control de l'éditeur en "Passif" (selectionne pas des objets au clic)
             HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
+            
+            // L'évent courant qui prend en compte les clics et les appuis de touche
             Event cur = Event.current;
             if (cur.type == EventType.MouseDown && cur.button == 0)
             {
+                // Fait un raycast depuis la fenêtre scene
                 Ray ray = HandleUtility.GUIPointToWorldRay(cur.mousePosition);
                 RaycastHit hit = new RaycastHit();
                 if (Physics.Raycast(ray, out hit))
@@ -126,6 +143,7 @@ public class PathfindingEditor : EditorWindow
         GameObject[] nodes = GameObject.FindGameObjectsWithTag("Node");
         foreach (GameObject obj in nodes)
         {
+            // DestroyImmediate c'est comme Destroy dans les MonoBehavior
             DestroyImmediate(obj);
         } 
         GameObject[] edges = GameObject.FindGameObjectsWithTag("Edge");
@@ -150,6 +168,7 @@ public class PathfindingEditor : EditorWindow
             instance.transform.parent = GameObject.Find("Edges").transform;
             instance.GetComponent<EdgeRepresentation>().edge = edge;
         }
+        // Permet de choisir soi-même le gameobject a sélectionner
         Selection.activeGameObject = GameObject.Find("Nodes").transform.parent.gameObject;
     }
 

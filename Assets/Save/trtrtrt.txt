@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<Pathfinding xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Nodes>
+    <Node positionX="-0.839814067" positionY="0.5" positionZ="-17.5226269" nodeId="0" />
+    <Node positionX="2.37925315" positionY="0.5" positionZ="-12.0382919" nodeId="1" />
+    <Node positionX="-3.224306" positionY="0.5" positionZ="-10.96527" nodeId="2" />
+  </Nodes>
+  <Edges>
+    <Edge firstNodeId="0" secondNodeId="2" />
+    <Edge firstNodeId="2" secondNodeId="1" />
+  </Edges>
+</Pathfinding>

@@ -7,6 +7,9 @@ using System.Xml.Serialization;
 [XmlRoot("Node")]
 public class Node
 {
+    // [XmlIgnore]
+
+
     [XmlIgnore]
     public float distance = 9999;
     [XmlIgnore]
