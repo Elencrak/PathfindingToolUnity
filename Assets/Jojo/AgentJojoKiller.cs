@@ -49,7 +49,6 @@ public class AgentJojoKiller : MonoBehaviour {
                     }
                 }
             }
-            Debug.Log("test");
             needToChangeTarget = false;
         }
         currentNavMeshAgent.SetDestination(targetPosition);
@@ -59,7 +58,6 @@ public class AgentJojoKiller : MonoBehaviour {
     {
         if (collision.transform.GetInstanceID() != transform.GetInstanceID() && collision.transform.tag == "Target")
         {
-            Debug.Log("toto");
             targets.Remove(collision.transform);
             needToChangeTarget = true;
             targetPosition = new Vector3(100000, 100000, 100000);
