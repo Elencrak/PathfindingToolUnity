@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 public class AgentM : MonoBehaviour {
 
+	public GameObject cancer;
     GameObject target;
 	GameObject[] tabTarget;
 	float timeToColor = 1;
@@ -71,6 +72,13 @@ public class AgentM : MonoBehaviour {
 		}
 	}
 
+	void Cancer(GameObject hit)
+	{
+		Vector3 pos = hit.transform.position;
+		Destroy (hit);
+		Instantiate (cancer, pos, Quaternion.identity);
+	}
+
 	void RemoveTargetFromTab(GameObject toRemove)
 	{
 		int index = -1;
@@ -97,7 +105,8 @@ public class AgentM : MonoBehaviour {
 	{
 		if (collision.gameObject.tag == "Target") 
 		{
-			this.gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezePositionZ;
+			//Cancer (collision.gameObject);
+			//this.gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezePositionZ;
 			Coloring (collision.gameObject);
 			RemoveTargetFromTab (collision.gameObject);
 			target = FindCloseTarget();
@@ -112,7 +121,7 @@ public class AgentM : MonoBehaviour {
 	{
 		if (collision.gameObject.tag == "Target") 
 		{
-			this.gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
+			//this.gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
 			Coloring (collision.gameObject);
 			RemoveTargetFromTab (collision.gameObject);
 			target = FindCloseTarget();
