@@ -13,7 +13,9 @@ public class AgentPoulpe : MonoBehaviour
     public List<Vector3> road = new List<Vector3>();
 
     private List<GameObject> players;
-    private int score;
+    private Vector3 begin;
+    private float startShoot;
+    private float delayShoot = 1;
 
     public GameObject[] temp;
 
@@ -34,7 +36,6 @@ public class AgentPoulpe : MonoBehaviour
         Debug.Log(PathfindingManager.GetInstance().test);*/
         players = new List<GameObject>();
         temp = GameObject.FindGameObjectsWithTag("Target");
-        score = 0;
         foreach(GameObject pla in temp)
         {
             if(pla != this.gameObject)
@@ -42,6 +43,7 @@ public class AgentPoulpe : MonoBehaviour
                 players.Add(pla);
             }
         }
+        begin = transform.position;
     }
 	
 	// Update is called once per frame
@@ -69,51 +71,71 @@ public class AgentPoulpe : MonoBehaviour
 
     void Update()
     {
-        bool first = false;
-        GameObject nearest = this.gameObject;
-        float dist = 0;
-        float tempdist;
-        //road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position, graph);
-        foreach(GameObject pla in players)
+        bool canHit = false;
+        if (startShoot + delayShoot <= Time.time)
         {
-            tempdist = Mathf.Abs(transform.position.x - pla.transform.position.x) + Mathf.Abs(transform.position.y - pla.transform.position.y) + Mathf.Abs(transform.position.z - pla.transform.position.z);
-            if (!first)
+            foreach (GameObject pla in players)
             {
-                first = true;
-                nearest = pla;
-                dist = tempdist;
-            }
-            else
-            {
-                if(tempdist < dist && pla.transform.position.y <= transform.position.y)
+                RaycastHit hit;
+                Physics.Raycast(transform.position, pla.transform.position - transform.position, out hit);
+                Debug.DrawRay(transform.position, pla.transform.position - transform.position, Color.red);
+                if (hit.collider.tag == "Target")
                 {
-                    dist = tempdist;
-                    nearest = pla;
+                    Shoot(hit.transform.position);
+                    canHit = true;
+                    break;
                 }
             }
         }
-        gameObject.GetComponent<NavMeshAgent>().SetDestination(nearest.transform.position);
+        if(!canHit)
+        {
+            bool first = false;
+            GameObject nearest = this.gameObject;
+            float dist = 0;
+            float tempdist;
+            //road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position, graph);
+            foreach(GameObject pla in players)
+            {
+                tempdist = Mathf.Abs(transform.position.x - pla.transform.position.x) + Mathf.Abs(transform.position.y - pla.transform.position.y) + Mathf.Abs(transform.position.z - pla.transform.position.z);
+                if (!first)
+                {
+                    first = true;
+                    nearest = pla;
+                    dist = tempdist;
+                }
+                else
+                {
+                    if(tempdist < dist && pla.transform.position.y <= transform.position.y)
+                    {
+                        dist = tempdist;
+                        nearest = pla;
+                    }
+                }
+            }
+            gameObject.GetComponent<NavMeshAgent>().SetDestination(nearest.transform.position);
+        }
+        else
+        {
+            gameObject.GetComponent<NavMeshAgent>().SetDestination(transform.position);
+        }
     }
 
     void OnCollisionEnter(Collision collision)
     {
-        foreach(GameObject pla in players)
+        switch(collision.gameObject.tag)
         {
-            if(pla == collision.gameObject)
-            {
-                players.Remove(pla);
-                score++;
-                if(score == 14)
-                {
-                    Victory();
-                }
-                return;
-            }
+            case "Bullet":
+                transform.position = begin;
+                break;
+            case "Target":
+                break;
         }
     }
 
-    void Victory()
+    void Shoot(Vector3 hit)
     {
-        Debug.Log("Poulpe a gagné bande de naze !");
+        startShoot = Time.time;
+        GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position + transform.forward * 2, Quaternion.Euler(this.transform.eulerAngles)) as GameObject;
+        bullet.transform.LookAt(hit);
     }
 }
