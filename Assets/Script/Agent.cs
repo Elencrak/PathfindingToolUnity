@@ -16,7 +16,7 @@ public class Agent : MonoBehaviour {
 
         //Select your pathfinding
         graph = new Pathfinding();
-        graph.Load(PlayerPrefs.GetString("CurrentPath"));
+        graph.Load("Windywyll");
         graph.setNeighbors();
         //
 
