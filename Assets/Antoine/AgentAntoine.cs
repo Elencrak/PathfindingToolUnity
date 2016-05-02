@@ -63,6 +63,7 @@ public class AgentAntoine : MonoBehaviour {
                 GetComponent<MeshRenderer>().material = cube;
                 transform.GetChild(0).gameObject.SetActive(false);
                 transform.GetChild(1).gameObject.SetActive(false);
+                Debug.Log("Antoine a posé ses couilles sur vos nez !");
             }
         }
         else
