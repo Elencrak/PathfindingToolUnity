@@ -65,7 +65,6 @@ public class AgentBenoitV : MonoBehaviour {
             }
         }else
         {
-            Debug.Log("J'ai tout mangé, je peux repartir jouer ?");
             myAgent.Stop();
         }
     }

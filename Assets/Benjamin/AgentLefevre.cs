@@ -19,10 +19,11 @@ public class AgentLefevre : MonoBehaviour
     {
         agent = GetComponent<NavMeshAgent>();
         float dist = Mathf.Infinity;
-        foreach(GameObject obj in GameObject.FindGameObjectsWithTag("Target"))
+        GameObject[] test = GameObject.FindGameObjectsWithTag("Target");
+        foreach (GameObject obj in test)
         {
             if (obj == gameObject)
-                return;
+                continue;
             float tmp = Vector3.Distance(transform.position, obj.transform.position);
             if (tmp < dist)
             {
