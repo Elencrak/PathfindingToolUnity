@@ -87,7 +87,7 @@ public class PierreAgent : MonoBehaviour {
     {
         if (targets.Contains(col.gameObject))
         {
-            col.gameObject.GetComponent<Collider>().isTrigger = true;
+            //col.gameObject.GetComponent<Collider>().isTrigger = true;
             targets.Remove(col.gameObject);
 
             if(targets.Count <= 0)
