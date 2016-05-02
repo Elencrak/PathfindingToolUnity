@@ -98,7 +98,7 @@ public class AgentM : MonoBehaviour {
 		float g = Random.Range (0.0f,1.0f);
 		float b = Random.Range (0.0f,1.0f);
 		Color col = new Color (r,g,b);
-		toColor.GetComponent<MeshRenderer> ().material.color = col;
+		if (toColor.GetComponent<MeshRenderer> ()) {toColor.GetComponent<MeshRenderer> ().material.color = col;}
 	}
 
 	void OnCollisionEnter(Collision collision) 
