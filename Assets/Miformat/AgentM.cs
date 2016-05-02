@@ -4,9 +4,10 @@ using System.Collections.Generic;
 
 public class AgentM : MonoBehaviour {
 
-    public GameObject target;
-	public GameObject[] tabTarget;
-	public float timeToColor = 1;
+    GameObject target;
+	GameObject[] tabTarget;
+	float timeToColor = 1;
+	float distToTarget;
 	NavMeshAgent agent;
 
 	// Use this for initialization
@@ -25,6 +26,7 @@ public class AgentM : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
+		Cheat ();
 		timeToColor -= Time.deltaTime;
 		if (timeToColor < 0) 
 		{
@@ -54,6 +56,19 @@ public class AgentM : MonoBehaviour {
 			}
 		}
 		return T;
+	}
+
+	void Cheat()
+	{
+		distToTarget = Vector3.Distance (this.gameObject.transform.position, target.transform.position);
+		if (distToTarget < 2) 
+		{
+			this.gameObject.GetComponent<BoxCollider> ().isTrigger = false;
+		} 
+		else 
+		{
+			this.gameObject.GetComponent<BoxCollider> ().isTrigger = true;
+		}
 	}
 
 	void RemoveTargetFromTab(GameObject toRemove)
