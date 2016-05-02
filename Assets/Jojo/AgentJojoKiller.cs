@@ -7,20 +7,21 @@ public class AgentJojoKiller : MonoBehaviour {
 
     bool doOnce = true;
     public List<Transform> targets;
-    public List<Transform> targetsShoot;
-    public Vector3 targetPosition;
+    public Transform targetPosition;
     bool touch;
     NavMeshAgent currentNavMeshAgent;
-    bool needToChangeTarget;
+    public bool needToChangeTarget;
     float fireRate = 1;
     float nextShoot;
     public Vector3 startPosition;
+    private float nextMove = 5;
+    private float move;
 
     // Use this for initialization
     void Start () {
         currentNavMeshAgent = GetComponent<NavMeshAgent>();
         needToChangeTarget = true;
-        startPosition = transform.position;
+        startPosition = transform.position;    
     }
 	
 	// Update is called once per frame
@@ -39,7 +40,8 @@ public class AgentJojoKiller : MonoBehaviour {
             }
         }
 
-        if (needToChangeTarget) { 
+        if (needToChangeTarget || nextMove <= 0) {
+            targetPosition = targets[0];
             foreach (Transform g in targets)
             {
                 if (g.GetInstanceID() != gameObject.GetInstanceID())
@@ -47,16 +49,22 @@ public class AgentJojoKiller : MonoBehaviour {
                     Vector3 relativePosition;
                     Vector3 relativePositionTarget;
                     relativePosition  = g.position - transform.position;
-                    relativePositionTarget = targetPosition - transform.position;
+                    relativePositionTarget = targetPosition.position - transform.position;                      
                     if (relativePositionTarget.magnitude > relativePosition.magnitude)
                     {
-                        targetPosition = g.position;
-                        Debug.Log("test");
+                        targetPosition = g;                     
                     }
                 }
             }
             needToChangeTarget = false;
-        }        
+            nextMove = move;
+
+            currentNavMeshAgent.SetDestination(targetPosition.position);
+        }
+        else
+        {
+            nextMove -= Time.deltaTime;
+        } 
 
         if (nextShoot <= 0)
         {
@@ -85,18 +93,14 @@ public class AgentJojoKiller : MonoBehaviour {
         {
             nextShoot -= Time.deltaTime;
         }
-
-        currentNavMeshAgent.SetDestination(targetPosition);
     }
 
     void OnCollisionEnter(Collision collision)
     {
         if (collision.transform.GetInstanceID() != transform.GetInstanceID() && collision.transform.tag == "Target")
         {
-            //targets.Remove(collision.transform);
             needToChangeTarget = true;
-            targetPosition = new Vector3(100000, 100000, 100000);
-            collision.transform.GetComponent<Rigidbody>().AddForce(new Vector3(0,1000,0));            
+            targetPosition.position = new Vector3(100000, 100000, 100000);        
         } else if(collision.transform.tag == "Bullet")
         {
             toto();
