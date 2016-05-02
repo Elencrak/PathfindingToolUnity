@@ -59,12 +59,21 @@ public class AgentBQY : MonoBehaviour {
                         currentDestination = d;
                         return;
                     } else if(Vector3.Distance(tTransform.position, currentDestination.transform.position) <= Vector3.Distance(tTransform.position, d.transform.position)) {
-
                         currentDestination = d;
-                        
                     }
-                    navMeshAgent.SetDestination(currentDestination.transform.position);
-                    return;
+                    Vector3 predictedDestination;
+                    /*On récupère la direction prévue par l'agent*/
+                    if (currentDestination.GetComponent<NavMeshAgent>().hasPath) {
+                        predictedDestination = currentDestination.GetComponent<NavMeshAgent>().path.corners[0];
+                    } else {
+                        predictedDestination = tTransform.position;
+                    }
+                    /*Si la direction prévue est plus proche que la position actuelle.*/
+                    if ((Vector3.Distance(tTransform.position, predictedDestination)) <= Vector3.Distance(tTransform.position, currentDestination.transform.position)) {
+                        navMeshAgent.SetDestination(currentDestination.transform.position);
+                    } else {
+                        navMeshAgent.SetDestination(predictedDestination);
+                    }
                 }
             }
         } else {
