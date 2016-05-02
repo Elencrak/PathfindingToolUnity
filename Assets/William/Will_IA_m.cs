@@ -41,6 +41,8 @@ public class Will_IA_m : MonoBehaviour {
             }
         }
         currentTarget = tempTarget;
+        // Petite aide :)
+        // currentTarget.GetComponent<NavMeshAgent>().SetDestination(transform.position);
         agent.SetDestination(currentTarget.transform.position);
         
     }
