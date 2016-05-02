@@ -6,6 +6,7 @@ public class AgentM : MonoBehaviour {
 
     public GameObject target;
 	public GameObject[] tabTarget;
+	public float timeToColor = 1;
 	NavMeshAgent agent;
 
 	// Use this for initialization
@@ -24,6 +25,12 @@ public class AgentM : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
+		timeToColor -= Time.deltaTime;
+		if (timeToColor < 0) 
+		{
+			timeToColor = 1;
+			Coloring (this.gameObject);
+		}
 		if (target == null) 
 		{
 			Debug.Log ("finish");
@@ -57,19 +64,41 @@ public class AgentM : MonoBehaviour {
 			index++;
 			if (go == toRemove) 
 			{
-				Debug.Log (toRemove.name);
-				Debug.Log (tabTarget [index].name);
-				Debug.Log (index);
 				tabTarget [index] = null;
 			}
 		}
 	}
 
+	void Coloring(GameObject toColor)
+	{
+		float r = Random.Range (0.0f,1.0f);
+		float g = Random.Range (0.0f,1.0f);
+		float b = Random.Range (0.0f,1.0f);
+		Color col = new Color (r,g,b);
+		toColor.GetComponent<MeshRenderer> ().material.color = col;
+	}
+
 	void OnCollisionEnter(Collision collision) 
 	{
-		Debug.Log ("hit");
 		if (collision.gameObject.tag == "Target") 
 		{
+			this.gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotationY;
+			Coloring (collision.gameObject);
+			RemoveTargetFromTab (collision.gameObject);
+			target = FindCloseTarget();
+			if (target != null) 
+			{
+				agent.destination = target.transform.position; 
+			}
+		}
+	}
+
+	void OnCollisionExit(Collision collision) 
+	{
+		if (collision.gameObject.tag == "Target") 
+		{
+			this.gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
+			Coloring (collision.gameObject);
 			RemoveTargetFromTab (collision.gameObject);
 			target = FindCloseTarget();
 			if (target != null) 
