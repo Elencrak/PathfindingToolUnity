@@ -22,6 +22,7 @@ public class Will_IA_m : MonoBehaviour {
 
     void targetUpdate()
     {
+
         if (targets.Count == 0)
         {
             win();
@@ -41,10 +42,18 @@ public class Will_IA_m : MonoBehaviour {
             }
         }
         currentTarget = tempTarget;
+
         // Petite aide :)
-        // currentTarget.GetComponent<NavMeshAgent>().SetDestination(transform.position);
+        if(currentTarget.GetComponent<NavMeshAgent>())
+        currentTarget.GetComponent<NavMeshAgent>().SetDestination(transform.position);
+
         agent.SetDestination(currentTarget.transform.position);
         
+    }
+
+    void fastCheckDistance()
+    {
+
     }
 
     void OnCollisionEnter(Collision col)
