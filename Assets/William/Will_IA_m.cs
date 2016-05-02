@@ -42,13 +42,13 @@ public class Will_IA_m : MonoBehaviour {
             }
         }
         currentTarget = tempTarget;
+        agent.SetDestination(currentTarget.transform.position);
 
         // Petite aide :)
-        if(currentTarget.GetComponent<NavMeshAgent>())
-        currentTarget.GetComponent<NavMeshAgent>().SetDestination(transform.position);
-
-        agent.SetDestination(currentTarget.transform.position);
-        
+        if (currentTarget.GetComponent<NavMeshAgent>())
+        {
+            currentTarget.GetComponent<NavMeshAgent>().SetDestination(transform.position);
+        }
     }
 
     void fastCheckDistance()
