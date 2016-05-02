@@ -135,6 +135,6 @@ public class AgentPoulpe : MonoBehaviour
     {
         startShoot = Time.time;
         transform.LookAt(hit);
-        GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position + transform.forward * 0, Quaternion.Euler(this.transform.eulerAngles)) as GameObject;
+        GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position + transform.forward * 2, Quaternion.Euler(this.transform.eulerAngles)) as GameObject;
     }
 }
