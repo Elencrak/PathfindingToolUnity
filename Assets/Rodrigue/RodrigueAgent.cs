@@ -82,6 +82,7 @@ public class RodrigueAgent : MonoBehaviour {
         navMeshAgent.SetDestination(currentTarget.transform.position);
         if(listOfTarget.Count == 0)
         {
+            Debug.Log("Rodrigue > All");
             navMeshAgent.Stop();
         }
     }

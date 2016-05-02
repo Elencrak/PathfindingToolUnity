@@ -27,7 +27,11 @@ public class AgentM : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
-		if (target != null) {Cheat ();}
+		if (target != null)
+        {
+            Cheat ();
+            agent.destination = target.transform.position;
+        }
 		timeToColor -= Time.deltaTime;
 		if (timeToColor < 0) 
 		{
