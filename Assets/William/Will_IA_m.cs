@@ -12,7 +12,7 @@ public class Will_IA_m : MonoBehaviour {
         targets = new List<GameObject>(GameObject.FindGameObjectsWithTag("Target"));
         targets.Remove(this.gameObject);
         targetUpdate();
-
+        InvokeRepeating("checkDestination", 0.5f, 0.5f);
     }
 	
 	// Update is called once per frame
@@ -43,17 +43,19 @@ public class Will_IA_m : MonoBehaviour {
         }
         currentTarget = tempTarget;
         agent.SetDestination(currentTarget.transform.position);
-
-        // Petite aide :)
-        if (currentTarget.GetComponent<NavMeshAgent>())
-        {
-            currentTarget.GetComponent<NavMeshAgent>().SetDestination(transform.position);
-        }
     }
 
-    void fastCheckDistance()
+    void checkDestination()
     {
+        if (currentTarget != null)
+        {
+            agent.SetDestination(currentTarget.transform.position);
 
+            if (currentTarget.GetComponent<NavMeshAgent>())
+            {
+                currentTarget.GetComponent<NavMeshAgent>().SetDestination(transform.position);
+            }
+        }
     }
 
     void OnCollisionEnter(Collision col)
