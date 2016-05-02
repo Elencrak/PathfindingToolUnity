@@ -10,6 +10,7 @@ public class AgentM : MonoBehaviour {
 	float timeToColor = 1;
 	float distToTarget;
 	NavMeshAgent agent;
+	Vector3 startPos;
 
 	// Use this for initialization
 	void Start () 
