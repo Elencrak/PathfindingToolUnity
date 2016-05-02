@@ -63,6 +63,26 @@ public class JordanAgent : MonoBehaviour {
                 case 3:
                     nav.SetDestination(points[count].position);
                     if (transform.position.x == points[count].position.x && transform.position.z == points[count].position.z)
+                        count++;
+                    break;
+                case 4:
+                    nav.SetDestination(points[count].position);
+                    if (transform.position.x == points[count].position.x && transform.position.z == points[count].position.z)
+                        count++;
+                    break;
+                case 5:
+                    nav.SetDestination(points[count].position);
+                    if (transform.position.x == points[count].position.x && transform.position.z == points[count].position.z)
+                        count++;
+                    break;
+                case 6:
+                    nav.SetDestination(points[count].position);
+                    if (transform.position.x == points[count].position.x && transform.position.z == points[count].position.z)
+                        count++;
+                    break;
+                case 7:
+                    nav.SetDestination(points[count].position);
+                    if (transform.position.x == points[count].position.x && transform.position.z == points[count].position.z)
                         count = 0;
                     break;
             }
