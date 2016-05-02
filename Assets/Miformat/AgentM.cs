@@ -26,7 +26,7 @@ public class AgentM : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
-		Cheat ();
+		if (target != null) {Cheat ();}
 		timeToColor -= Time.deltaTime;
 		if (timeToColor < 0) 
 		{
@@ -97,7 +97,7 @@ public class AgentM : MonoBehaviour {
 	{
 		if (collision.gameObject.tag == "Target") 
 		{
-			this.gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotationY;
+			this.gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezePositionZ;
 			Coloring (collision.gameObject);
 			RemoveTargetFromTab (collision.gameObject);
 			target = FindCloseTarget();
