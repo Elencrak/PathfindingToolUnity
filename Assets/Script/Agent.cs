@@ -13,12 +13,16 @@ public class Agent : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        PathfindingManager.GetInstance().currentPathfinding = new Pathfinding();
-        PathfindingManager.GetInstance().currentPathfinding.Load(PlayerPrefs.GetString("CurrentPath"));
-        PathfindingManager.GetInstance().currentPathfinding.setNeighbors();
-        graph = PathfindingManager.GetInstance().currentPathfinding;
+
+        //Select your pathfinding
+        graph = new Pathfinding();
+        graph.Load(PlayerPrefs.GetString("CurrentPath"));
+        graph.setNeighbors();
+        //
+
+
         target = GameObject.FindGameObjectWithTag("Target");
-        road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position);
+        road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position,graph);
         InvokeRepeating("UpdateRoad", 0.5f, 0.5f);
         Debug.Log(PathfindingManager.GetInstance().test);
     }
@@ -47,6 +51,6 @@ public class Agent : MonoBehaviour {
 
     void UpdateRoad()
     {
-        road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position);
+        road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position, graph);
     }
 }

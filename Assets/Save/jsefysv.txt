@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<Pathfinding xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Nodes>
+    <Node positionX="60.92217" positionY="0.5" positionZ="59.49364" nodeId="0" />
+    <Node positionX="37.3356133" positionY="0.5" positionZ="44.022892" nodeId="3" />
+    <Node positionX="36.32114" positionY="0.5" positionZ="35.6534729" nodeId="4" />
+    <Node positionX="35.560276" positionY="3.4931407" positionZ="27.5376759" nodeId="5" />
+    <Node positionX="36.3211365" positionY="6.64289761" positionZ="20.68996" nodeId="6" />
+    <Node positionX="36.32114" positionY="9.442678" positionZ="14.6031084" nodeId="7" />
+    <Node positionX="37.0819969" positionY="13.64235" positionZ="5.472828" nodeId="8" />
+    <Node positionX="36.8283768" positionY="14.4" positionZ="2.6830225" nodeId="9" />
+    <Node positionX="32.5168571" positionY="14.4" positionZ="2.42940617" nodeId="10" />
+    <Node positionX="25.6691475" positionY="14.4" positionZ="2.42940617" nodeId="11" />
+    <Node positionX="36.986084" positionY="14.3211956" positionZ="3.9969883" nodeId="12" />
+  </Nodes>
+  <Edges>
+    <Edge firstNodeId="3" secondNodeId="4" />
+    <Edge firstNodeId="4" secondNodeId="5" />
+    <Edge firstNodeId="5" secondNodeId="6" />
+    <Edge firstNodeId="6" secondNodeId="7" />
+    <Edge firstNodeId="7" secondNodeId="8" />
+    <Edge firstNodeId="8" secondNodeId="9" />
+    <Edge firstNodeId="9" secondNodeId="10" />
+    <Edge firstNodeId="10" secondNodeId="11" />
+    <Edge firstNodeId="9" secondNodeId="8" />
+    <Edge firstNodeId="12" secondNodeId="8" />
+    <Edge firstNodeId="12" secondNodeId="9" />
+  </Edges>
+</Pathfinding>  <Edge firstNodeId="8" secondNodeId="9" />
+    <Edge firstNodeId="9" secondNodeId="10" />
+    <Edge firstNodeId="10" secondNodeId="11" />
+    <Edge firstNodeId="9" secondNodeId="8" />
+    <Edge firstNodeId="12" secondNodeId="8" />
+    <Edge firstNodeId="12" secondNodeId="9" />
+  </Edges>
+</Pathfinding>

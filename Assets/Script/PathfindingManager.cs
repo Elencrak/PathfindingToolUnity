@@ -53,23 +53,23 @@ public class PathfindingManager  {
         }
     }
 
-    public List<Vector3> GetRoad(Vector3 startPosition, Vector3 destination)
+    public List<Vector3> GetRoad(Vector3 startPosition, Vector3 destination,Pathfinding path)
     {
         List<Vector3> road = new List<Vector3>();
-        Node startNode = FindNearNode(startPosition);
+        Node startNode = FindNearNode(startPosition,path);
         startNode.distance = 0;
-        Node endNode = FindNearNode(destination);
+        Node endNode = FindNearNode(destination,path);
 
 
         return FindPathFromNode(startNode,endNode);
 
     }
 
-    private Node FindNearNode(Vector3 position)
+    private Node FindNearNode(Vector3 position, Pathfinding path)
     {
         Node closestNode = null;
         float distMin = 9999f;
-        foreach(Node node in currentPathfinding.nodes)
+        foreach(Node node in path.nodes)
         {
             float dist = Vector3.Distance(position, node.getPosition());
             if (dist < distMin)

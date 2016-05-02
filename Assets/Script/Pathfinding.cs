@@ -28,7 +28,7 @@ public class Pathfinding {
         string path = Application.dataPath + "/Save/" + name + ".txt";
 
         XmlSerializer serializer = new XmlSerializer(typeof(Pathfinding));
-        FileStream stream = new FileStream(path, FileMode.OpenOrCreate);
+        FileStream stream = new FileStream(path, FileMode.Create);
         serializer.Serialize(stream, this);
         stream.Close();
         Debug.Log("saved at "+path);

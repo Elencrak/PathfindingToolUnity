@@ -81,6 +81,22 @@ public class PathfindingEditor : EditorWindow
                     }
                 }
             }
+            // Remove a node
+            if (cur.type == EventType.MouseDown && cur.button == 1)
+            {
+                // Fait un raycast depuis la fenêtre scene
+                Ray ray = HandleUtility.GUIPointToWorldRay(cur.mousePosition);
+                RaycastHit hit = new RaycastHit();
+                if (Physics.Raycast(ray, out hit))
+                {
+                    if (hit.transform.tag == "Node")
+                    {
+                        RemoveNode(hit.transform.GetComponent<NodeRepresentation>().node);
+                            
+
+                    }
+                }
+            }
             if (cur.type == EventType.MouseUp && cur.button == 0)
             {
             
@@ -153,6 +169,37 @@ public class PathfindingEditor : EditorWindow
         }
     }
 
+    public void RemoveNode(Node node)
+    {
+
+        PathfindingManager.GetInstance().currentPathfinding.nodes.Remove(node);
+        GameObject[] nodes = GameObject.FindGameObjectsWithTag("Node");
+        foreach (GameObject obj in nodes)
+        {
+            // DestroyImmediate c'est comme Destroy dans les MonoBehavior
+            if(obj.GetComponent<NodeRepresentation>().node == node)
+            {
+                DestroyImmediate(obj);
+            }
+        }
+        GameObject[] edges = GameObject.FindGameObjectsWithTag("Edge");
+        foreach (GameObject obj in edges)
+        {
+            Edge edge = obj.GetComponent<EdgeRepresentation>().edge;
+            if(edge.firstNode == node)
+            {
+                PathfindingManager.GetInstance().currentPathfinding.edges.Remove(edge);
+                DestroyImmediate(obj);
+                continue;
+            }
+            if (edge.secondNode == node)
+            {
+                PathfindingManager.GetInstance().currentPathfinding.edges.Remove(edge);
+                DestroyImmediate(obj);
+            }
+        }
+    }
+
     private void RebuildPath()
     {
         Pathfinding current = PathfindingManager.GetInstance().currentPathfinding;
@@ -215,14 +262,12 @@ public class PathfindingEditor : EditorWindow
         RaycastHit hit = new RaycastHit();
         if (Physics.Raycast(ray, out hit))
         {
-            GameObject instance = Instantiate(nodeRepresentation, hit.point, Quaternion.identity) as GameObject;
+            GameObject instance = Instantiate(nodeRepresentation, hit.point+Vector3.up*0.5f, Quaternion.identity) as GameObject;
             instance.GetComponent<NodeRepresentation>().node = new Node(hit.point,PathfindingManager.GetInstance().currentPathfinding.nodes.Count);
             PathfindingManager.GetInstance().currentPathfinding.nodes.Add(instance.GetComponent<NodeRepresentation>().node);
             instance.transform.parent = GameObject.Find("Nodes").transform;
             Selection.activeGameObject = instance.transform.parent.parent.gameObject;
         }
-        PathfindingManager.GetInstance().test++;
-        Debug.Log(PathfindingManager.GetInstance().test);
 
     }
 
