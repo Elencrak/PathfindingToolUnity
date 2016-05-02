@@ -36,7 +36,7 @@ public class AgentM : MonoBehaviour {
 		}
 		if (target == null) 
 		{
-			Debug.Log ("finish");
+			Debug.Log ("MiformatFinish");
 		}
 	}
 
