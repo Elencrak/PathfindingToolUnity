@@ -78,7 +78,6 @@ public class AgentPoulpe : MonoBehaviour
             {
                 RaycastHit hit;
                 Physics.Raycast(transform.position, pla.transform.position - transform.position, out hit);
-                Debug.DrawRay(transform.position, pla.transform.position - transform.position, Color.red);
                 if (hit.collider.tag == "Target")
                 {
                     Shoot(hit.transform.position);
@@ -135,7 +134,7 @@ public class AgentPoulpe : MonoBehaviour
     void Shoot(Vector3 hit)
     {
         startShoot = Time.time;
+        transform.LookAt(hit);
         GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position + transform.forward * 2, Quaternion.Euler(this.transform.eulerAngles)) as GameObject;
-        bullet.transform.LookAt(hit);
     }
 }
