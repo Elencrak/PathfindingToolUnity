@@ -54,7 +54,6 @@ public class AgentJ : MonoBehaviour
             {
                 target = Tr;
                 distanceDefaultTarget = Vector3.Distance(transform.position, target.position);
-                Debug.Log(Tr);
             }
         }
 
@@ -93,6 +92,7 @@ public class AgentJ : MonoBehaviour
         Quaternion rotation = Quaternion.LookRotation(relativePos);
 
         GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position + transform.forward*2.0f, rotation) as GameObject;
+        bullet.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
         Physics.IgnoreCollision(this.GetComponent<BoxCollider>(), bullet.GetComponent<CapsuleCollider>());
     }
 
