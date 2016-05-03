@@ -89,7 +89,8 @@ public class Will_IA_m : MonoBehaviour {
     {
         if (col.collider.tag == "Bullet")
         {
-            transform.position = spawn;
+            agent.Warp(spawn);
+            //transform.position = spawn;
             targetUpdate();
         }
     }
