@@ -64,6 +64,7 @@ public class AgentLefevre : MonoBehaviour
     }
     void Init()
     {
+        Debug.Log("init");
         transform.position = spawn;
         currentCover = 0;
     }
@@ -71,7 +72,6 @@ public class AgentLefevre : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
         /*if (targets.Count > 0)
             agent.SetDestination(target.transform.position);
         else
@@ -120,7 +120,7 @@ public class AgentLefevre : MonoBehaviour
             targets.Remove(col.gameObject);
             UpdateRoad();
         }
-        if (col.transform.tag == "Bullet" && targets.Contains(col.gameObject))
+        if (col.transform.tag == "Bullet")
         {
             Init();
         }
@@ -150,7 +150,8 @@ public class AgentLefevre : MonoBehaviour
             Vector3 relativePos = target.transform.position - coverPoints[coverPointIndex + 1];
             Quaternion rotation = Quaternion.LookRotation(relativePos);
 
-            GameObject instance = Instantiate(bullet, transform.position+ relativePos.normalized, rotation) as GameObject;
+            GameObject instance = Instantiate(bullet, transform.position+ relativePos.normalized*2.0f, rotation) as GameObject;
+            Debug.Log("fire");
         }
         agent.Resume();
         agent.SetDestination(coverPoints[coverPointIndex]);
