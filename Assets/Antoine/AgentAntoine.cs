@@ -139,6 +139,7 @@ public class AgentAntoine : MonoBehaviour
         if (other.gameObject.tag == "Bullet")
         {
             GetComponent<NavMeshAgent>().Warp(SpawnPos);
+            GetComponent<NavMeshAgent>().SetDestination(points[index].transform.position);
         }
     }
 
