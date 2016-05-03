@@ -26,6 +26,7 @@ public class AgentPoulpe : MonoBehaviour
 	// Use this for initialization
 	void Start ()
     {
+        GetComponent<Renderer>().material.color = Color.blue;
         /*
         //Select your pathfinding
         graph = new Pathfinding();
@@ -120,7 +121,7 @@ public class AgentPoulpe : MonoBehaviour
     void Shoot(GameObject hit)
     {
         startShoot = Time.time;
-        transform.LookAt(hit.transform.position + hit.transform.forward * hit.GetComponent<NavMeshAgent>().speed/* * Vector3.Distance(transform.position, hit.transform.position)*/);
+        transform.LookAt(hit.transform.position + hit.transform.forward * (hit.GetComponent<NavMeshAgent>().speed / 40 * Vector3.Distance(transform.position, hit.transform.position)));
         GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position + transform.forward * 2, Quaternion.Euler(this.transform.eulerAngles)) as GameObject;
         bullet.GetComponent<bulletScript>().launcherName = "Poulpe";
     }

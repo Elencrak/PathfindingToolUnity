@@ -15,6 +15,7 @@ public class Poulpe3 : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        GetComponent<Renderer>().material.color = Color.blue;
         begin = transform.position;
         leader = transform.parent.GetChild(0).gameObject;
         bot1 = transform.parent.GetChild(1).gameObject;
@@ -63,7 +64,7 @@ public class Poulpe3 : MonoBehaviour
     void Shoot(GameObject hit)
     {
         startShoot = Time.time;
-        transform.LookAt(hit.transform.position + hit.transform.forward * hit.GetComponent<NavMeshAgent>().speed/* * Vector3.Distance(transform.position, hit.transform.position)*/);
+        transform.LookAt(hit.transform.position + hit.transform.forward * (hit.GetComponent<NavMeshAgent>().speed / 40 * Vector3.Distance(transform.position, hit.transform.position)));
         GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position + transform.forward * 2, Quaternion.Euler(this.transform.eulerAngles)) as GameObject;
         bullet.GetComponent<bulletScript>().launcherName = "Poulpe";
     }
