@@ -11,7 +11,8 @@ public class Will_IA_m : MonoBehaviour {
     GameObject currentTarget;
     NavMeshAgent agent;
     GameObject bullet;
-
+    bool canShoot = false;
+    Vector3 strafeDest;
     void Start () {
         spawn = transform.position;
         agent = GetComponent<NavMeshAgent>();
@@ -30,6 +31,12 @@ public class Will_IA_m : MonoBehaviour {
 
     void move()
     {
+        
+        
+    }
+
+    void targetUpdate()
+    {
         GameObject tempTarget = targets[0];
         Vector3 myPos = transform.position;
         float distance = Vector3.Distance(myPos, targets[0].transform.position);
@@ -44,28 +51,39 @@ public class Will_IA_m : MonoBehaviour {
             }
         }
         currentTarget = tempTarget;
-        agent.SetDestination(currentTarget.transform.position);
         if (distance < range)
         {
-            if (Random.Range(0, 3) > 1)
-            {
-                agent.SetDestination(transform.right * -10);
-            }
-            else
-            {
-                agent.SetDestination(transform.right * 10);
-            }
-            //agent.SetDestination(transform.right * Random.Range(-5, 5));
+            strafe();
         }
-    }
-
-    void targetUpdate()
-    {
-        move();
+        else
+        {
+            agent.SetDestination(currentTarget.transform.position);
+        }    
         
     }
 
-    
+    void strafe()
+    {
+        if (strafeDest != null)
+        {
+            float d = Vector3.Distance(strafeDest, transform.position);
+            if (d < 2 || d > 20)
+            {
+                if (Random.Range(0, 3) > 1)
+                {
+                    strafeDest = transform.right * -10;
+                }
+                else
+                {
+                    strafeDest = transform.right * 10;
+                }
+            }
+            agent.SetDestination(strafeDest);
+            
+        }
+        
+        //agent.SetDestination(transform.right * Random.Range(-5, 5));
+    }
 
     void OnCollisionEnter(Collision col)
     {
