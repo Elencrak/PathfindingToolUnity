@@ -31,7 +31,7 @@ public class AgentBenoitV : MonoBehaviour {
         //FindTarget();
         InvokeRepeating("MoveToTarget", 0.1f, 0.5f);
         InvokeRepeating("FindTarget", 0.1f, 0.1f);
-        InvokeRepeating("SwitchPosition", 0.1f, 0.2f);
+        InvokeRepeating("SwitchPosition", 0.1f, 0.1f);
     }
 
     void FindTargets()
@@ -77,7 +77,6 @@ public class AgentBenoitV : MonoBehaviour {
                 Vector3 direction = targets[i].transform.position - transform.position;
                 RaycastHit _hit;
                 Physics.Raycast(transform.position, direction, out _hit);
-                Debug.DrawRay(transform.position, direction, Color.red, 0.5f);
                 if(_hit.transform.gameObject == targets[i])
                 {
                     currentDistance = Vector3.Distance(transform.position, targets[i].transform.position);
@@ -109,6 +108,7 @@ public class AgentBenoitV : MonoBehaviour {
 
     void Shoot(GameObject _target)
     {
+        transform.LookAt(new Vector3(_target.transform.position.x, transform.position.y, _target.transform.position.z));
        GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position+ transform.forward*2.0f, Quaternion.identity) as GameObject;
 
         bullet.transform.LookAt(_target.transform.position);
