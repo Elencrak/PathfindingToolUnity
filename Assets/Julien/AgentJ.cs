@@ -96,7 +96,7 @@ public class AgentJ : MonoBehaviour
 
     void Death()
     {
-        this.gameObject.transform.position = startPosition;
+        agent.Warp(startPosition);
 
     }
 
