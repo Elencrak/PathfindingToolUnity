@@ -101,17 +101,20 @@ public class AgentBenoitV : MonoBehaviour {
         }
         if (myTargetShoot != null)
         {
-            if(currentCoolDown >= coolDown)
+            RaycastHit _hit;
+            Physics.Raycast(transform.position, transform.position+ myTargetShoot.transform.position, out _hit);
+            if (currentCoolDown >= coolDown)
             {
-                Shoot(myTargetShoot);
-                currentCoolDown = 0;
-            }
-            else
+                    Shoot(myTargetShoot);
+                    currentCoolDown = 0;
+            }else
             {
                 currentCoolDown += 0.1f;
-
             }
-                
+
+            
+
+
         }
 
 
@@ -121,8 +124,10 @@ public class AgentBenoitV : MonoBehaviour {
     {
         transform.LookAt(new Vector3(_target.transform.position.x, transform.position.y, _target.transform.position.z));
        GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position+ transform.forward*2.0f, Quaternion.identity) as GameObject;
-        
-        bullet.transform.LookAt(_target.transform.position+ new Vector3(_target.GetComponent<Rigidbody>().velocity.x, 0f , _target.GetComponent<Rigidbody>().velocity.z)*2.0f);
+        Vector3 _velocity = _target.GetComponent<NavMeshAgent>().velocity;
+        _velocity.Normalize();
+        bullet.transform.LookAt(_target.transform.position + new Vector3(_target.transform.forward.x * _velocity.x, _target.transform.forward.y * _velocity.y, _target.transform.forward.z * _velocity.z)*3.0f);
+        Debug.DrawLine(transform.position, _target.transform.position + new Vector3(_target.transform.forward.x* _velocity.x, _target.transform.forward.y * _velocity.y, _target.transform.forward.z * _velocity.z)*3.0f, Color.red, 0.5f);
     }
     /*void ChangeTarget()
     {
