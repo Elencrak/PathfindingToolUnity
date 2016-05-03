@@ -72,18 +72,18 @@ public class AgentPoulpe : MonoBehaviour
     void Update()
     {
         bool canHit = false;
-        if (startShoot + delayShoot <= Time.time)
+        foreach (GameObject pla in players)
         {
-            foreach (GameObject pla in players)
+            RaycastHit hit;
+            Physics.Raycast(transform.position, pla.transform.position - transform.position, out hit);
+            if (hit.collider.tag == "Target")
             {
-                RaycastHit hit;
-                Physics.Raycast(transform.position, pla.transform.position - transform.position, out hit);
-                if (hit.collider.tag == "Target")
+                if(startShoot + delayShoot <= Time.time)
                 {
                     Shoot(hit.transform.position);
-                    canHit = true;
-                    break;
                 }
+                canHit = true;
+                break;
             }
         }
         if(!canHit)
@@ -136,5 +136,6 @@ public class AgentPoulpe : MonoBehaviour
         startShoot = Time.time;
         transform.LookAt(hit);
         GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position + transform.forward * 2, Quaternion.Euler(this.transform.eulerAngles)) as GameObject;
+        bullet.GetComponent<bulletScript>().launcherName = "Poulpe";
     }
 }
