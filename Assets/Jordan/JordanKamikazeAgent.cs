@@ -20,10 +20,11 @@ public class JordanKamikazeAgent : MonoBehaviour {
         if (col.gameObject.tag == "Bullet")
         {
             if (col.gameObject.GetComponent<bulletScript>().launcherName != "Pelolance")
+            {
+                target = col.gameObject.transform;
+                fire();
                 this.transform.position = initPos;
-
-            target = col.gameObject.transform;
-            fire();
+            }
         }
     }
 
