@@ -11,7 +11,6 @@ public class AgentRobinMathieu : MonoBehaviour
     public GameObject nearestTarget;
     public BoxCollider nearTargetCollider;
     public List<GameObject> targets;
-    public List<GameObject> hitTargets;
     public NavMeshAgent agent;
     bool hasWin = false;
 
@@ -29,7 +28,6 @@ public class AgentRobinMathieu : MonoBehaviour
         parentNumber.teamName = playerID;
         startPoint = transform.position;
         targets = new List<GameObject>(GameObject.FindGameObjectsWithTag("Target"));
-        hitTargets = new List<GameObject>();
         agent = GetComponent<NavMeshAgent>();
 
         for (int i = targets.Count - 1; i >= 0; --i)
@@ -39,16 +37,12 @@ public class AgentRobinMathieu : MonoBehaviour
                 targets.Remove(targets[i]);
             }
         }
-        InvokeRepeating("Gagne", 0.0f, 1.5f);
+        //InvokeRepeating("Gagne", 0.0f, 1.5f);
     }
 
     void Gagne()
     {
         bool isWin = true;
-        foreach (GameObject target in targets)
-        {
-            isWin = isWin && hitTargets.Contains(target);
-        }
         if (isWin && !hasWin)
         {
             hasWin = true;
@@ -65,10 +59,7 @@ public class AgentRobinMathieu : MonoBehaviour
         {
             if (target == null || (target && Vector3.Distance(target.transform.position, transform.position) > Vector3.Distance(targets[i].transform.position, transform.position)))
             {
-                if (!hitTargets.Contains(targets[i]))
-                {
-                    target = targets[i];
-                }
+                target = targets[i];
             }
         }
         if (target)
@@ -90,11 +81,6 @@ public class AgentRobinMathieu : MonoBehaviour
 
     void OnCollisionEnter(Collision coll)
     {
-        if (coll.gameObject.CompareTag("Target") && coll.gameObject.name != "Robin")
-        {
-            //StartCoroutine(FreezeEnemy(coll.gameObject));
-            hitTargets.Add(coll.gameObject);
-        }
         if (coll.gameObject.CompareTag("Bullet") && !coll.gameObject.GetComponent<bulletScript>().launcherName.Equals(playerID))
         {
             Restart();
