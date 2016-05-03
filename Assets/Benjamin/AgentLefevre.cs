@@ -64,7 +64,7 @@ public class AgentLefevre : MonoBehaviour
     }
     void Init()
     {
-        transform.position = spawn;
+        agent.Warp(spawn);
         currentCover = 0;
     }
 
