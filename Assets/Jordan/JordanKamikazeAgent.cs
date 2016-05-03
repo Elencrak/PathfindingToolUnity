@@ -23,7 +23,7 @@ public class JordanKamikazeAgent : MonoBehaviour {
             {
                 target = col.gameObject.transform;
                 fire();
-                this.transform.position = initPos;
+                nav.Warp(initPos);
             }
         }
     }
