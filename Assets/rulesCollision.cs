@@ -21,6 +21,10 @@ public class rulesCollision : MonoBehaviour {
         {
             entity.Hit(1);
             rules.getInstance().score(gameObject, collision.gameObject);
+            if(entity)
+            {
+                entity.Hit(1);
+            }
         }
     }
 }

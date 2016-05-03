@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class AgentDoubleRobin : MonoBehaviour
+public class AgentDoubleRobin : Entity
 {
     GameObject Target;
     BoxCollider TargetCollider;
@@ -17,7 +17,7 @@ public class AgentDoubleRobin : MonoBehaviour
 
     AgentSimpleRobin tankUnit;
 
-    void Start()
+    protected override void Start()
     {
         bullets = new List<GameObject>();
         if (prefabBullet == null)
@@ -30,6 +30,7 @@ public class AgentDoubleRobin : MonoBehaviour
 
         InvokeRepeating("UpdateTarget", 0.0f, 0.5f);
         InvokeRepeating("UpdateRoad", 0.0f, 0.8f);
+        base.Start();
     }
 
     void UpdateTarget()
