@@ -96,6 +96,7 @@ public class AgentJ : MonoBehaviour
 
     void Death()
     {
+        Debug.Log("mort");
         agent.Warp(startPosition);
 
     }
