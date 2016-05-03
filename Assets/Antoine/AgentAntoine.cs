@@ -29,6 +29,10 @@ public class AgentAntoine : MonoBehaviour
     public GameObject spawnBullet;
     public GameObject spawnBulletRotation;
 
+    public AnimationCurve curve;
+
+    private float offset = 0;
+
     // Use this for initialization
     void Start()
     {
@@ -56,9 +60,13 @@ public class AgentAntoine : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        offset = 7 * Mathf.Sin(Time.time * 5);
+
         if (canShoot && target != null)
         {
+            spawnBulletRotation.transform.LookAt(target.transform.position);
             GameObject go = Instantiate(bullet, spawnBullet.transform.position, Quaternion.identity) as GameObject;
+            go.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
             go.transform.LookAt(target.transform.position);
             canShoot = false;
         }
@@ -70,6 +78,8 @@ public class AgentAntoine : MonoBehaviour
                 lastShoot = 0.0f;
                 canShoot = true;
             }
+            if(!target)
+                spawnBulletRotation.transform.LookAt(PathPoint);
         }
 
 
@@ -83,6 +93,7 @@ public class AgentAntoine : MonoBehaviour
                 PathPoint = points[index].transform.position;
             }
             GetComponent<NavMeshAgent>().SetDestination(PathPoint);
+            transform.position = transform.position + /*new Vector3(0f, 0f, offset * 0.02f);*/ transform.right * offset * 0.02f;
         }
         else
         {
