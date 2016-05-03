@@ -15,7 +15,7 @@ public class rulesCollision : MonoBehaviour {
 
     void OnCollisionEnter(Collision collision)
     {
-        if (collision.transform.tag == "Target")
+        if (collision.transform.tag == "Bullet")
         {
             rules.getInstance().score(gameObject, collision.gameObject);
         }
