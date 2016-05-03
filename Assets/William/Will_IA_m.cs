@@ -8,7 +8,7 @@ public class Will_IA_m : MonoBehaviour {
     float range = 20;
     Vector3 spawn;
     Rigidbody rigid;
-    List<GameObject> targets;
+    public List<GameObject> targets;
     GameObject currentTarget;
     NavMeshAgent agent;
     GameObject bullet;
@@ -20,8 +20,10 @@ public class Will_IA_m : MonoBehaviour {
         rigid = GetComponent<Rigidbody>();
         spawn = transform.position;
         agent = GetComponent<NavMeshAgent>();
-        targets = new List<GameObject>(GameObject.FindGameObjectsWithTag("Target"));
-        targets.Remove(this.gameObject);
+
+        targets = transform.parent.GetComponent<TeamWillScript>().ennemis;
+        //targets = new List<GameObject>(GameObject.FindGameObjectsWithTag("Target"));
+        //targets.Remove(this.gameObject);
         bullet = new GameObject();
         bullet = (GameObject) Resources.Load("Bullet");
         InvokeRepeating("targetUpdate", 0, 0.3f);
@@ -68,25 +70,27 @@ public class Will_IA_m : MonoBehaviour {
         isStrafing = true;
         Vector3 pos = transform.position;
         strafeDest = transform.position+(transform.right * 5);
-        float cmptTime = 0;
         agent.SetDestination(strafeDest);
-        while (Vector3.Distance(strafeDest, transform.position) > 1 &&(cmptTime < 2))
-        {
+        yield return new WaitForSeconds(0.5f);
+        //isStrafing = false;
 
-            cmptTime +=Time.deltaTime;
-            yield return 5;
-        }
-        agent.SetDestination(pos);
-        cmptTime = 0;
-        while (Vector3.Distance(pos, transform.position) > 1 && cmptTime < 2)
-        {
-            cmptTime += Time.deltaTime;
-            yield return 5;
-        }
 
-        //yield return new WaitForSeconds(1f);
+        //float cmptTime = 0;
+        //while (Vector3.Distance(strafeDest, transform.position) > 1 &&(cmptTime < 2))
+        //{
+
+        //    cmptTime +=Time.deltaTime;
+        //   yield return 5;
+        //}
+        //agent.SetDestination(pos);
+        //cmptTime = 0;
+        //while (Vector3.Distance(pos, transform.position) > 1 && cmptTime < 2)
+        //{
+        //    cmptTime += Time.deltaTime;
+        //    yield return 5;
+        //}
     }
-    
+
 
     void strafe()
     {
@@ -152,10 +156,11 @@ public class Will_IA_m : MonoBehaviour {
 
     void shootBullet(GameObject targ)
     {
+        lastShoot = Time.time;
         GameObject spawnedBullet = (GameObject)Instantiate(bullet, transform.position, transform.rotation);
         spawnedBullet.transform.LookAt(targ.transform.position + (targ.GetComponent<NavMeshAgent>().velocity.normalized));
         spawnedBullet.GetComponent<bulletScript>().launcherName = "TeamWill";
         Physics.IgnoreCollision(GetComponent<BoxCollider>(), spawnedBullet.GetComponent<CapsuleCollider>());
-        lastShoot = Time.time;
+        
     }
 }
