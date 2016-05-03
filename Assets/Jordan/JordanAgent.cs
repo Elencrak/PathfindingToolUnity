@@ -4,29 +4,32 @@ using System.Collections.Generic;
 
 public class JordanAgent : MonoBehaviour {
 
+    private GameObject bullet;
     private List<GameObject> enemies;
+    private Vector3 initPos;
     public List<Transform> points;
     private int count;
     private bool touchedEveryone = false;
     private NavMeshAgent nav;
+    private float startFireCoolDown;
+    private float fireCoolDown = 1.0f;
 
-    void OnEnterCollision(Collision col)
+    void OnCollisionEnter(Collision col)
     {
-        if(col.gameObject.tag == "Target")
+        if(col.gameObject.tag == "Bullet")
         {
-            if(enemies.Contains(col.gameObject))
-            {
-                AddPoint();
-                enemies.Remove(col.gameObject);
-
-                if (enemies.Count == 0)
-                    touchedEveryone = true;
-            }
+            if (col.gameObject.GetComponent<bulletScript>().launcherName != "Pelolance")
+                nav.Warp(initPos);
         }
     }
 
 	// Use this for initialization
 	void Start () {
+
+        bullet = Resources.Load("Bullet") as GameObject;
+
+        initPos = this.transform.position;
+
         GameObject[] temp = GameObject.FindGameObjectsWithTag("Target");
 
         enemies = new List<GameObject>(temp);
@@ -41,56 +44,21 @@ public class JordanAgent : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-        if (!touchedEveryone)
+        if (fireCoolDown + startFireCoolDown < Time.time)
+            fire();
+
+        if(transform.position.x != points[0].position.x && transform.position.z != points[0].position.z)
         {
-            switch (count)
-            {
-                case 0:
-                    nav.SetDestination(points[count].position);
-                    if (transform.position.x == points[count].position.x && transform.position.z == points[count].position.z)
-                        count++;
-                    break;
-                case 1:
-                    nav.SetDestination(points[count].position);
-                    if (transform.position.x == points[count].position.x && transform.position.z == points[count].position.z)
-                        count++;
-                    break;
-                case 2:
-                    nav.SetDestination(points[count].position);
-                    if (transform.position.x == points[count].position.x && transform.position.z == points[count].position.z)
-                        count++;
-                    break;
-                case 3:
-                    nav.SetDestination(points[count].position);
-                    if (transform.position.x == points[count].position.x && transform.position.z == points[count].position.z)
-                        count++;
-                    break;
-                case 4:
-                    nav.SetDestination(points[count].position);
-                    if (transform.position.x == points[count].position.x && transform.position.z == points[count].position.z)
-                        count++;
-                    break;
-                case 5:
-                    nav.SetDestination(points[count].position);
-                    if (transform.position.x == points[count].position.x && transform.position.z == points[count].position.z)
-                        count++;
-                    break;
-                case 6:
-                    nav.SetDestination(points[count].position);
-                    if (transform.position.x == points[count].position.x && transform.position.z == points[count].position.z)
-                        count++;
-                    break;
-                case 7:
-                    nav.SetDestination(points[count].position);
-                    if (transform.position.x == points[count].position.x && transform.position.z == points[count].position.z)
-                        count = 0;
-                    break;
-            }
+            nav.SetDestination(points[0].position);
         }
 	}
 
-    void AddPoint()
+    void fire()
     {
-
+        startFireCoolDown = Time.time;
+        Object temp = Instantiate(bullet);
+        ((GameObject)temp).transform.position = this.transform.position - this.transform.forward;
+        ((GameObject)temp).transform.LookAt(points[1].transform);
+        ((GameObject)temp).GetComponent<bulletScript>().launcherName = "Pelolance";
     }
 }

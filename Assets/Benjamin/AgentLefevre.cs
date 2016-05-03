@@ -12,7 +12,12 @@ public class AgentLefevre : MonoBehaviour
     private Pathfinding graph;
     public List<Vector3> road = new List<Vector3>();
     public List<GameObject> targets = new List<GameObject>();
+    Vector3[] coverPoints;
+    Vector3 spawn;
+    int currentCover;
     NavMeshAgent agent;
+    public GameObject bullet;
+    float fireRate;
 
     // Use this for initialization
     void Start()
@@ -31,7 +36,17 @@ public class AgentLefevre : MonoBehaviour
                 target = obj;
             }
             targets.Add(obj);
+            
         }
+        spawn = transform.position;
+        coverPoints = new Vector3[6];
+        coverPoints[0] = transform.GetChild(0).position;
+        coverPoints[1] = transform.GetChild(1).position;
+        coverPoints[2] = transform.GetChild(2).position;
+        coverPoints[3] = transform.GetChild(3).position;
+        coverPoints[4] = transform.GetChild(4).position;
+        coverPoints[5] = transform.GetChild(5).position;
+        currentCover = 0;
 
         /*
         //Select your pathfinding
@@ -46,21 +61,25 @@ public class AgentLefevre : MonoBehaviour
         Debug.Log(PathfindingManager.GetInstance().test);
 
         */
-        InvokeRepeating("UpdateRoad", 0.5f, 0.5f);
+        InvokeRepeating("Fire", 0f, 1f);
 
+    }
+    void Init()
+    {
+        agent.Warp(spawn);
+        currentCover = 0;
     }
 
     // Update is called once per frame
     void Update()
     {
-
-        if (targets.Count > 0)
+        /*if (targets.Count > 0)
             agent.SetDestination(target.transform.position);
         else
         {
             Debug.Log("Benjamin à fini !");
             Destroy(this);
-        }
+        }*/
         /*
         if (road.Count > 0)
         {
@@ -102,5 +121,75 @@ public class AgentLefevre : MonoBehaviour
             targets.Remove(col.gameObject);
             UpdateRoad();
         }
+        if (col.transform.tag == "Bullet")
+        {
+            Init();
+        }
+    }
+
+    public void Fire()
+    {
+        StartCoroutine(fireRoutine(currentCover));
+    }
+
+    public IEnumerator fireRoutine(int coverPointIndex)
+    {
+        agent.Stop();
+        target = GetTarget(coverPointIndex);
+        if (target == null)
+        {
+
+            ChangeCover();
+            yield return null;
+        }
+        else
+        {
+            Vector3 startPos = target.transform.position;
+            agent.Resume();
+            agent.SetDestination(coverPoints[coverPointIndex + 1]);
+            yield return new WaitForSeconds(0.5f);
+            Vector3 direction = target.transform.position-startPos;
+            agent.Stop();
+            Vector3 relativePos = (target.transform.position+ direction) - coverPoints[coverPointIndex + 1];
+            Quaternion rotation = Quaternion.LookRotation(relativePos);
+
+            GameObject instance = Instantiate(bullet, transform.position+ relativePos.normalized*2.0f, rotation) as GameObject;
+            instance.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
+        }
+        agent.Resume();
+        agent.SetDestination(coverPoints[coverPointIndex]);
+        yield return null;
+    }
+
+    GameObject GetTarget(int coverPointIndex)
+    {
+        float dist = Mathf.Infinity;
+        GameObject target = null;
+        foreach(GameObject obj in targets)
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(coverPoints[coverPointIndex + 1], obj.transform.position - coverPoints[coverPointIndex + 1], out hit))
+            {
+                if (hit.transform.gameObject == obj)
+                {
+                    float tmp = Vector3.Distance(transform.position, obj.transform.position);
+                    if(tmp < dist)
+                    {
+                        dist = tmp;
+                        target = obj;
+                    }
+                }
+            }
+        }
+        return target;
+        
+
+    }
+    void ChangeCover()
+    {
+        agent.Resume();
+        currentCover+=2;
+        currentCover %= coverPoints.Length;
+        agent.SetDestination(coverPoints[currentCover]);
     }
 }
