@@ -15,6 +15,12 @@ public class JordanAgentNPlanque : MonoBehaviour {
     private float startFireCoolDown;
     private float fireCoolDown = 1.0f;
 
+    void OnTriggerEnter(Collider col)
+    {
+        if (col.tag == "Target" && col.transform.parent.name != "Pelolance")
+            target = col.transform;
+    }
+
     void OnCollisionEnter(Collision col)
     {
         if (col.gameObject.tag == "Bullet")

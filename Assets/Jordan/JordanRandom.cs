@@ -20,6 +20,9 @@ public class JordanRandom : MonoBehaviour {
     {
         if(col.tag == "Bullet" && col.gameObject.GetComponent<bulletScript>().launcherName != "Pelolance")
         {
+            if (fireCoolDown + startFireCoolDown < Time.time)
+                fireDirected(col.transform);
+
             randomTarget();
         }
 
@@ -89,6 +92,15 @@ public class JordanRandom : MonoBehaviour {
         Object temp = Instantiate(bullet);
         ((GameObject)temp).transform.position = this.transform.position + this.transform.forward;
         ((GameObject)temp).transform.LookAt(target.position + target.forward * 3);
+        ((GameObject)temp).GetComponent<bulletScript>().launcherName = "Pelolance";
+    }
+
+    void fireDirected(Transform tar)
+    {
+        startFireCoolDown = Time.time;
+        Object temp = Instantiate(bullet);
+        ((GameObject)temp).transform.position = this.transform.position + this.transform.forward;
+        ((GameObject)temp).transform.LookAt(tar.position - tar.forward);
         ((GameObject)temp).GetComponent<bulletScript>().launcherName = "Pelolance";
     }
 }
