@@ -14,11 +14,12 @@ public class AgentBenoitV : MonoBehaviour {
     public Transform[] points;
     public List<Vector3> pointOfInterest;
     int index;
+    string myTeamName;
 
     float coolDown = 1.0f;
     public float currentCoolDown;
+    
 
-	// Use this for initialization
 	void Start () {
         index = 0;
         coolDown = 1.0f;
@@ -26,6 +27,7 @@ public class AgentBenoitV : MonoBehaviour {
         spawnPosition = transform.position;
         distanceMin = Mathf.Infinity;
         myAgent = GetComponent<NavMeshAgent>();
+        myTeamName = transform.parent.GetComponent<TeamNumber>().teamName;
 
         pointOfInterest = new List<Vector3>();
         for(int i = 0; i < points.Length; ++i)
@@ -35,7 +37,7 @@ public class AgentBenoitV : MonoBehaviour {
         myTarget = pointOfInterest[0];
 
         FindTargets();
-        InvokeRepeating("MoveToTarget", 0.1f, 0.5f);
+        InvokeRepeating("MoveToTarget", 0.1f, 0.1f);
         InvokeRepeating("FindTarget", 0.1f, 0.1f);
         InvokeRepeating("SwitchPosition", 0.1f, 0.1f);
     }
@@ -44,9 +46,10 @@ public class AgentBenoitV : MonoBehaviour {
     {
         GameObject[] tempTargets;
         tempTargets = GameObject.FindGameObjectsWithTag("Target");
+        Debug.Log(myTeamName);
         foreach (GameObject target in tempTargets)
         {
-            if (target.gameObject != this.gameObject)
+            if (target.gameObject != this.gameObject && !target.name.Contains("BenoitV")/* && target.transform.parent.GetComponent<TeamNumber>().teamName != myTeamName*/)
             {
                 targets.Add(target);
             }
@@ -63,7 +66,9 @@ public class AgentBenoitV : MonoBehaviour {
         }*/
         if(otherCollider.gameObject.tag == "Bullet")
         {
-            transform.position = spawnPosition;
+            Debug.Log("test");
+            myAgent.Warp(spawnPosition);
+            //transform.position = spawnPosition;
             myTargetShoot = null;
         }
     }
@@ -96,17 +101,20 @@ public class AgentBenoitV : MonoBehaviour {
         }
         if (myTargetShoot != null)
         {
-            if(currentCoolDown >= coolDown)
+            RaycastHit _hit;
+            Physics.Raycast(transform.position, transform.position+ myTargetShoot.transform.position, out _hit);
+            if (currentCoolDown >= coolDown)
             {
-                Shoot(myTargetShoot);
-                currentCoolDown = 0;
+                    Shoot(myTargetShoot);
+                    currentCoolDown = 0;
+            }else
+            {
+                currentCoolDown += 0.1f;
             }
-            else
-            {
-                currentCoolDown += Time.deltaTime;
 
-            }
-                
+            
+
+
         }
 
 
@@ -116,8 +124,10 @@ public class AgentBenoitV : MonoBehaviour {
     {
         transform.LookAt(new Vector3(_target.transform.position.x, transform.position.y, _target.transform.position.z));
        GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position+ transform.forward*2.0f, Quaternion.identity) as GameObject;
-
-        bullet.transform.LookAt(_target.transform.position);
+        Vector3 _velocity = _target.GetComponent<NavMeshAgent>().velocity;
+        _velocity.Normalize();
+        bullet.transform.LookAt(_target.transform.position + _target.transform.position + _velocity * _target.GetComponent<NavMeshAgent>().speed);
+        Debug.DrawLine(transform.position, _target.transform.position + _velocity * _target.GetComponent<NavMeshAgent>().speed, Color.red, 0.5f);
     }
     /*void ChangeTarget()
     {

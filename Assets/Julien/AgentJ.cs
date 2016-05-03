@@ -80,7 +80,6 @@ public class AgentJ : MonoBehaviour
         if (col.gameObject.tag == "Bullet")
         {
             Death();
-
         }
 
     }
@@ -92,15 +91,19 @@ public class AgentJ : MonoBehaviour
         Quaternion rotation = Quaternion.LookRotation(relativePos);
 
         GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position + transform.forward*2.0f, rotation) as GameObject;
+        Physics.IgnoreCollision(this.GetComponent<BoxCollider>(), bullet.GetComponent<CapsuleCollider>());
     }
 
     void Death()
     {
         Debug.Log("mort");
         agent.Warp(startPosition);
-
     }
 
+    void DodgeMovement()
+    {
+
+    }
 }
 
 
