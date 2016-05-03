@@ -4,12 +4,12 @@ using System.Collections.Generic;
 
 public class TeamWillScript : MonoBehaviour {
 
-    List<Will_IA_m> members;
+    List<Will> members;
     public List<GameObject> ennemis;
 
     // Use this for initialization
     void Awake () {
-        members = new List<Will_IA_m>(GetComponentsInChildren<Will_IA_m>());
+        members = new List<Will>(GetComponentsInChildren<Will>());
         ennemis = new List<GameObject>(GameObject.FindGameObjectsWithTag("Target"));
         ennemis.Remove(members[0].gameObject);
         if (members.Count > 1)
