@@ -49,11 +49,19 @@ public class JordanAgentNPlanque : MonoBehaviour {
     void Update()
     {
         RaycastHit hit;
-        Physics.Raycast(transform.position, points[1].position - transform.position, out hit, 10000.0f);
+
+        if(target == null)
+            Physics.Raycast(transform.position, points[1].position - transform.position, out hit, 10000.0f);
+        else
+            Physics.Raycast(transform.position, target.position - transform.position, out hit, 10000.0f);
+
         if (hit.collider.tag == "Target" && hit.collider.transform.parent.name != "Pelolance")
         {
             target = hit.collider.gameObject.transform;
         }
+
+        if (target != null && hit.collider.tag != "Target")
+            target = null;
 
         if (fireCoolDown + startFireCoolDown < Time.time && target != null)
             fire();
