@@ -15,7 +15,7 @@ public class RodrigueAgent : MonoBehaviour {
 
     public GameObject[] interestPoints;
 
-
+    public List<GameObject> listOfBullets = new List<GameObject>();
     public float rateOfFire;
 
     public bool canShoot;
@@ -30,7 +30,11 @@ public class RodrigueAgent : MonoBehaviour {
         {
             if(temp != this.gameObject)
             {
-                listOfTarget.Add(temp);
+                //if(temp.transform.parent.GetComponent<TeamNumber>().teamName != "RektByRodrigue")
+                //{
+                    listOfTarget.Add(temp);
+                //}
+                
             }
         }
         //InvokeRepeating("GetTarget", 0.5f, 0.5f);
@@ -45,6 +49,29 @@ public class RodrigueAgent : MonoBehaviour {
         InvokeRepeating("FindTarget", 0.1f, 0.1f);
     }
 	
+    void OnTriggerEnter(Collider parOther)
+    {
+        if(parOther.tag == "Bullet" && parOther.GetComponent<bulletScript>().launcherName !="RektByRodrigue")
+        {
+            listOfBullets.Add(parOther.gameObject);
+            Vector3 bulletForward = parOther.transform.forward;
+            //RaycastHit hit;
+            //if(Physics.Raycast(parOther.transform.position, bulletForward, out hit, 100))
+            //{
+
+            //}
+        }
+    }
+        
+
+    void OnTriggerExit(Collider parOther)
+    {
+        if (parOther.tag == "Bullet" && parOther.GetComponent<bulletScript>().launcherName != "RektByRodrigue")
+        {
+            listOfBullets.Remove(parOther.gameObject);
+        }
+    }
+
 	// Update is called once per frame
 	void Update () {
         if (Vector3.Distance(transform.position, interestPoints[0].transform.position) < 1)
@@ -93,6 +120,7 @@ public class RodrigueAgent : MonoBehaviour {
                     {
                         transform.LookAt(player.transform);
                         currentTarget = player;
+                        
                     }
                     if (canShoot)
                     {
@@ -108,7 +136,8 @@ public class RodrigueAgent : MonoBehaviour {
         canShoot = false;
         GameObject bullets = Instantiate(Resources.Load("Bullet"), transform.position + transform.forward*2.0f + new Vector3(0, 1.5f, 0), Quaternion.identity) as GameObject;
         Physics.IgnoreCollision(this.GetComponent<BoxCollider>(), bullets.GetComponent<CapsuleCollider>());
-        bullets.transform.LookAt(target.transform);
+
+        bullets.transform.LookAt(target.transform.position);
         bullets.GetComponent<bulletScript>().launcherName = teamName;
         yield return new WaitForSeconds(rateOfFire);
         canShoot = true;
