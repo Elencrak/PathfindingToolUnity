@@ -2,7 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class JordanAgentNPlanque : MonoBehaviour {
+public class JordanRandom : MonoBehaviour {
+
 
     private GameObject bullet;
     private List<GameObject> enemies;
@@ -17,6 +18,14 @@ public class JordanAgentNPlanque : MonoBehaviour {
 
     void OnTriggerEnter(Collider col)
     {
+        if(col.tag == "Bullet" && col.gameObject.GetComponent<bulletScript>().launcherName != "Pelolance")
+        {
+            if (fireCoolDown + startFireCoolDown < Time.time)
+                fireDirected(col.transform);
+
+            randomTarget();
+        }
+
         if (col.tag == "Target" && col.transform.parent.name != "Pelolance")
             target = col.transform;
     }
@@ -26,6 +35,7 @@ public class JordanAgentNPlanque : MonoBehaviour {
         if (col.gameObject.tag == "Bullet")
         {
                 nav.Warp(initPos);
+                randomTarget();
         }
     }
 
@@ -42,48 +52,55 @@ public class JordanAgentNPlanque : MonoBehaviour {
         enemies = new List<GameObject>(temp);
 
         enemies.Remove(gameObject);
+        GameObject tempGO = GameObject.Find("VieuxPlanqueAgent");
+        enemies.Remove(tempGO);
+        tempGO = GameObject.Find("NouveauPlanqueAgent");
+        enemies.Remove(tempGO);
 
         count = 0;
 
         nav = gameObject.GetComponent<NavMeshAgent>();
 
         target = null;
+
+        randomTarget();
     }
 
     // Update is called once per frame
     void Update()
     {
         RaycastHit hit;
+        Physics.Raycast(transform.position, target.position - transform.position, out hit, 10000.0f);
 
-        if(target == null)
-            Physics.Raycast(transform.position, points[1].position - transform.position, out hit, 10000.0f);
-        else
-            Physics.Raycast(transform.position, target.position - transform.position, out hit, 10000.0f);
-
-        if (hit.collider.tag == "Target" && hit.collider.transform.parent.name != "Pelolance")
-        {
-            target = hit.collider.gameObject.transform;
-        }
-
-        if (target != null && hit.collider.tag != "Target")
-            target = null;
-
-        if (fireCoolDown + startFireCoolDown < Time.time && target != null)
+        if (fireCoolDown + startFireCoolDown < Time.time && hit.collider.tag == "Target")
             fire();
 
-        if (transform.position.x != points[0].position.x && transform.position.z != points[0].position.z)
+        if (transform.position != target.position)
         {
-            nav.SetDestination(points[0].position);
+            nav.SetDestination(target.position);
         }
+    }
+
+    void randomTarget()
+    {
+        target = enemies[Random.Range(0, enemies.Count)].transform;
     }
 
     void fire()
     {
         startFireCoolDown = Time.time;
         Object temp = Instantiate(bullet);
-        ((GameObject)temp).transform.position = this.transform.position - this.transform.forward;
+        ((GameObject)temp).transform.position = this.transform.position + this.transform.forward;
         ((GameObject)temp).transform.LookAt(target.position + target.forward * 3);
         ((GameObject)temp).GetComponent<bulletScript>().launcherName = "Pelolance";
     }
 
+    void fireDirected(Transform tar)
+    {
+        startFireCoolDown = Time.time;
+        Object temp = Instantiate(bullet);
+        ((GameObject)temp).transform.position = this.transform.position + this.transform.forward;
+        ((GameObject)temp).transform.LookAt(tar.position - tar.forward);
+        ((GameObject)temp).GetComponent<bulletScript>().launcherName = "Pelolance";
+    }
 }
