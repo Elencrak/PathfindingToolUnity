@@ -19,7 +19,6 @@ public class JordanAgentNPlanque : MonoBehaviour {
     {
         if (col.gameObject.tag == "Bullet")
         {
-            if(col.gameObject.GetComponent<bulletScript>().launcherName != "Pelolance")
                 nav.Warp(initPos);
         }
     }

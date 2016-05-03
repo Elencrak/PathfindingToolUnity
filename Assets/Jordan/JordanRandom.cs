@@ -31,11 +31,8 @@ public class JordanRandom : MonoBehaviour {
     {
         if (col.gameObject.tag == "Bullet")
         {
-            if (col.gameObject.GetComponent<bulletScript>().launcherName != "Pelolance")
-            {
                 nav.Warp(initPos);
                 randomTarget();
-            }
         }
     }
 
