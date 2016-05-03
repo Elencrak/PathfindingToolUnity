@@ -19,6 +19,8 @@ public class Poulpe1 : MonoBehaviour
     private GameObject bot1;
     private GameObject bot2;
     private int index;
+    private float startDogge;
+    private float delayDogge = 0.25f;
     public Vector3[] patrol;
 
     public GameObject[] temp;
@@ -103,7 +105,10 @@ public class Poulpe1 : MonoBehaviour
         {
             index = Random.Range(0, patrol.Length);
         }
-        GetComponent<NavMeshAgent>().SetDestination(patrol[index]);
+        if(startDogge + delayDogge <= Time.time)
+        {
+            GetComponent<NavMeshAgent>().SetDestination(patrol[index]);
+        }
     }
 
     void OnCollisionEnter(Collision collision)
@@ -167,6 +172,7 @@ public class Poulpe1 : MonoBehaviour
     {
         if (collider.tag == "Bullet" && collider.GetComponent<bulletScript>().launcherName != "Poulpe")
         {
+            startDogge = Time.time;
             Vector3 point = transform.position + transform.forward * 1.0f;
             if(Vector3.Distance(collider.transform.position, point) <= 2f)
             {
