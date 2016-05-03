@@ -39,8 +39,8 @@ public class AgentPoulpe : MonoBehaviour
         road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position,graph);
         InvokeRepeating("UpdateRoad", 0.5f, 0.5f);
         Debug.Log(PathfindingManager.GetInstance().test);*/
-        bot1 = transform.parent.GetChild(1).gameObject;
-        bot2 = transform.parent.GetChild(2).gameObject;
+        //bot1 = transform.parent.GetChild(1).gameObject;
+        //bot2 = transform.parent.GetChild(2).gameObject;
         players = new List<GameObject>();
         temp = GameObject.FindGameObjectsWithTag("Target");
         foreach(GameObject pla in temp)
@@ -51,8 +51,8 @@ public class AgentPoulpe : MonoBehaviour
             }
         }
         begin = transform.position;
-        bot1.GetComponent<Poulpe2>().GetTargets(players);
-        bot2.GetComponent<Poulpe3>().GetTargets(players);
+        //bot1.GetComponent<Poulpe2>().GetTargets(players);
+        //bot2.GetComponent<Poulpe3>().GetTargets(players);
         patrol = new Vector3[4];
         patrol[0] = new Vector3(-67, 1, -67);
         patrol[1] = new Vector3(67, 1, -67);
@@ -121,9 +121,32 @@ public class AgentPoulpe : MonoBehaviour
     void Shoot(GameObject hit)
     {
         startShoot = Time.time;
-        transform.LookAt(hit.transform.position + hit.transform.forward * (hit.GetComponent<NavMeshAgent>().speed / 40 * Vector3.Distance(transform.position, hit.transform.position)));
+        transform.LookAt(CalcShootAngle(hit));
         GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position + transform.forward * 2, Quaternion.Euler(this.transform.eulerAngles)) as GameObject;
         bullet.GetComponent<bulletScript>().launcherName = "Poulpe";
+    }
+
+    Vector3 CalcShootAngle(GameObject hit)
+    {
+        Vector3 hitPos = hit.transform.position;
+        float hitSpeed = hit.GetComponent<NavMeshAgent>().speed;
+        float distance = Vector3.Distance(transform.position, hitPos);
+        float bulletSpeed = 40;
+        float erreur = 0.5f;
+        float temps = distance / bulletSpeed;
+        Vector3 hitPosArrive = hitPos + hit.transform.forward * hitSpeed * temps;
+        float newDist = Vector3.Distance(transform.position, hitPosArrive);
+        while (newDist - distance > erreur)
+        {
+            hitPos = hitPosArrive;
+            distance = Vector3.Distance(transform.position, hitPos) - distance;
+            temps = distance / bulletSpeed;
+            hitPosArrive = hitPos + hit.transform.forward * hitSpeed * temps;
+            newDist = Vector3.Distance(transform.position, hitPosArrive);
+            distance = Vector3.Distance(transform.position, hitPos);
+        }
+        Vector3 point = hitPosArrive;
+        return point;
     }
 
     void OnTriggerStay(Collider collider)
