@@ -4,21 +4,40 @@ using System.Collections.Generic;
 
 public class AgentBenoitV : MonoBehaviour {
 
+    Vector3 spawnPosition;
     public List<GameObject> targets;
     NavMeshAgent myAgent;
-    public GameObject myTarget;
+    public Vector3 myTarget;
+    public GameObject myTargetShoot;
     float distanceMin;
     float currentDistance;
-    
+    public Transform[] points;
+    public List<Vector3> pointOfInterest;
+    int index;
+
+    float coolDown = 1.0f;
+    public float currentCoolDown;
 
 	// Use this for initialization
 	void Start () {
+        index = 0;
+        coolDown = 1.0f;
+        currentCoolDown = 1.0f;
+        spawnPosition = transform.position;
         distanceMin = Mathf.Infinity;
         myAgent = GetComponent<NavMeshAgent>();
+
+        pointOfInterest = new List<Vector3>();
+        for(int i = 0; i < points.Length; ++i)
+        {
+            pointOfInterest.Add(points[i].position);
+        }
+        myTarget = pointOfInterest[0];
+
         FindTargets();
-        FindTarget();
         InvokeRepeating("MoveToTarget", 0.1f, 0.5f);
-        InvokeRepeating("ChangeTarget", 0.1f, 0.5f);
+        InvokeRepeating("FindTarget", 0.1f, 0.1f);
+        InvokeRepeating("SwitchPosition", 0.1f, 0.1f);
     }
 
     void FindTargets()
@@ -37,16 +56,21 @@ public class AgentBenoitV : MonoBehaviour {
 
     void OnCollisionEnter(Collision otherCollider)
     {
-        if (otherCollider.gameObject.tag == "Target")
+        /*if (otherCollider.gameObject.tag == "Target")
         {
             targets.Remove(otherCollider.gameObject);
-            FindTarget();
+            //FindTarget();
+        }*/
+        if(otherCollider.gameObject.tag == "Bullet")
+        {
+            transform.position = spawnPosition;
+            myTargetShoot = null;
         }
     }
 
     void MoveToTarget()
     {
-        myAgent.SetDestination(myTarget.transform.position);
+        myAgent.SetDestination(myTarget);
     }
 
     void FindTarget()
@@ -56,20 +80,46 @@ public class AgentBenoitV : MonoBehaviour {
             distanceMin = Mathf.Infinity;
             for (int i = 0; i < targets.Count; ++i)
             {
-                currentDistance = Vector3.Distance(transform.position, targets[i].transform.position);
-                if (currentDistance < distanceMin)
+                Vector3 direction = targets[i].transform.position - transform.position;
+                RaycastHit _hit;
+                Physics.Raycast(transform.position, direction, out _hit);
+                if(_hit.transform.gameObject == targets[i])
                 {
-                    myTarget = targets[i];
-                    distanceMin = currentDistance;
+                    currentDistance = Vector3.Distance(transform.position, targets[i].transform.position);
+                    if (currentDistance < distanceMin)
+                    {
+                        myTargetShoot = targets[i];
+                        distanceMin = currentDistance;
+                    }
                 }
             }
-        }else
-        {
-            myAgent.Stop();
         }
+        if (myTargetShoot != null)
+        {
+            if(currentCoolDown >= coolDown)
+            {
+                Shoot(myTargetShoot);
+                currentCoolDown = 0;
+            }
+            else
+            {
+                currentCoolDown += Time.deltaTime;
+
+            }
+                
+        }
+
+
     }
 
-    void ChangeTarget()
+    void Shoot(GameObject _target)
+    {
+        transform.LookAt(new Vector3(_target.transform.position.x, transform.position.y, _target.transform.position.z));
+       GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position+ transform.forward*2.0f, Quaternion.identity) as GameObject;
+
+        bullet.transform.LookAt(_target.transform.position);
+    }
+    /*void ChangeTarget()
     {
         if (targets.Count > 0)
         {
@@ -78,14 +128,26 @@ public class AgentBenoitV : MonoBehaviour {
                 currentDistance = Vector3.Distance(transform.position, targets[i].transform.position);
                 if (currentDistance < distanceMin && currentDistance < 10f)
                 {
-                    myTarget = targets[i];
+                    myTargetShoot = targets[i];
                     distanceMin = currentDistance;
                 }
             }
-        }else
+        }
+    }*/
+
+    void SwitchPosition()
+    {
+        if(Vector3.Distance(myTarget, transform.position)<1.5f)
         {
-            Debug.Log("J'ai tout mangé, je peux repartir jouer ?");
-            myAgent.Stop();
+            if(index == points.Length-1)
+            {
+                index = 0;
+            }else
+            {
+                index++;
+            }
+            Debug.Log(index);
+           myTarget = pointOfInterest[index];
         }
     }
 }

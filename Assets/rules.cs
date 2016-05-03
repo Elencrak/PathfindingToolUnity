@@ -24,10 +24,8 @@ public class rules : MonoBehaviour {
     }
 
     private bool first = true;
-    private System.DateTime initialTime;
-    public int currentCost = 0;
 
-    private SortedList<int, GameObject> scoreBoard = new SortedList<int, GameObject>(new CheatComparer());
+    private SortedList<int, string> scoreBoard = new SortedList<int, string>(new CheatComparer());
     private Text scoreBoardDisplay;
 
 	// Use this for initialization
@@ -37,48 +35,59 @@ public class rules : MonoBehaviour {
         {
             _instance = this;
         }
-        initialTime = System.DateTime.Now;
         scoreBoardDisplay = GameObject.FindGameObjectWithTag("ScoreBoard").GetComponent<Text>();
     }
 	
 	// Update is called once per frame
 	void Update ()
     {
-        currentCost = (int)(System.DateTime.Now - initialTime).TotalSeconds;
         if (first)
         {
             GameObject[] agents = GameObject.FindGameObjectsWithTag("Target");
             foreach(GameObject agent in agents)
             {                
-                agent.AddComponent<rulesCollision>();
+                agent.AddComponent<rulesCollision>();           
             }
             first = false;
         }
 
 
         string txt = "";
-        foreach(KeyValuePair<int, GameObject> score in scoreBoard)
+        foreach(KeyValuePair<int, string> score in scoreBoard)
         {
-            txt = score.Value.name + "\t\t\t\t" + score.Key + "\n" + txt;
+            txt = score.Value + "\t\t\t\t" + score.Key + "\n" + txt;
         }
         scoreBoardDisplay.text = "Scores : \n\n" + txt;
 	}
 
-    public long score(GameObject o1, GameObject o2)
+    private int updateScore(string teamName, int delta)
     {
-        int index = scoreBoard.IndexOfValue(o1);
+        int index = scoreBoard.IndexOfValue(teamName);
         int currentScore;
         if (index >= 0)
         {
             currentScore = scoreBoard.Keys[index];
-            currentScore += currentCost;
+            currentScore += delta;
             scoreBoard.RemoveAt(index);
         }
         else
         {
-            currentScore = currentCost;
+            currentScore = delta;
         }
-        scoreBoard.Add(currentScore, o1);
+        scoreBoard.Add(currentScore, teamName);
         return currentScore;
+    }
+
+    public int score(GameObject target, GameObject bullet)
+    {
+        string sourceTeamName = bullet.GetComponent<bulletScript>().launcherName;
+
+        int r = updateScore(sourceTeamName, 1);
+
+        string targetTeamName = target.GetComponentInParent<TeamNumber>().teamName;
+
+        updateScore(targetTeamName, -1);
+
+        return r;
     }
 }
