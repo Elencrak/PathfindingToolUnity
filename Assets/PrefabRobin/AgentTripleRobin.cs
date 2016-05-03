@@ -29,7 +29,6 @@ public class AgentTripleRobin : Entity
         StartCoroutine(Shoot());
 
         InvokeRepeating("UpdateTarget", 0.0f, 0.5f);
-        InvokeRepeating("UpdateRoad", 0.0f, 0.8f);
         base.Start();
     }
 
