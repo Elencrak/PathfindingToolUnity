@@ -64,9 +64,32 @@ public class Poulpe3 : MonoBehaviour
     void Shoot(GameObject hit)
     {
         startShoot = Time.time;
-        transform.LookAt(hit.transform.position + hit.transform.forward * (hit.GetComponent<NavMeshAgent>().speed / 40 * Vector3.Distance(transform.position, hit.transform.position)));
+        transform.LookAt(CalcShootAngle(hit));
         GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position + transform.forward * 2, Quaternion.Euler(this.transform.eulerAngles)) as GameObject;
         bullet.GetComponent<bulletScript>().launcherName = "Poulpe";
+    }
+
+    Vector3 CalcShootAngle(GameObject hit)
+    {
+        Vector3 hitPos = hit.transform.position;
+        float hitSpeed = hit.GetComponent<NavMeshAgent>().speed;
+        float distance = Vector3.Distance(transform.position, hitPos);
+        float bulletSpeed = 40;
+        float erreur = 0.5f;
+        float temps = distance / bulletSpeed;
+        Vector3 hitPosArrive = hitPos + hit.transform.forward * hitSpeed * temps;
+        float newDist = Vector3.Distance(transform.position, hitPosArrive);
+        while (newDist - distance > erreur)
+        {
+            hitPos = hitPosArrive;
+            distance = Vector3.Distance(transform.position, hitPos) - distance;
+            temps = distance / bulletSpeed;
+            hitPosArrive = hitPos + hit.transform.forward * hitSpeed * temps;
+            newDist = Vector3.Distance(transform.position, hitPosArrive);
+            distance = Vector3.Distance(transform.position, hitPos);
+        }
+        Vector3 point = hitPosArrive;
+        return point;
     }
 
     void OnTriggerStay(Collider collider)
