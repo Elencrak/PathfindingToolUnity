@@ -37,7 +37,7 @@ public class AgentBenoitV : MonoBehaviour {
         myTarget = pointOfInterest[0];
 
         FindTargets();
-        InvokeRepeating("MoveToTarget", 0.1f, 0.5f);
+        InvokeRepeating("MoveToTarget", 0.1f, 0.1f);
         InvokeRepeating("FindTarget", 0.1f, 0.1f);
         InvokeRepeating("SwitchPosition", 0.1f, 0.1f);
     }
@@ -49,7 +49,7 @@ public class AgentBenoitV : MonoBehaviour {
         Debug.Log(myTeamName);
         foreach (GameObject target in tempTargets)
         {
-            if (target.gameObject != this.gameObject && target.transform.parent.GetComponent<TeamNumber>().teamName != myTeamName)
+            if (target.gameObject != this.gameObject && !target.name.Contains("BenoitV")/* && target.transform.parent.GetComponent<TeamNumber>().teamName != myTeamName*/)
             {
                 targets.Add(target);
             }
@@ -66,7 +66,9 @@ public class AgentBenoitV : MonoBehaviour {
         }*/
         if(otherCollider.gameObject.tag == "Bullet")
         {
-            transform.position = spawnPosition;
+            Debug.Log("test");
+            myAgent.Warp(spawnPosition);
+            //transform.position = spawnPosition;
             myTargetShoot = null;
         }
     }
@@ -106,7 +108,7 @@ public class AgentBenoitV : MonoBehaviour {
             }
             else
             {
-                currentCoolDown += Time.deltaTime;
+                currentCoolDown += 0.1f;
 
             }
                 
@@ -119,8 +121,8 @@ public class AgentBenoitV : MonoBehaviour {
     {
         transform.LookAt(new Vector3(_target.transform.position.x, transform.position.y, _target.transform.position.z));
        GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position+ transform.forward*2.0f, Quaternion.identity) as GameObject;
-
-        bullet.transform.LookAt(_target.transform.position);
+        
+        bullet.transform.LookAt(_target.transform.position+ new Vector3(_target.GetComponent<Rigidbody>().velocity.x, 0f , _target.GetComponent<Rigidbody>().velocity.z)*2.0f);
     }
     /*void ChangeTarget()
     {
