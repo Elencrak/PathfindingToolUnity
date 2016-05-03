@@ -3,7 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class AgentRobinMathieu : MonoBehaviour {
-    
+
+    [Header("IA")]
+
+    public Vector3 startPoint;
     public GameObject nearestTarget;
     BoxCollider nearTargetCollider;
     public List<GameObject> targets;
@@ -11,16 +14,35 @@ public class AgentRobinMathieu : MonoBehaviour {
     NavMeshAgent agent;
     bool hasWin = false;
 
-    float timeFreezeEnemy = 1.0f;
+    [Header("GUN")]
 
-	// Use this for initialization
-	void Start () {
+    public float RoF = 1.0f;
+    public List<GameObject> bullets;
+    public GameObject prefabBullet;
+    GameObject bulletList;
+
+    [Header("Values")]
+
+    float timeFreezeEnemy = 1.0f;
+    public bool isShooting = true;
+
+    // Use this for initialization
+    void Start () {
+
+        bullets = new List<GameObject>();
+        if(prefabBullet == null)
+        {
+            prefabBullet = Resources.Load<GameObject>("Bullet");
+        }
+        bulletList = transform.parent.GetChild(1).gameObject;
+        startPoint = transform.position;
         targets = new List<GameObject>(GameObject.FindGameObjectsWithTag("Target"));
         hitTargets = new List<GameObject>();
         agent = GetComponent<NavMeshAgent>();
         InvokeRepeating("UpdateTarget", 0.0f, 0.5f);
-        InvokeRepeating("UpdateRoad", 0.0f, 0.5f);
+        InvokeRepeating("UpdateRoad", 0.0f, 0.8f);
         InvokeRepeating("Gagne", 0.0f, 1.5f);
+        StartCoroutine(Shoot());
     }
 	
 	// Update is called once per frame
@@ -74,12 +96,17 @@ public class AgentRobinMathieu : MonoBehaviour {
         }
     }
 
-    void UpdateRoad()
+    /*void UpdateRoad()
     {
         if(nearestTarget)
         {
-            agent.SetDestination(nearestTarget.transform.position + nearTargetCollider.center);
+            agent.SetDestination(nearTargetCollider.transform.position + nearTargetCollider.center);
         }
+    }*/
+
+    void UpdateRoad()
+    {
+        agent.SetDestination(targets[Random.Range(0, targets.Count - 1)].transform.position);
     }
 
     void OnCollisionEnter(Collision coll)
@@ -89,6 +116,33 @@ public class AgentRobinMathieu : MonoBehaviour {
             StartCoroutine(FreezeEnemy(coll.gameObject));
             hitTargets.Add(coll.gameObject);
         }
+        if(coll.gameObject.CompareTag("Bullet") && !bullets.Contains(coll.gameObject))
+        {
+            Restart();
+        }
+    }
+
+    IEnumerator Shoot()
+    {
+        while(isShooting)
+        {
+            if(nearTargetCollider)
+            {
+                Vector3 direction = (nearTargetCollider.transform.position + nearTargetCollider.center) - transform.position;
+
+                GameObject go = Instantiate(prefabBullet, transform.position + direction.normalized * 2.0f, Quaternion.LookRotation(direction.normalized)) as GameObject;
+
+                go.transform.parent = bulletList.transform;
+
+                bullets.Add(go);
+            }
+            yield return new WaitForSeconds(RoF);
+        }
+    }
+
+    void Restart()
+    {
+        agent.Warp(startPoint);
     }
 
     IEnumerator FreezeEnemy(GameObject enemy)
