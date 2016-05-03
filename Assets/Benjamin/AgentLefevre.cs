@@ -150,10 +150,29 @@ public class AgentLefevre : MonoBehaviour
             yield return new WaitForSeconds(0.5f);
             Vector3 direction = target.transform.position-startPos;
             agent.Stop();
-            Vector3 relativePos = (target.transform.position+ direction) - coverPoints[coverPointIndex + 1];
-            Quaternion rotation = Quaternion.LookRotation(relativePos);
+            
 
-            GameObject instance = Instantiate(bullet, transform.position+ relativePos.normalized*2.0f, rotation) as GameObject;
+            float dist = Vector3.Distance(transform.position, target.transform.position);
+            float timeToHit = dist/80f;
+            Vector3 posToShoot = startPos+(direction*2f)*timeToHit;
+            dist = Vector3.Distance(transform.position, posToShoot);
+            timeToHit = dist / 80f;
+            posToShoot = startPos + (direction * 2f)* 2f * timeToHit;
+            Debug.DrawLine(transform.position, posToShoot, Color.blue, 2f);
+            GameObject instance;
+            if (timeToHit > 0.5f)
+            {
+                Vector3 relativePos = posToShoot - transform.position;
+                Quaternion rotation = Quaternion.LookRotation(relativePos);
+                instance = Instantiate(bullet, transform.position+ relativePos.normalized*2.0f, rotation) as GameObject;
+
+            }
+            else
+            {
+                Vector3 relativePos = target.transform.position+direction - transform.position;
+                Quaternion rotation = Quaternion.LookRotation(relativePos);
+                instance = Instantiate(bullet, transform.position + relativePos.normalized * 2.0f, rotation) as GameObject;
+            }
             instance.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
         }
         agent.Resume();

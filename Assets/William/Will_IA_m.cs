@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class Will_IA_m : MonoBehaviour {
     
-    float shootCooldown=1;
+    float shootCooldown= 1;
     float range = 20;
     Vector3 spawn;
     List<GameObject> targets;
@@ -13,6 +13,8 @@ public class Will_IA_m : MonoBehaviour {
     GameObject bullet;
     bool canShoot = false;
     Vector3 strafeDest;
+    float lastShoot=0;
+    public bool isStrafing = false;
     void Start () {
         spawn = transform.position;
         agent = GetComponent<NavMeshAgent>();
@@ -20,13 +22,12 @@ public class Will_IA_m : MonoBehaviour {
         targets.Remove(this.gameObject);
         bullet = new GameObject();
         bullet = (GameObject) Resources.Load("Bullet");
-        InvokeRepeating("targetUpdate", 0, 0.8f);
-        InvokeRepeating("shoot", 1, shootCooldown);
+        InvokeRepeating("targetUpdate", 0, 0.3f);
+        //InvokeRepeating("shoot", 0.1f, shootCooldown);
     }
 	
-	// Update is called once per frame
 	void Update () {
-	
+        shoot();
 	}
 
     void move()
@@ -51,78 +52,90 @@ public class Will_IA_m : MonoBehaviour {
             }
         }
         currentTarget = tempTarget;
-        if (distance < range)
-        {
-            strafe();
-        }
-        else
+        if (!isStrafing)
         {
             agent.SetDestination(currentTarget.transform.position);
-        }    
-        
+        }
+    }
+    
+
+    IEnumerator startStrafe()
+    {
+        isStrafing = true;
+        Vector3 pos = transform.position;
+        strafeDest = transform.position+(transform.right * 5);
+
+        agent.SetDestination(strafeDest);
+        while (Vector3.Distance(strafeDest, transform.position) > 1)
+        {
+            yield return 1;
+        }
+        agent.SetDestination(pos);
+        while (Vector3.Distance(pos, transform.position) > 1)
+        {
+            yield return 1;
+        }
+
+        //yield return new WaitForSeconds(1f);
+    }
+
+    void OnTriggerEnter()
+    {
+
     }
 
     void strafe()
     {
-        if (strafeDest != null)
-        {
-            float d = Vector3.Distance(strafeDest, transform.position);
-            if (d < 2 || d > 20)
-            {
-                if (Random.Range(0, 3) > 1)
-                {
-                    strafeDest = transform.right * -10;
-                }
-                else
-                {
-                    strafeDest = transform.right * 10;
-                }
-            }
-            agent.SetDestination(strafeDest);
-            
-        }
-        
-        //agent.SetDestination(transform.right * Random.Range(-5, 5));
+        if(!isStrafing)
+        StartCoroutine(startStrafe());
     }
 
     void OnCollisionEnter(Collision col)
     {
         if (col.collider.tag == "Bullet")
         {
+            isStrafing = false;
+            StopAllCoroutines();
             agent.Warp(spawn);
-            //transform.position = spawn;
+            transform.position = spawn;
             targetUpdate();
         }
     }
-    
+
+    void OnTriggerEnter(Collider col)
+    {
+        Debug.Log("trigger");
+        if(col.tag == "Bullet")
+        strafe();
+    }
 
     void shoot()
     {
         if (currentTarget == null)
             return;
-
+        if (lastShoot + shootCooldown > Time.time)
+            return;
+        
         RaycastHit hit;
         Vector3 dir = currentTarget.transform.position - transform.position;
         if (Physics.Raycast(transform.position, dir, out hit))
         {
             //Debug.Log("ray " + hit.collider.name);
             if (hit.collider.tag == currentTarget.tag)
-            {
-                //Debug.Log("shoot");
+            {                
                 GameObject spawnedBullet = (GameObject)Instantiate(bullet, transform.position, transform.rotation);
-                spawnedBullet.transform.LookAt(currentTarget.transform.position+(currentTarget.transform.forward*2));
+                spawnedBullet.transform.LookAt(currentTarget.transform.position + (currentTarget.GetComponent<Rigidbody>().velocity));
                 spawnedBullet.GetComponent<bulletScript>().launcherName = "TeamWill";
                 Physics.IgnoreCollision(GetComponent<BoxCollider>(), spawnedBullet.GetComponent<CapsuleCollider>());
+                lastShoot = Time.time;                
+            }
+            else
+            {
+                isStrafing = false;
+                StopAllCoroutines();
             }
             
         }
 
-    }
-
-    void win()
-    {
-        currentTarget = null;
-        agent.SetDestination(new Vector3(1,15,2));
-        Debug.Log("Mission completed by " + gameObject.name);
     }
 }
