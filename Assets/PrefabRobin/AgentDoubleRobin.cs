@@ -12,6 +12,7 @@ public class AgentDoubleRobin : MonoBehaviour
     public float RoF = 1.0f;
     public List<GameObject> bullets;
     public GameObject prefabBullet;
+    public GameObject predictionZone;
 
 
     AgentSimpleRobin tankUnit;
@@ -24,6 +25,7 @@ public class AgentDoubleRobin : MonoBehaviour
             prefabBullet = Resources.Load<GameObject>("Bullet");
         }
         tankUnit = transform.parent.parent.GetComponent<AgentSimpleRobin>();
+        predictionZone = GameObject.FindGameObjectWithTag("Prediction");
         StartCoroutine(Shoot());
 
         InvokeRepeating("UpdateTarget", 0.0f, 0.5f);
@@ -63,7 +65,7 @@ public class AgentDoubleRobin : MonoBehaviour
             {
                 NavMeshAgent targ = Target.GetComponent<NavMeshAgent>();
 
-                Vector3 positionPredicted = TargetCollider.transform.position;
+                Vector3 positionPredicted = TargetCollider.transform.position + Vector3.up * 0.5f;
 
                 float distanceParcourue = 0.0f;
 
@@ -75,24 +77,25 @@ public class AgentDoubleRobin : MonoBehaviour
 
                 RaycastHit hit;
 
-                if (Physics.Raycast(transform.position, positionPredicted, out hit))
-                {
-                    if (!hit.collider.gameObject.CompareTag("Target"))
-                    {
-                        yield return new WaitForFixedUpdate();
-                        continue;
-                    }
-                }
+                predictionZone.transform.position = positionPredicted;
 
                 Vector3 direction = (positionPredicted + TargetCollider.center) - transform.position;
 
-                GameObject go = Instantiate(prefabBullet, transform.position + direction.normalized * 2.0f, Quaternion.LookRotation(direction.normalized)) as GameObject;
+                if (Physics.Raycast(transform.position, direction.normalized, out hit, Vector3.Distance(positionPredicted, transform.position)))
+                {
+                    if (hit.collider.gameObject.CompareTag("Prediction") || hit.collider.gameObject.CompareTag("Target"))
+                    {
 
-                go.GetComponent<bulletScript>().launcherName = AgentRobinMathieu.playerID;
+                        GameObject go = Instantiate(prefabBullet, transform.position + direction.normalized * 2.0f, Quaternion.LookRotation(direction.normalized)) as GameObject;
 
-                bullets.Add(go);
+                        go.GetComponent<bulletScript>().launcherName = AgentRobinMathieu.playerID;
+
+                        bullets.Add(go);
+                        yield return new WaitForSeconds(RoF - RoF / 10.0f);
+                    }
+                }
             }
-            yield return new WaitForSeconds(RoF);
+            yield return new WaitForSeconds(RoF / 10.0f);
         }
     }
 }
