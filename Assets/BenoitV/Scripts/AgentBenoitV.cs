@@ -7,11 +7,12 @@ public class AgentBenoitV : MonoBehaviour {
     Vector3 spawnPosition;
     public List<GameObject> targets;
     NavMeshAgent myAgent;
-    public GameObject myTarget;
+    public Vector3 myTarget;
     public GameObject myTargetShoot;
     float distanceMin;
     float currentDistance;
-    public Transform[] pointOfInterest;
+    public Transform[] points;
+    public List<Vector3> pointOfInterest;
     int index;
 
     float coolDown = 1.0f;
@@ -25,10 +26,15 @@ public class AgentBenoitV : MonoBehaviour {
         spawnPosition = transform.position;
         distanceMin = Mathf.Infinity;
         myAgent = GetComponent<NavMeshAgent>();
-       // pointOfInterest = new Transform[3];
+
+        pointOfInterest = new List<Vector3>();
+        for(int i = 0; i < points.Length; ++i)
+        {
+            pointOfInterest.Add(points[i].position);
+        }
+        myTarget = pointOfInterest[0];
+
         FindTargets();
-        myTarget = pointOfInterest[0].gameObject;
-        //FindTarget();
         InvokeRepeating("MoveToTarget", 0.1f, 0.5f);
         InvokeRepeating("FindTarget", 0.1f, 0.1f);
         InvokeRepeating("SwitchPosition", 0.1f, 0.1f);
@@ -64,7 +70,7 @@ public class AgentBenoitV : MonoBehaviour {
 
     void MoveToTarget()
     {
-        myAgent.SetDestination(myTarget.transform.position);
+        myAgent.SetDestination(myTarget);
     }
 
     void FindTarget()
@@ -131,16 +137,17 @@ public class AgentBenoitV : MonoBehaviour {
 
     void SwitchPosition()
     {
-        if(Vector3.Distance(myTarget.transform.position, transform.position)<1.5f)
+        if(Vector3.Distance(myTarget, transform.position)<1.5f)
         {
-            if(index == pointOfInterest.Length-1)
+            if(index == points.Length-1)
             {
                 index = 0;
             }else
             {
                 index++;
             }
-           myTarget = pointOfInterest[index].gameObject;
+            Debug.Log(index);
+           myTarget = pointOfInterest[index];
         }
     }
 }
