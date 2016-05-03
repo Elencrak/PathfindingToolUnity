@@ -70,7 +70,7 @@ public class AgentM : MonoBehaviour {
 		{
 			Debug.Log ("Miformat Have Finish");
 		}
-		if (agent.remainingDistance < 1) 
+		if (agent.remainingDistance < 0.5f) 
 		{
 			isArrived = true;
 			isAvoiding = false;
@@ -118,13 +118,15 @@ public class AgentM : MonoBehaviour {
 
 	void Avoid()
 	{
-		Collider[] closeBullet = Physics.OverlapSphere (this.gameObject.transform.position, 3);
+		Collider[] closeBullet = Physics.OverlapSphere (this.gameObject.transform.position, 5);
 		foreach (Collider go in closeBullet) 
 		{
 			if (go.gameObject.tag == "Bullet" && go.gameObject.GetComponent<bulletScript> ().launcherName != "OSOK") 
 			{
-				Vector3 newDest = this.gameObject.transform.position + go.gameObject.transform.right * 2 + go.gameObject.transform.forward;
-				//Debug.Log (newDest);
+				Vector3 newDest;
+				int rnd = Random.Range (0,1);
+				if (rnd == 0) {newDest = this.gameObject.transform.position + go.gameObject.transform.right * 2 + go.gameObject.transform.forward;} 
+				else{newDest = this.gameObject.transform.position - go.gameObject.transform.right * 2 + go.gameObject.transform.forward;}
 				agent.destination = newDest;
 				isAvoiding = true;
 				isArrived = false;
@@ -232,8 +234,8 @@ public class AgentM : MonoBehaviour {
 
 	void Death()
 	{
+		agent.Warp (startPos);
 		this.gameObject.transform.position = startPos;
-		agent.destination = startPos;
 		target = FindCloseTarget();
 		agent.destination = target.transform.position;
 	}
