@@ -64,7 +64,6 @@ public class AgentLefevre : MonoBehaviour
     }
     void Init()
     {
-        Debug.Log("init");
         transform.position = spawn;
         currentCover = 0;
     }
@@ -151,7 +150,7 @@ public class AgentLefevre : MonoBehaviour
             Quaternion rotation = Quaternion.LookRotation(relativePos);
 
             GameObject instance = Instantiate(bullet, transform.position+ relativePos.normalized*2.0f, rotation) as GameObject;
-            Debug.Log("fire");
+            instance.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
         }
         agent.Resume();
         agent.SetDestination(coverPoints[coverPointIndex]);
