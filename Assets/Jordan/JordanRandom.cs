@@ -18,12 +18,12 @@ public class JordanRandom : MonoBehaviour {
 
     void OnTriggerEnter(Collider col)
     {
-        if(col.tag == "Bullet")
+        if(col.tag == "Bullet" && col.gameObject.GetComponent<bulletScript>().launcherName != "Pelolance")
         {
             randomTarget();
         }
 
-        if (col.tag == "Target")
+        if (col.tag == "Target" && col.transform.parent.name != "Pelolance")
             target = col.transform;
     }
 
