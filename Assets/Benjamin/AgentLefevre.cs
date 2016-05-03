@@ -39,11 +39,13 @@ public class AgentLefevre : MonoBehaviour
             
         }
         spawn = transform.position;
-        coverPoints = new Vector3[4];
+        coverPoints = new Vector3[6];
         coverPoints[0] = transform.GetChild(0).position;
         coverPoints[1] = transform.GetChild(1).position;
         coverPoints[2] = transform.GetChild(2).position;
         coverPoints[3] = transform.GetChild(3).position;
+        coverPoints[4] = transform.GetChild(4).position;
+        coverPoints[5] = transform.GetChild(5).position;
         currentCover = 0;
 
         /*
@@ -142,14 +144,35 @@ public class AgentLefevre : MonoBehaviour
         }
         else
         {
+            Vector3 startPos = target.transform.position;
             agent.Resume();
             agent.SetDestination(coverPoints[coverPointIndex + 1]);
             yield return new WaitForSeconds(0.5f);
+            Vector3 direction = target.transform.position-startPos;
             agent.Stop();
-            Vector3 relativePos = target.transform.position - coverPoints[coverPointIndex + 1];
-            Quaternion rotation = Quaternion.LookRotation(relativePos);
+            
 
-            GameObject instance = Instantiate(bullet, transform.position+ relativePos.normalized*2.0f, rotation) as GameObject;
+            float dist = Vector3.Distance(transform.position, target.transform.position);
+            float timeToHit = dist/80f;
+            Vector3 posToShoot = startPos+(direction*2f)*timeToHit;
+            dist = Vector3.Distance(transform.position, posToShoot);
+            timeToHit = dist / 80f;
+            posToShoot = startPos + (direction * 2f)* 2f * timeToHit;
+            Debug.DrawLine(transform.position, posToShoot, Color.blue, 2f);
+            GameObject instance;
+            if (timeToHit > 0.5f)
+            {
+                Vector3 relativePos = posToShoot - transform.position;
+                Quaternion rotation = Quaternion.LookRotation(relativePos);
+                instance = Instantiate(bullet, transform.position+ relativePos.normalized*2.0f, rotation) as GameObject;
+
+            }
+            else
+            {
+                Vector3 relativePos = target.transform.position+direction - transform.position;
+                Quaternion rotation = Quaternion.LookRotation(relativePos);
+                instance = Instantiate(bullet, transform.position + relativePos.normalized * 2.0f, rotation) as GameObject;
+            }
             instance.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
         }
         agent.Resume();

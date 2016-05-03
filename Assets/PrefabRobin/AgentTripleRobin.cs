@@ -49,19 +49,41 @@ public class AgentTripleRobin : MonoBehaviour
 
     IEnumerator Shoot()
     {
+        bulletScript bullet = prefabBullet.GetComponent<bulletScript>();
         while (tankUnit.isShooting)
         {
             if (TargetCollider)
             {
-                Vector3 direction = (TargetCollider.transform.position + TargetCollider.center) - transform.position;
+                NavMeshAgent targ = Target.GetComponent<NavMeshAgent>();
 
-                GameObject go = Instantiate(prefabBullet, transform.position + direction.normalized * 2.0f, Quaternion.LookRotation(direction.normalized)) as GameObject;
-                
-                go.GetComponent<bulletScript>().launcherName = AgentRobinMathieu.playerID;
+                Vector3 positionPredicted = TargetCollider.transform.position;
 
-                bullets.Add(go);
+                float distanceParcourue = 0.0f;
+
+                while (Vector3.Distance(transform.position, positionPredicted) - distanceParcourue > float.Epsilon)
+                {
+                    positionPredicted += targ.velocity * Time.fixedDeltaTime;
+                    distanceParcourue += Time.fixedDeltaTime * bullet.speed;
+                }
+
+                RaycastHit hit;
+
+                if (Physics.Raycast(transform.position, positionPredicted, out hit))
+                {
+                    if (hit.collider.gameObject.CompareTag("Target"))
+                    {
+                        Vector3 direction = (positionPredicted + TargetCollider.center) - transform.position;
+
+                        GameObject go = Instantiate(prefabBullet, transform.position + direction.normalized * 2.0f, Quaternion.LookRotation(direction.normalized)) as GameObject;
+
+                        go.GetComponent<bulletScript>().launcherName = AgentRobinMathieu.playerID;
+
+                        bullets.Add(go);
+                        yield return new WaitForSeconds(RoF - RoF / 10.0f);
+                    }
+                }
             }
-            yield return new WaitForSeconds(RoF);
+            yield return new WaitForSeconds(RoF / 10.0f);
         }
     }
 }

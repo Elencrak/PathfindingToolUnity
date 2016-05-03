@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class AgentAntoine : MonoBehaviour
 {
     public GameObject target;
+    public GameObject targetBullet;
     public float speed = 10.0f;
     public float closeEnoughRange = 1.0f;
     private Vector3 currentTarget;
@@ -29,7 +30,7 @@ public class AgentAntoine : MonoBehaviour
     public GameObject spawnBullet;
     public GameObject spawnBulletRotation;
 
-    public AnimationCurve curve;
+    public bool esquive;
 
     private float offset = 0;
 
@@ -54,7 +55,15 @@ public class AgentAntoine : MonoBehaviour
             }
         }
 
-        //FindNewTarget();
+        GameObject lol = GameObject.Find("PointsAntoine");
+        for(int i = 0; i<lol.transform.childCount; i++)
+        {
+            points[i] = lol.transform.GetChild(i).gameObject;
+        }
+
+        bullet = Resources.Load("Bullet") as GameObject;
+
+        esquive = false;
     }
 
     // Update is called once per frame
@@ -69,6 +78,7 @@ public class AgentAntoine : MonoBehaviour
             go.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
             go.transform.LookAt(target.transform.position);
             canShoot = false;
+            lastShoot = 0.0f;
         }
         else
         {
@@ -83,7 +93,7 @@ public class AgentAntoine : MonoBehaviour
         }
 
 
-        if (!finished)
+        if (!finished && !esquive)
         {
             if(Vector3.Distance(transform.position, PathPoint) <= 3f)
             {
@@ -93,9 +103,9 @@ public class AgentAntoine : MonoBehaviour
                 PathPoint = points[index].transform.position;
             }
             GetComponent<NavMeshAgent>().SetDestination(PathPoint);
-            transform.position = transform.position + /*new Vector3(0f, 0f, offset * 0.02f);*/ transform.right * offset * 0.02f;
+           // transform.position = (transform.position + transform.right * offset * 0.02f);
         }
-        else
+        else if (!esquive)
         {
             transform.Rotate(Vector3.up, Time.deltaTime * 50f);
         }
@@ -130,7 +140,8 @@ public class AgentAntoine : MonoBehaviour
 
         if (other.gameObject.tag == "Bullet")
         {
-            transform.position = SpawnPos;
+            GetComponent<NavMeshAgent>().Warp(SpawnPos);
+            GetComponent<NavMeshAgent>().SetDestination(points[index].transform.position);
         }
     }
 
@@ -166,12 +177,36 @@ public class AgentAntoine : MonoBehaviour
                     if (Physics.Raycast(transform.position, fwd, out hit) && hit.transform.tag == "Target")
                     {
                         target = enemies[i];
-                        //transform.LookAt(target.transform.position);
                         spawnBulletRotation.transform.LookAt(target.transform.position);
                         dist = tempDist;
                     }
                 }
             }
         }
+    }
+
+    public void Dodge(Vector3 pos, Vector3 v)
+    {
+        if(canShoot)
+        {
+            spawnBulletRotation.transform.LookAt(pos);
+            GameObject go = Instantiate(bullet, spawnBullet.transform.position, Quaternion.identity) as GameObject;
+            go.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
+            go.transform.LookAt(pos);
+            canShoot = false;
+        }
+        else
+        {
+            esquive = true;
+            StartCoroutine(Esquive(v));
+        }
+    }
+
+    IEnumerator Esquive(Vector3 v)
+    {
+        GetComponent<NavMeshAgent>().SetDestination(transform.position + v * 10);
+        yield return new WaitForSeconds(1f);
+        GetComponent<NavMeshAgent>().SetDestination(points[index].transform.position);
+        esquive = false;
     }
 }
