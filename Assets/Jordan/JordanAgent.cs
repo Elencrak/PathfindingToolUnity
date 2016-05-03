@@ -9,6 +9,9 @@ public class JordanAgent : MonoBehaviour {
     private int count;
     private bool touchedEveryone = false;
     private NavMeshAgent nav;
+	GameObject bullet;
+	GameObject target;
+	float timer = 1;
 
     void OnEnterCollision(Collision col)
     {
@@ -27,6 +30,7 @@ public class JordanAgent : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		bullet = Resources.Load ("Bullet") as GameObject;
         GameObject[] temp = GameObject.FindGameObjectsWithTag("Target");
 
         enemies = new List<GameObject>(temp);
@@ -37,10 +41,25 @@ public class JordanAgent : MonoBehaviour {
 
         nav = gameObject.GetComponent<NavMeshAgent>();
     }
-	
+
+	void ShootTest()
+	{
+		Vector3 asmodunk = this.gameObject.transform.position;
+		asmodunk.y += 2;
+		GameObject currentBullet = Instantiate (bullet, asmodunk, Quaternion.identity) as GameObject;
+		target = GameObject.Find ("MiformatAgent-0");
+		currentBullet.transform.LookAt (target.transform.position);
+		currentBullet.GetComponent<bulletScript>().launcherName = "yolo";
+	}
+
 	// Update is called once per frame
 	void Update () {
-
+		timer -= Time.deltaTime;
+		if (timer < 0) 
+		{
+			ShootTest ();
+			timer = 1;
+		}
         if (!touchedEveryone)
         {
             switch (count)
