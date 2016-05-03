@@ -121,7 +121,7 @@ public class AgentBenoitV : MonoBehaviour {
                 transform.LookAt(new Vector3(_target.transform.position.x, transform.position.y, _target.transform.position.z));
 
                 GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position + transform.forward * 2.0f, Quaternion.identity) as GameObject;
-
+                bullet.GetComponent<bulletScript>().launcherName = "TeamTank";
                 float distanceToTarget = Vector3.Distance(transform.position, _target.transform.position);
                 float ratio = distanceToTarget / 40f;
                 Vector3 _velocity = _target.GetComponent<NavMeshAgent>().velocity;
@@ -161,7 +161,6 @@ public class AgentBenoitV : MonoBehaviour {
             {
                 index++;
             }
-            Debug.Log(index);
            myTarget = pointOfInterest[index];
         }
     }
