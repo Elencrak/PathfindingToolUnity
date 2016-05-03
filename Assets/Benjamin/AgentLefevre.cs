@@ -150,7 +150,7 @@ public class AgentLefevre : MonoBehaviour
             Vector3 relativePos = target.transform.position - coverPoints[coverPointIndex + 1];
             Quaternion rotation = Quaternion.LookRotation(relativePos);
 
-            GameObject instance = Instantiate(bullet, transform.position, rotation) as GameObject;
+            GameObject instance = Instantiate(bullet, transform.position+ relativePos.normalized, rotation) as GameObject;
         }
         agent.Resume();
         agent.SetDestination(coverPoints[coverPointIndex]);
