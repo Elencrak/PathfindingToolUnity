@@ -46,7 +46,6 @@ public class AgentBenoitV : MonoBehaviour {
     {
         GameObject[] tempTargets;
         tempTargets = GameObject.FindGameObjectsWithTag("Target");
-        Debug.Log(myTeamName);
         foreach (GameObject target in tempTargets)
         {
             if (target.gameObject != this.gameObject && !target.name.Contains("BenoitV")/* && target.transform.parent.GetComponent<TeamNumber>().teamName != myTeamName*/)
@@ -66,7 +65,6 @@ public class AgentBenoitV : MonoBehaviour {
         }*/
         if(otherCollider.gameObject.tag == "Bullet")
         {
-            Debug.Log("test");
             myAgent.Warp(spawnPosition);
             //transform.position = spawnPosition;
             myTargetShoot = null;

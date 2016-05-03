@@ -54,7 +54,6 @@ public class AgentJ : MonoBehaviour
             {
                 target = Tr;
                 distanceDefaultTarget = Vector3.Distance(transform.position, target.position);
-                Debug.Log(Tr);
             }
         }
 
