@@ -13,17 +13,21 @@ public class RodrigueAgent : MonoBehaviour {
     public Vector3 spawnPoint;
     public List<GameObject> listOfTarget = new List<GameObject>();
 
-    public GameObject[] interestPoints;
+    public GameObject[] interestPoints = new GameObject[2];
 
     public List<GameObject> listOfBullets = new List<GameObject>();
     public float rateOfFire;
 
     public bool canShoot;
+    public bool isDodging;
 
     public string teamName = "RektByRodrigue";
+    
 
     // Use this for initialization
     void Start () {
+        interestPoints[0] = GameObject.Find("left plateforme");
+        interestPoints[1] = GameObject.Find("right plateforme");
         canShoot = true;
         targetPossible = GameObject.FindGameObjectsWithTag("Target");
         foreach(GameObject temp in targetPossible)
@@ -47,38 +51,53 @@ public class RodrigueAgent : MonoBehaviour {
         navMeshAgent.SetDestination(interestPoints[0].transform.position);
         rateOfFire = 1;
         InvokeRepeating("FindTarget", 0.1f, 0.1f);
+        isDodging = false;
     }
 	
-    void OnTriggerEnter(Collider parOther)
-    {
-        if(parOther.tag == "Bullet" && parOther.GetComponent<bulletScript>().launcherName !="RektByRodrigue")
-        {
-            listOfBullets.Add(parOther.gameObject);
-            Vector3 bulletForward = parOther.transform.forward;
-            //RaycastHit hit;
-            //if(Physics.Raycast(parOther.transform.position, bulletForward, out hit, 100))
-            //{
+    //void OnTriggerEnter(Collider parOther)
+    //{
+    //    if(parOther.tag == "Bullet" && parOther.GetComponent<bulletScript>().launcherName !="RektByRodrigue")
+    //    {
+    //        listOfBullets.Add(parOther.gameObject);
+    //        Vector3 bulletForward = parOther.transform.forward;
+    //        RaycastHit hit;
+    //        Debug.DrawRay(parOther.transform.position, bulletForward*100, Color.red, 0.5f);
+    //        if(Physics.Raycast(parOther.transform.position, bulletForward, out hit, 100))
+    //        {
 
-            //}
-        }
-    }
-        
+    //        }
+    //        else
+    //        {
+                
+    //            StartCoroutine(Dodge());
+    //        }
+    //    }
+    //}
 
-    void OnTriggerExit(Collider parOther)
-    {
-        if (parOther.tag == "Bullet" && parOther.GetComponent<bulletScript>().launcherName != "RektByRodrigue")
-        {
-            listOfBullets.Remove(parOther.gameObject);
-        }
-    }
+    //IEnumerator Dodge()
+    //{
+    //    isDodging = true;
+    //    navMeshAgent.Stop();
+    //    yield return new WaitForSeconds(1f);
+    //    navMeshAgent.Resume();
+    //    isDodging = false;
+    //}
+
+    //void OnTriggerExit(Collider parOther)
+    //{
+    //    if (parOther.tag == "Bullet" && parOther.GetComponent<bulletScript>().launcherName != "RektByRodrigue")
+    //    {
+    //        listOfBullets.Remove(parOther.gameObject);
+    //    }
+    //}
 
 	// Update is called once per frame
 	void Update () {
-        if (Vector3.Distance(transform.position, interestPoints[0].transform.position) < 1)
+        if (Vector3.Distance(transform.position, interestPoints[0].transform.position) < 1 && !isDodging)
         {
             navMeshAgent.SetDestination(interestPoints[1].transform.position);
         }
-        else if (Vector3.Distance(transform.position, interestPoints[1].transform.position) < 1)
+        else if (Vector3.Distance(transform.position, interestPoints[1].transform.position) < 1 && !isDodging)
         {
             navMeshAgent.SetDestination(interestPoints[0].transform.position);
         }
@@ -136,8 +155,10 @@ public class RodrigueAgent : MonoBehaviour {
         canShoot = false;
         GameObject bullets = Instantiate(Resources.Load("Bullet"), transform.position + transform.forward*2.0f + new Vector3(0, 1.5f, 0), Quaternion.identity) as GameObject;
         Physics.IgnoreCollision(this.GetComponent<BoxCollider>(), bullets.GetComponent<CapsuleCollider>());
+        Vector3 velocity = target.GetComponent<Rigidbody>().velocity;
+        float t = Vector3.Distance(transform.position, target.transform.position) / 40f;
 
-        bullets.transform.LookAt(target.transform.position);
+        bullets.transform.LookAt(target.transform.position + velocity * t);
         bullets.GetComponent<bulletScript>().launcherName = teamName;
         yield return new WaitForSeconds(rateOfFire);
         canShoot = true;
