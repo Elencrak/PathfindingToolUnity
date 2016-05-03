@@ -142,7 +142,6 @@ public class Will_IA_m : MonoBehaviour {
                     {
                         if (hit.collider.gameObject == obj)
                         {
-                            Debug.Log("shoot "+obj.name);
                             shootBullet(obj);
                             return;
                         }

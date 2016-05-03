@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class AgentTripleRobin : MonoBehaviour
+public class AgentTripleRobin : Entity
 {
     GameObject Target;
     BoxCollider TargetCollider;
@@ -12,11 +12,12 @@ public class AgentTripleRobin : MonoBehaviour
     public float RoF = 1.0f;
     public List<GameObject> bullets;
     public GameObject prefabBullet;
+    public GameObject predictionZone;
 
 
     AgentSimpleRobin tankUnit;
 
-    void Start()
+    protected override void Start()
     {
         bullets = new List<GameObject>();
         if (prefabBullet == null)
@@ -24,10 +25,11 @@ public class AgentTripleRobin : MonoBehaviour
             prefabBullet = Resources.Load<GameObject>("Bullet");
         }
         tankUnit = transform.parent.parent.GetComponent<AgentSimpleRobin>();
+        predictionZone = GameObject.FindGameObjectWithTag("Prediction");
         StartCoroutine(Shoot());
 
         InvokeRepeating("UpdateTarget", 0.0f, 0.5f);
-        InvokeRepeating("UpdateRoad", 0.0f, 0.8f);
+        base.Start();
     }
 
     void UpdateTarget()
@@ -56,7 +58,7 @@ public class AgentTripleRobin : MonoBehaviour
             {
                 NavMeshAgent targ = Target.GetComponent<NavMeshAgent>();
 
-                Vector3 positionPredicted = TargetCollider.transform.position;
+                Vector3 positionPredicted = TargetCollider.transform.position + Vector3.up * 0.5f;
 
                 float distanceParcourue = 0.0f;
 
@@ -68,11 +70,14 @@ public class AgentTripleRobin : MonoBehaviour
 
                 RaycastHit hit;
 
-                if (Physics.Raycast(transform.position, positionPredicted, out hit))
+                predictionZone.transform.position = positionPredicted;
+
+                Vector3 direction = (positionPredicted + TargetCollider.center) - transform.position;
+
+                if (Physics.Raycast(transform.position, direction.normalized, out hit, Vector3.Distance(positionPredicted, transform.position)))
                 {
-                    if (hit.collider.gameObject.CompareTag("Target"))
+                    if (hit.collider.gameObject.CompareTag("Prediction") || hit.collider.gameObject.CompareTag("Target"))
                     {
-                        Vector3 direction = (positionPredicted + TargetCollider.center) - transform.position;
 
                         GameObject go = Instantiate(prefabBullet, transform.position + direction.normalized * 2.0f, Quaternion.LookRotation(direction.normalized)) as GameObject;
 

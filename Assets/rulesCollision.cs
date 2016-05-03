@@ -3,9 +3,11 @@ using System.Collections;
 
 public class rulesCollision : MonoBehaviour {
 
+    Entity entity;
+
 	// Use this for initialization
 	void Start () {
-	
+        entity = GetComponent<Entity>();
 	}
 	
 	// Update is called once per frame
@@ -18,6 +20,10 @@ public class rulesCollision : MonoBehaviour {
         if (collision.transform.tag == "Bullet")
         {
             rules.getInstance().score(gameObject, collision.gameObject);
+            if(entity)
+            {
+                entity.Hit(1);
+            }
         }
     }
 }
