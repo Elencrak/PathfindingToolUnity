@@ -22,7 +22,10 @@ public class JordanKamikazeAgent : MonoBehaviour {
             if (col.gameObject.GetComponent<bulletScript>().launcherName != "Pelolance")
             {
                 target = col.gameObject.transform;
-                fire();
+
+                if (fireCoolDown + startFireCoolDown < Time.time && target != null)
+                    fire();
+
                 nav.Warp(initPos);
             }
         }
