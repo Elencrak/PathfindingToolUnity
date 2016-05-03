@@ -18,7 +18,8 @@ public class JordanAgent : MonoBehaviour {
     {
         if(col.gameObject.tag == "Bullet")
         {
-            this.transform.position = initPos;
+            if (col.gameObject.GetComponent<bulletScript>().launcherName != "Pelolance")
+                this.transform.position = initPos;
         }
     }
 
@@ -55,9 +56,9 @@ public class JordanAgent : MonoBehaviour {
     void fire()
     {
         startFireCoolDown = Time.time;
-        //fire in direction of points[1].position
         Object temp = Instantiate(bullet);
         ((GameObject)temp).transform.position = this.transform.position - this.transform.forward;
         ((GameObject)temp).transform.LookAt(points[1].transform);
+        ((GameObject)temp).GetComponent<bulletScript>().launcherName = "Pelolance";
     }
 }

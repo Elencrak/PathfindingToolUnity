@@ -13,6 +13,7 @@ public class AgentM : MonoBehaviour {
 	NavMeshAgent agent;
 	Vector3 startPos;
 	float fireRate = 1;
+	public int ID;
 
 	// Use this for initialization
 	void Start () 
@@ -23,7 +24,23 @@ public class AgentM : MonoBehaviour {
 		tabTarget = GameObject.FindGameObjectsWithTag ("Target");
 		RemoveTargetFromTab (this.gameObject);
 		target = FindCloseTarget();
-		agent.destination = new Vector3 (51,1,-31); 
+		while (target.GetComponent<AgentM> ()) 
+		{
+			RemoveTargetFromTab (target);
+			target = FindCloseTarget();
+		}
+		switch (ID) 
+		{
+			case 0:
+				agent.destination = new Vector3 (51,1,-31); 
+				break;
+			case 1:
+				agent.destination = new Vector3 (51,1,-45);
+				break;
+			case 2:
+				agent.destination = new Vector3 (82,1,-39); 
+				break;
+		}
 		/*if (target != null) 
 		{
 			agent.destination = target.transform.position; 
@@ -127,7 +144,7 @@ public class AgentM : MonoBehaviour {
 
 	void OnCollisionEnter(Collision collision) 
 	{
-		if (collision.gameObject.tag == "Bullet"){Death ();}
+		if (collision.gameObject.tag == "Bullet" && collision.gameObject.GetComponent<bulletScript>().launcherName != "OSOK"){Death ();}
 		if (collision.gameObject.tag == "Target") 
 		{
 			//Cancer (collision.gameObject);
@@ -135,6 +152,11 @@ public class AgentM : MonoBehaviour {
 			Coloring (collision.gameObject);
 			//RemoveTargetFromTab (collision.gameObject);
 			target = FindCloseTarget();
+			while (target.GetComponent<AgentM> ()) 
+			{
+				RemoveTargetFromTab (target);
+				target = FindCloseTarget();
+			}
 			//if (target != null) 
 			//{
 			//	agent.destination = target.transform.position; 
@@ -153,7 +175,13 @@ public class AgentM : MonoBehaviour {
 		asmodunk.y += 3;
 		currentBullet = Instantiate (bullet, asmodunk, Quaternion.identity) as GameObject;
 		target = FindCloseTarget();
+		while (target.GetComponent<AgentM> ()) 
+		{
+			RemoveTargetFromTab (target);
+			target = FindCloseTarget();
+		}
 		currentBullet.transform.LookAt (target.transform.position);
+		currentBullet.GetComponent<bulletScript>().launcherName = "OSOK";
 	}
 
 	void OnCollisionExit(Collision collision) 
@@ -164,6 +192,11 @@ public class AgentM : MonoBehaviour {
 			Coloring (collision.gameObject);
 			//RemoveTargetFromTab (collision.gameObject);
 			target = FindCloseTarget();
+			while (target.GetComponent<AgentM> ()) 
+			{
+				RemoveTargetFromTab (target);
+				target = FindCloseTarget();
+			}
 			//if (target != null) 
 			//{
 			//	agent.destination = target.transform.position; 

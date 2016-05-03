@@ -20,6 +20,8 @@ public class RodrigueAgent : MonoBehaviour {
 
     public bool canShoot;
 
+    public string teamName = "RektByRodrigue";
+
     // Use this for initialization
     void Start () {
         canShoot = true;
@@ -39,7 +41,6 @@ public class RodrigueAgent : MonoBehaviour {
 
         spawnPoint = transform.position;
         navMeshAgent.SetDestination(interestPoints[0].transform.position);
-
         rateOfFire = 1;
         InvokeRepeating("FindTarget", 0.1f, 0.1f);
     }
@@ -108,6 +109,7 @@ public class RodrigueAgent : MonoBehaviour {
         GameObject bullets = Instantiate(Resources.Load("Bullet"), transform.position + transform.forward*2.0f + new Vector3(0, 1.5f, 0), Quaternion.identity) as GameObject;
         Physics.IgnoreCollision(this.GetComponent<BoxCollider>(), bullets.GetComponent<CapsuleCollider>());
         bullets.transform.LookAt(target.transform);
+        bullets.GetComponent<bulletScript>().launcherName = teamName;
         yield return new WaitForSeconds(rateOfFire);
         canShoot = true;
     }
