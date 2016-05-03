@@ -75,9 +75,21 @@ public class AgentAntoine : MonoBehaviour
         if (canShoot && target != null)
         {
             spawnBulletRotation.transform.LookAt(target.transform.position);
+
+            /*Vector3 D = target.transform.position - transform.position;
+            Vector3 D2 = target.transform.position - transform.position;
+
+
+            float top = (D.x * D2.x) + (D.y * D2.y) + (D.z * D2.z);
+            float leftBot = Mathf.Sqrt((D.x * D.x) + (D.y * D.y) + (D.z * D.z));
+            float rightBot = Mathf.Sqrt((D2.x * D2.x) + (D2.y * D2.y) + (D2.z * D2.z));
+            float alpha = Mathf.Acos(top / (leftBot * rightBot));
+
+            spawnBulletRotation.transform.Rotate(Vector3.up, alpha);*/
+
             GameObject go = Instantiate(bullet, spawnBullet.transform.position, Quaternion.identity) as GameObject;
             go.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
-            go.transform.LookAt(target.transform.position + target.transform.forward);
+            go.transform.LookAt(target.transform.position/* + target.transform.forward*/);
             canShoot = false;
             lastShoot = 0.0f;
         }
