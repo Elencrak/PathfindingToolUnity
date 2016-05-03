@@ -80,8 +80,13 @@ public class AgentJojoKiller : MonoBehaviour {
                         if(hit.transform.tag == "Target")
                         {
                             Debug.DrawRay(transform.position, relativePosition.normalized *5, Color.red, 1);
-                            GameObject temp = Instantiate(Resources.Load("Bullet"), transform.position + relativePosition.normalized * 3, Quaternion.identity) as GameObject;
-                            temp.transform.LookAt(transform.position + relativePosition.normalized*10);
+                            GameObject temp = Instantiate(Resources.Load("Bullet"), transform.position + relativePosition.normalized * 10, Quaternion.identity) as GameObject;
+
+                            //Anticipation
+                            float t = Vector3.Distance(g.position, transform.position) / temp.GetComponent<bulletScript>().speed;
+                            Vector3 tempPosition = g.position + (g.GetComponent<NavMeshAgent>().velocity * t);
+                            temp.transform.LookAt(tempPosition);
+
                             temp.GetComponentInParent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
                             nextShoot = fireRate;
                             break;

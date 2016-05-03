@@ -53,11 +53,11 @@ public class PierreAgent : MonoBehaviour {
 
     void Fire()
     {
-        transform.LookAt(currentTargetFire + (currentTargetFire -lastTargetPosition)*5);
+        transform.LookAt(currentTargetFire + (currentTargetFire -lastTargetPosition)*Vector3.Distance(currentTargetFire,transform.position)/4);
 
         GameObject b = Instantiate(bullet, transform.position + transform.forward * 1.5f, Quaternion.identity) as GameObject;
 
-        b.transform.LookAt(currentTargetFire + (currentTargetFire - lastTargetPosition)*5);
+        b.transform.LookAt(currentTargetFire + (currentTargetFire - lastTargetPosition) * Vector3.Distance(currentTargetFire, transform.position)/4);
         b.GetComponent<bulletScript>().launcherName = team.teamName;
     }
 
