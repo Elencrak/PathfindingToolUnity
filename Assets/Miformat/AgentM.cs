@@ -17,6 +17,7 @@ public class AgentM : MonoBehaviour {
 	int state = 1;
 	bool isArrived = false;
 	bool isAvoiding = false;
+	GameObject toAvoid = null;
 
 	// Use this for initialization
 	void Start () 
@@ -122,7 +123,7 @@ public class AgentM : MonoBehaviour {
 		Collider[] closeBullet = Physics.OverlapSphere (this.gameObject.transform.position, 5);
 		foreach (Collider go in closeBullet) 
 		{
-			if (go.gameObject.tag == "Bullet" && go.gameObject.GetComponent<bulletScript> ().launcherName != "OSOK") 
+			if (go.gameObject != toAvoid && go.gameObject.tag == "Bullet" && go.gameObject.GetComponent<bulletScript> ().launcherName != "OSOK") 
 			{
 				Vector3 newDest = this.gameObject.transform.position;
 				if (go.gameObject.transform.position.x > this.gameObject.transform.position.x) {newDest += go.gameObject.transform.right*2;}
@@ -135,6 +136,8 @@ public class AgentM : MonoBehaviour {
 				agent.destination = newDest;
 				isAvoiding = true;
 				isArrived = false;
+				toAvoid = go.gameObject;
+				//Debug.Log (this.gameObject.name + " avoiding " + go.gameObject.name + " to : " + newDest);
 				break;
 			}
 		}
