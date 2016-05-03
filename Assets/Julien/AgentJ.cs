@@ -31,7 +31,7 @@ public class AgentJ : MonoBehaviour
             }
         }
 
-        InvokeRepeating("FindTarget", 0.1f, 1.0f);
+        InvokeRepeating("FindTarget", 0.5f, 3.0f);
         InvokeRepeating("FireBullet", 0.01f, 1.0f);
     }
 
@@ -54,7 +54,7 @@ public class AgentJ : MonoBehaviour
             {
                 target = Tr;
                 distanceDefaultTarget = Vector3.Distance(transform.position, target.position);
-                Debug.Log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+                Debug.Log(Tr);
             }
         }
 
@@ -74,7 +74,7 @@ public class AgentJ : MonoBehaviour
             }
             else
             {
-                
+                Debug.Log("AgentJ a terminé");
                 agent.Stop();
             }
         }
@@ -98,7 +98,6 @@ public class AgentJ : MonoBehaviour
 
     void Death()
     {
-        Debug.Log("mort");
         agent.Warp(startPosition);
     }
 
