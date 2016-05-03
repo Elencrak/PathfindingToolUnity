@@ -5,7 +5,6 @@ using System.Collections.Generic;
 public class AgentAntoine : MonoBehaviour
 {
     public GameObject target;
-    public GameObject targetBullet;
     public float speed = 10.0f;
     public float closeEnoughRange = 1.0f;
     private Vector3 currentTarget;
@@ -55,7 +54,9 @@ public class AgentAntoine : MonoBehaviour
             }
         }
 
+
         GameObject lol = GameObject.Find("PointsAntoine");
+        points = new GameObject[lol.transform.childCount];
         for(int i = 0; i<lol.transform.childCount; i++)
         {
             points[i] = lol.transform.GetChild(i).gameObject;
@@ -63,7 +64,7 @@ public class AgentAntoine : MonoBehaviour
 
         bullet = Resources.Load("Bullet") as GameObject;
 
-        esquive = false;
+        //FindNewTarget();
     }
 
     // Update is called once per frame
@@ -76,7 +77,7 @@ public class AgentAntoine : MonoBehaviour
             spawnBulletRotation.transform.LookAt(target.transform.position);
             GameObject go = Instantiate(bullet, spawnBullet.transform.position, Quaternion.identity) as GameObject;
             go.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
-            go.transform.LookAt(target.transform.position);
+            go.transform.LookAt(target.transform.position + target.transform.forward);
             canShoot = false;
             lastShoot = 0.0f;
         }
@@ -93,19 +94,19 @@ public class AgentAntoine : MonoBehaviour
         }
 
 
-        if (!finished && !esquive)
+        if (!finished)
         {
             if(Vector3.Distance(transform.position, PathPoint) <= 3f)
             {
-                index++;
+                index = Random.Range(0, points.Length);
                 if (index >= points.Length)
                     index = 0;
                 PathPoint = points[index].transform.position;
             }
             GetComponent<NavMeshAgent>().SetDestination(PathPoint);
-           // transform.position = (transform.position + transform.right * offset * 0.02f);
+            //transform.position = transform.position + /*new Vector3(0f, 0f, offset * 0.02f);*/ transform.right * offset * 0.02f;
         }
-        else if (!esquive)
+        else
         {
             transform.Rotate(Vector3.up, Time.deltaTime * 50f);
         }
@@ -177,6 +178,7 @@ public class AgentAntoine : MonoBehaviour
                     if (Physics.Raycast(transform.position, fwd, out hit) && hit.transform.tag == "Target")
                     {
                         target = enemies[i];
+                        //transform.LookAt(target.transform.position);
                         spawnBulletRotation.transform.LookAt(target.transform.position);
                         dist = tempDist;
                     }
@@ -185,17 +187,17 @@ public class AgentAntoine : MonoBehaviour
         }
     }
 
-    public void Dodge(Vector3 pos, Vector3 v)
+    public void Dodge(Vector3 pos, Vector3 v, Vector3 forward)
     {
-        if(canShoot)
+        if (canShoot && (!target || Vector3.Distance(transform.position, target.transform.position) > Vector3.Distance(transform.position, pos)))
         {
             spawnBulletRotation.transform.LookAt(pos);
             GameObject go = Instantiate(bullet, spawnBullet.transform.position, Quaternion.identity) as GameObject;
             go.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
-            go.transform.LookAt(pos);
+            go.transform.LookAt(pos + forward);
             canShoot = false;
         }
-        else
+        else if(esquive != true)
         {
             esquive = true;
             StartCoroutine(Esquive(v));
@@ -205,7 +207,7 @@ public class AgentAntoine : MonoBehaviour
     IEnumerator Esquive(Vector3 v)
     {
         GetComponent<NavMeshAgent>().SetDestination(transform.position + v * 10);
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(2f);
         GetComponent<NavMeshAgent>().SetDestination(points[index].transform.position);
         esquive = false;
     }
