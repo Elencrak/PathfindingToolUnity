@@ -19,7 +19,6 @@ public class rulesCollision : MonoBehaviour {
     {
         if (collision.transform.tag == "Bullet")
         {
-            entity.Hit(1);
             rules.getInstance().score(gameObject, collision.gameObject);
             if(entity)
             {
