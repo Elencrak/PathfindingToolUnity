@@ -50,7 +50,7 @@ public class AgentSimpleRobin : AgentRobinMathieu
 
                 while (Vector3.Distance(transform.position, positionPredicted) - distanceParcourue > float.Epsilon)
                 {
-                    positionPredicted += nearestTarget.GetComponent<NavMeshAgent>().velocity * Time.fixedDeltaTime;
+                    positionPredicted += targ.velocity * Time.fixedDeltaTime;
                     distanceParcourue += Time.fixedDeltaTime * bullet.speed;
                 }
 

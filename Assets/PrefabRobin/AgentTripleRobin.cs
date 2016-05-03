@@ -62,7 +62,7 @@ public class AgentTripleRobin : MonoBehaviour
 
                 while (Vector3.Distance(transform.position, positionPredicted) - distanceParcourue > float.Epsilon)
                 {
-                    positionPredicted += Target.GetComponent<NavMeshAgent>().velocity * Time.fixedDeltaTime;
+                    positionPredicted += targ.velocity * Time.fixedDeltaTime;
                     distanceParcourue += Time.fixedDeltaTime * bullet.speed;
                 }
 
@@ -70,22 +70,20 @@ public class AgentTripleRobin : MonoBehaviour
 
                 if (Physics.Raycast(transform.position, positionPredicted, out hit))
                 {
-                    if (!hit.collider.gameObject.CompareTag("Target"))
+                    if (hit.collider.gameObject.CompareTag("Target"))
                     {
-                        yield return new WaitForFixedUpdate();
-                        continue;
+                        Vector3 direction = (positionPredicted + TargetCollider.center) - transform.position;
+
+                        GameObject go = Instantiate(prefabBullet, transform.position + direction.normalized * 2.0f, Quaternion.LookRotation(direction.normalized)) as GameObject;
+
+                        go.GetComponent<bulletScript>().launcherName = AgentRobinMathieu.playerID;
+
+                        bullets.Add(go);
+                        yield return new WaitForSeconds(RoF - RoF / 10.0f);
                     }
                 }
-
-                Vector3 direction = (positionPredicted + TargetCollider.center) - transform.position;
-
-                GameObject go = Instantiate(prefabBullet, transform.position + direction.normalized * 2.0f, Quaternion.LookRotation(direction.normalized)) as GameObject;
-
-                go.GetComponent<bulletScript>().launcherName = AgentRobinMathieu.playerID;
-
-                bullets.Add(go);
             }
-            yield return new WaitForSeconds(RoF);
+            yield return new WaitForSeconds(RoF / 10.0f);
         }
     }
 }

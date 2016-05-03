@@ -39,10 +39,7 @@ public class AgentDoubleRobin : MonoBehaviour
         {
             if (target == null || (target && Vector3.Distance(target.transform.position, transform.position) < Vector3.Distance(tankUnit.targets[i].transform.position, transform.position)))
             {
-                if (!tankUnit.hitTargets.Contains(tankUnit.targets[i]))
-                {
-                    target = tankUnit.targets[i];
-                }
+                target = tankUnit.targets[i];
             }
         }
         if (target)
@@ -72,7 +69,7 @@ public class AgentDoubleRobin : MonoBehaviour
 
                 while (Vector3.Distance(transform.position, positionPredicted) - distanceParcourue > float.Epsilon)
                 {
-                    positionPredicted += Target.GetComponent<NavMeshAgent>().velocity * Time.fixedDeltaTime;
+                    positionPredicted += targ.velocity * Time.fixedDeltaTime;
                     distanceParcourue += Time.fixedDeltaTime * bullet.speed;
                 }
 
