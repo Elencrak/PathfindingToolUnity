@@ -3,20 +3,22 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class Will_IA_m : MonoBehaviour {
+    
     float shootCooldown=1;
-    //float range = 10;
+    float range = 20;
     Vector3 spawn;
     List<GameObject> targets;
     GameObject currentTarget;
     NavMeshAgent agent;
-    
+    GameObject bullet;
 
     void Start () {
         spawn = transform.position;
         agent = GetComponent<NavMeshAgent>();
         targets = new List<GameObject>(GameObject.FindGameObjectsWithTag("Target"));
         targets.Remove(this.gameObject);
-
+        bullet = new GameObject();
+        bullet = (GameObject) Resources.Load("Bullet");
         InvokeRepeating("targetUpdate", 0, 0.8f);
         InvokeRepeating("shoot", 1, shootCooldown);
     }
@@ -43,29 +45,22 @@ public class Will_IA_m : MonoBehaviour {
         }
         currentTarget = tempTarget;
         agent.SetDestination(currentTarget.transform.position);
-        if (distance < 15)
+        if (distance < range)
         {
-
-            agent.SetDestination(transform.right*Random.Range(-5,5));
-            
+            if (Random.Range(0, 3) > 1)
+            {
+                agent.SetDestination(transform.right * -10);
+            }
+            else
+            {
+                agent.SetDestination(transform.right * 10);
+            }
+            //agent.SetDestination(transform.right * Random.Range(-5, 5));
         }
     }
 
     void targetUpdate()
     {
-        //if (shooting == true)
-        //{
-        //    float dist = Vector3.Distance(transform.position, currentTarget.transform.position);
-        //    if (dist < range)
-        //    {
-        //        strafe();
-        //        return;
-        //    }
-        //    else
-        //    {
-        //        shooting = false;
-        //    }
-        //}
         move();
         
     }
@@ -74,11 +69,6 @@ public class Will_IA_m : MonoBehaviour {
 
     void OnCollisionEnter(Collision col)
     {
-        //if (col.collider.gameObject == currentTarget)
-        //{
-        //    targets.Remove(currentTarget);
-        //    targetUpdate();
-        //}
         if (col.collider.tag == "Bullet")
         {
             transform.position = spawn;
@@ -100,9 +90,10 @@ public class Will_IA_m : MonoBehaviour {
             if (hit.collider.tag == currentTarget.tag)
             {
                 //Debug.Log("shoot");
-                GameObject bullet = (GameObject)Instantiate(Resources.Load("Bullet"), transform.position, transform.rotation);
-                bullet.transform.LookAt(currentTarget.transform.position);
-                Physics.IgnoreCollision(GetComponent<BoxCollider>(), bullet.GetComponent<CapsuleCollider>());
+                GameObject spawnedBullet = (GameObject)Instantiate(bullet, transform.position, transform.rotation);
+                spawnedBullet.transform.LookAt(currentTarget.transform.position);
+                spawnedBullet.GetComponent<bulletScript>().launcherName = "TeamWill";
+                Physics.IgnoreCollision(GetComponent<BoxCollider>(), spawnedBullet.GetComponent<CapsuleCollider>());
             }
             
         }
