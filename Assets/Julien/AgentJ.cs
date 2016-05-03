@@ -31,8 +31,8 @@ public class AgentJ : MonoBehaviour
             }
         }
 
-        InvokeRepeating("FindTarget", 0.5f, 0.5f);
-        InvokeRepeating("FireBullet", 0.5f, 1.0f);
+        InvokeRepeating("FindTarget", 0.5f, 3.0f);
+        InvokeRepeating("FireBullet", 0.01f, 1.0f);
     }
 
 
@@ -53,6 +53,8 @@ public class AgentJ : MonoBehaviour
             if (distancePlayerToTarget  < distanceDefaultTarget)
             {
                 target = Tr;
+                distanceDefaultTarget = Vector3.Distance(transform.position, target.position);
+                Debug.Log(Tr);
             }
         }
 
