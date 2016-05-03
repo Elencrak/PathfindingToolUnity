@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class AgentRobinMathieu : MonoBehaviour
+public class AgentRobinMathieu : Entity
 {
 
     [Header("IA")]
@@ -21,7 +21,7 @@ public class AgentRobinMathieu : MonoBehaviour
     public static string playerID = "Squad Robin";
     TeamNumber parentNumber;
 
-    protected virtual void Start()
+    protected override void Start()
     {
 
         parentNumber = transform.parent.parent.GetComponent<TeamNumber>();
@@ -38,6 +38,8 @@ public class AgentRobinMathieu : MonoBehaviour
             }
         }
         //InvokeRepeating("Gagne", 0.0f, 1.5f);
+
+        base.Start();
     }
 
     void Gagne()
@@ -77,19 +79,6 @@ public class AgentRobinMathieu : MonoBehaviour
     protected virtual void UpdateRoad()
     {
         agent.SetDestination(targets[Random.Range(0, targets.Count - 1)].transform.position);
-    }
-
-    void OnCollisionEnter(Collision coll)
-    {
-        if (coll.gameObject.CompareTag("Bullet") && !coll.gameObject.GetComponent<bulletScript>().launcherName.Equals(playerID))
-        {
-            Restart();
-        }
-    }
-
-    void Restart()
-    {
-        agent.Warp(startPoint);
     }
 
     IEnumerator FreezeEnemy(GameObject enemy)
