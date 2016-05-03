@@ -16,6 +16,8 @@ public class AgentPoulpe : MonoBehaviour
     private Vector3 begin;
     private float startShoot;
     private float delayShoot = 1;
+    private GameObject bot1;
+    private GameObject bot2;
 
     public GameObject[] temp;
 
@@ -34,16 +36,20 @@ public class AgentPoulpe : MonoBehaviour
         road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position,graph);
         InvokeRepeating("UpdateRoad", 0.5f, 0.5f);
         Debug.Log(PathfindingManager.GetInstance().test);*/
+        bot1 = transform.parent.GetChild(1).gameObject;
+        bot2 = transform.parent.GetChild(2).gameObject;
         players = new List<GameObject>();
         temp = GameObject.FindGameObjectsWithTag("Target");
         foreach(GameObject pla in temp)
         {
-            if(pla != this.gameObject)
+            if(pla != this.gameObject && pla != bot1 && pla != bot2)
             {
                 players.Add(pla);
             }
         }
         begin = transform.position;
+        bot1.GetComponent<Poulpe2>().GetTargets(players);
+        bot2.GetComponent<Poulpe3>().GetTargets(players);
     }
 	
 	// Update is called once per frame
@@ -76,7 +82,7 @@ public class AgentPoulpe : MonoBehaviour
         {
             RaycastHit hit;
             Physics.Raycast(transform.position, pla.transform.position - transform.position, out hit);
-            if (hit.collider.tag == "Target")
+            if (hit.collider.tag == "Target" && hit.collider.gameObject != bot1 && hit.collider.gameObject != bot2)
             {
                 if(startShoot + delayShoot <= Time.time)
                 {
