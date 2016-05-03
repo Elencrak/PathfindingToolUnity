@@ -12,7 +12,7 @@ public class AgentRobinMathieu : MonoBehaviour
     public BoxCollider nearTargetCollider;
     public List<GameObject> targets;
     public List<GameObject> hitTargets;
-    NavMeshAgent agent;
+    public NavMeshAgent agent;
     bool hasWin = false;
 
     [Header("Values")]
@@ -92,7 +92,7 @@ public class AgentRobinMathieu : MonoBehaviour
     {
         if (coll.gameObject.CompareTag("Target") && coll.gameObject.name != "Robin")
         {
-            StartCoroutine(FreezeEnemy(coll.gameObject));
+            //StartCoroutine(FreezeEnemy(coll.gameObject));
             hitTargets.Add(coll.gameObject);
         }
         if (coll.gameObject.CompareTag("Bullet") && !coll.gameObject.GetComponent<bulletScript>().launcherName.Equals(playerID))

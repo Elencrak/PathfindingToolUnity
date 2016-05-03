@@ -3,7 +3,7 @@ using System.Collections;
 
 public class bulletScript : MonoBehaviour {
 
-    float speed = 40f;
+    public float speed = 40f;
     public string launcherName;
 	// Use this for initialization
 	void Start () {
