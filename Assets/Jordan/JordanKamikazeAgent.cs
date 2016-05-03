@@ -59,7 +59,7 @@ public class JordanKamikazeAgent : MonoBehaviour {
     {
         startFireCoolDown = Time.time;
         Object temp = Instantiate(bullet);
-        ((GameObject)temp).transform.position = this.transform.position - this.transform.forward;
+        ((GameObject)temp).transform.position = this.transform.position + this.transform.forward;
         ((GameObject)temp).transform.LookAt(target.position - target.forward);
         ((GameObject)temp).GetComponent<bulletScript>().launcherName = "Pelolance";
     }
