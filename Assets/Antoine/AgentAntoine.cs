@@ -54,6 +54,14 @@ public class AgentAntoine : MonoBehaviour
             }
         }
 
+        GameObject lol = GameObject.Find("PointsAntoine");
+        for(int i = 0; i<lol.transform.childCount; i++)
+        {
+            points[i] = lol.transform.GetChild(i).gameObject;
+        }
+
+        bullet = Resources.Load("Bullet") as GameObject;
+
         //FindNewTarget();
     }
 
@@ -130,7 +138,8 @@ public class AgentAntoine : MonoBehaviour
 
         if (other.gameObject.tag == "Bullet")
         {
-            transform.position = SpawnPos;
+            GetComponent<NavMeshAgent>().Warp(SpawnPos);
+            GetComponent<NavMeshAgent>().SetDestination(points[index].transform.position);
         }
     }
 
