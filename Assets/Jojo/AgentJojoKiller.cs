@@ -110,8 +110,6 @@ public class AgentJojoKiller : MonoBehaviour {
 
     void toto()
     {
-        Debug.Log(startPosition);
-        Debug.Log(transform.position);
  
         //transform.position = startPosition;
         currentNavMeshAgent.Warp(startPosition);
