@@ -12,6 +12,7 @@ public class JordanAgent : MonoBehaviour {
 	GameObject bullet;
 	GameObject target;
 	float timer = 1;
+	int IDTarget;
 
     void OnEnterCollision(Collision col)
     {
@@ -30,6 +31,7 @@ public class JordanAgent : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		IDTarget = Random.Range(0,3);
 		bullet = Resources.Load ("Bullet") as GameObject;
         GameObject[] temp = GameObject.FindGameObjectsWithTag("Target");
 
@@ -47,7 +49,7 @@ public class JordanAgent : MonoBehaviour {
 		Vector3 asmodunk = this.gameObject.transform.position;
 		asmodunk.y += 2;
 		GameObject currentBullet = Instantiate (bullet, asmodunk, Quaternion.identity) as GameObject;
-		target = GameObject.Find ("MiformatAgent-0");
+		target = GameObject.Find ("MiformatAgent-" + IDTarget);
 		currentBullet.transform.LookAt (target.transform.position);
 		currentBullet.GetComponent<bulletScript>().launcherName = "yolo";
 	}
