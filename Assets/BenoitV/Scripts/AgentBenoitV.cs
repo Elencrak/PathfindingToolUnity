@@ -126,8 +126,8 @@ public class AgentBenoitV : MonoBehaviour {
        GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position+ transform.forward*2.0f, Quaternion.identity) as GameObject;
         Vector3 _velocity = _target.GetComponent<NavMeshAgent>().velocity;
         _velocity.Normalize();
-        bullet.transform.LookAt(_target.transform.position + new Vector3(_target.transform.forward.x * _velocity.x, _target.transform.forward.y * _velocity.y, _target.transform.forward.z * _velocity.z)*3.0f);
-        Debug.DrawLine(transform.position, _target.transform.position + new Vector3(_target.transform.forward.x* _velocity.x, _target.transform.forward.y * _velocity.y, _target.transform.forward.z * _velocity.z)*3.0f, Color.red, 0.5f);
+        bullet.transform.LookAt(_target.transform.position + _target.transform.position + _velocity * _target.GetComponent<NavMeshAgent>().speed);
+        Debug.DrawLine(transform.position, _target.transform.position + _velocity * _target.GetComponent<NavMeshAgent>().speed, Color.red, 0.5f);
     }
     /*void ChangeTarget()
     {
