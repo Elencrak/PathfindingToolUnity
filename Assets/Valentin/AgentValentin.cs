@@ -13,6 +13,7 @@ public class AgentValentin : MonoBehaviour {
     Vector3[] allPos = new Vector3[4];
     Vector3 targetMovement;
     int mov = 1;
+    public int score = 0;
 
 
 	// Use this for initialization
@@ -75,7 +76,7 @@ public class AgentValentin : MonoBehaviour {
                     if(hit.transform.tag == "Target")
                     {
                         GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position + direction * 2, Quaternion.identity)as GameObject;
-
+                        bullet.GetComponent<bulletScript>().launcherName = "TeamValentinPharhaLaunchRocket";
                         bullet.transform.LookAt(transform.position + direction*10);
                         break;
                     }
