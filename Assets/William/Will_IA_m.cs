@@ -68,18 +68,19 @@ public class Will_IA_m : MonoBehaviour {
         isStrafing = true;
         Vector3 pos = transform.position;
         strafeDest = transform.position+(transform.right * 5);
-        int cmpt = 0;
+        float cmptTime = 0;
         agent.SetDestination(strafeDest);
-        while (Vector3.Distance(strafeDest, transform.position) > 1 &&(cmpt < 100))
+        while (Vector3.Distance(strafeDest, transform.position) > 1 &&(cmptTime < 2))
         {
-            cmpt++;
+
+            cmptTime +=Time.deltaTime;
             yield return 5;
         }
         agent.SetDestination(pos);
-        cmpt = 0;
-        while (Vector3.Distance(pos, transform.position) > 1 && cmpt <100)
+        cmptTime = 0;
+        while (Vector3.Distance(pos, transform.position) > 1 && cmptTime < 2)
         {
-            cmpt++;
+            cmptTime += Time.deltaTime;
             yield return 5;
         }
 
@@ -122,19 +123,39 @@ public class Will_IA_m : MonoBehaviour {
             if (hit.collider.tag == currentTarget.tag)
             {
                 strafe();
-                GameObject spawnedBullet = (GameObject)Instantiate(bullet, transform.position, transform.rotation);
-                spawnedBullet.transform.LookAt(currentTarget.transform.position + (currentTarget.GetComponent<NavMeshAgent>().velocity.normalized));
-                spawnedBullet.GetComponent<bulletScript>().launcherName = "TeamWill";
-                Physics.IgnoreCollision(GetComponent<BoxCollider>(), spawnedBullet.GetComponent<CapsuleCollider>());
-                lastShoot = Time.time;                
+                shootBullet(currentTarget);     
             }
             else
             {
                 isStrafing = false;
                 StopAllCoroutines();
+
+                //TEST
+                foreach (GameObject obj in targets)
+                {
+                    dir = obj.transform.position - transform.position;
+                    if (Physics.Raycast(transform.position, dir, out hit))
+                    {
+                        if (hit.collider.tag == obj.tag)
+                        {
+                            shootBullet(obj);
+                            return;
+                        }
+                    }
+                }
+                //
             }
             
         }
 
+    }
+
+    void shootBullet(GameObject targ)
+    {
+        GameObject spawnedBullet = (GameObject)Instantiate(bullet, transform.position, transform.rotation);
+        spawnedBullet.transform.LookAt(targ.transform.position + (targ.GetComponent<NavMeshAgent>().velocity.normalized));
+        spawnedBullet.GetComponent<bulletScript>().launcherName = "TeamWill";
+        Physics.IgnoreCollision(GetComponent<BoxCollider>(), spawnedBullet.GetComponent<CapsuleCollider>());
+        lastShoot = Time.time;
     }
 }
