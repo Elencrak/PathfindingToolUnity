@@ -37,11 +37,35 @@ public class AgentSimpleRobin : AgentRobinMathieu
 
     IEnumerator Shoot()
     {
+        bulletScript bullet = prefabBullet.GetComponent<bulletScript>();
         while (isShooting)
         {
             if (nearTargetCollider)
             {
-                Vector3 direction = (nearTargetCollider.transform.position + nearTargetCollider.center) - transform.position;
+                NavMeshAgent targ = nearestTarget.GetComponent<NavMeshAgent>();
+
+                Vector3 positionPredicted = nearTargetCollider.transform.position;
+
+                float distanceParcourue = 0.0f;
+
+                while (Vector3.Distance(transform.position, positionPredicted) - distanceParcourue > float.Epsilon)
+                {
+                    positionPredicted += nearestTarget.GetComponent<NavMeshAgent>().velocity * Time.fixedDeltaTime;
+                    distanceParcourue += Time.fixedDeltaTime * bullet.speed;
+                }
+
+                RaycastHit hit;
+
+                if (Physics.Raycast(transform.position, positionPredicted, out hit))
+                {
+                    if(!hit.collider.gameObject.CompareTag("Target"))
+                    {
+                        yield return new WaitForFixedUpdate();
+                        continue;
+                    }
+                }
+
+                Vector3 direction = (positionPredicted + nearTargetCollider.center) - transform.position;
 
                 GameObject go = Instantiate(prefabBullet, transform.position + direction.normalized * 2.0f, Quaternion.LookRotation(direction.normalized)) as GameObject;
                 

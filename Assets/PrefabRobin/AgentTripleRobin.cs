@@ -49,14 +49,38 @@ public class AgentTripleRobin : MonoBehaviour
 
     IEnumerator Shoot()
     {
+        bulletScript bullet = prefabBullet.GetComponent<bulletScript>();
         while (tankUnit.isShooting)
         {
             if (TargetCollider)
             {
-                Vector3 direction = (TargetCollider.transform.position + TargetCollider.center) - transform.position;
+                NavMeshAgent targ = Target.GetComponent<NavMeshAgent>();
+
+                Vector3 positionPredicted = TargetCollider.transform.position;
+
+                float distanceParcourue = 0.0f;
+
+                while (Vector3.Distance(transform.position, positionPredicted) - distanceParcourue > float.Epsilon)
+                {
+                    positionPredicted += Target.GetComponent<NavMeshAgent>().velocity * Time.fixedDeltaTime;
+                    distanceParcourue += Time.fixedDeltaTime * bullet.speed;
+                }
+
+                RaycastHit hit;
+
+                if (Physics.Raycast(transform.position, positionPredicted, out hit))
+                {
+                    if (!hit.collider.gameObject.CompareTag("Target"))
+                    {
+                        yield return new WaitForFixedUpdate();
+                        continue;
+                    }
+                }
+
+                Vector3 direction = (positionPredicted + TargetCollider.center) - transform.position;
 
                 GameObject go = Instantiate(prefabBullet, transform.position + direction.normalized * 2.0f, Quaternion.LookRotation(direction.normalized)) as GameObject;
-                
+
                 go.GetComponent<bulletScript>().launcherName = AgentRobinMathieu.playerID;
 
                 bullets.Add(go);
