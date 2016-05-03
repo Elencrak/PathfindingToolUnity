@@ -12,8 +12,12 @@ public class TeamWillScript : MonoBehaviour {
         members = new List<Will_IA_m>(GetComponentsInChildren<Will_IA_m>());
         ennemis = new List<GameObject>(GameObject.FindGameObjectsWithTag("Target"));
         ennemis.Remove(members[0].gameObject);
-        ennemis.Remove(members[1].gameObject);
-        ennemis.Remove(members[2].gameObject);
+        if (members.Count > 1)
+        {
+            ennemis.Remove(members[1].gameObject);
+            ennemis.Remove(members[2].gameObject);
+        }
+        
     }
 	
 }
