@@ -55,7 +55,7 @@ public class PierreAgent : MonoBehaviour {
     {
         transform.LookAt(currentTargetFire + (currentTargetFire -lastTargetPosition)*5);
 
-        GameObject b = Instantiate(bullet, transform.position + transform.forward * 3, Quaternion.identity) as GameObject;
+        GameObject b = Instantiate(bullet, transform.position + transform.forward * 1.5f, Quaternion.identity) as GameObject;
 
         b.transform.LookAt(currentTargetFire + (currentTargetFire - lastTargetPosition)*5);
         b.GetComponent<bulletScript>().launcherName = team.teamName;
@@ -66,15 +66,15 @@ public class PierreAgent : MonoBehaviour {
 
 
 
-        Collider[] hitColliders = Physics.OverlapSphere(transform.position, 20);
+        /*Collider[] hitColliders = Physics.OverlapSphere(transform.position, 20);
         
         foreach (Collider col in hitColliders)
         {
-            if (col.tag == "Bullet")
+            if (col.tag == "Bullet" && col.GetComponent<bulletScript>().launcherName != team.teamName)
             {
                 nav.SetDestination(transform.position + col.transform.right*20);
             }
-        }
+        }*/
 
         //Debug.Log(currentTarget + " " + transform.position);
 
@@ -123,7 +123,7 @@ public class PierreAgent : MonoBehaviour {
             }
         }
         
-        //nav.SetDestination(currentTargetFire);
+        nav.SetDestination(currentTargetFire);
     }
 
     void OnCollisionEnter(Collision col)
