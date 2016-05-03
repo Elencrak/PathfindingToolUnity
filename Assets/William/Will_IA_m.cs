@@ -89,7 +89,8 @@ public class Will_IA_m : MonoBehaviour {
     {
         if (col.collider.tag == "Bullet")
         {
-            transform.position = spawn;
+            agent.Warp(spawn);
+            //transform.position = spawn;
             targetUpdate();
         }
     }
@@ -109,7 +110,7 @@ public class Will_IA_m : MonoBehaviour {
             {
                 //Debug.Log("shoot");
                 GameObject spawnedBullet = (GameObject)Instantiate(bullet, transform.position, transform.rotation);
-                spawnedBullet.transform.LookAt(currentTarget.transform.position);
+                spawnedBullet.transform.LookAt(currentTarget.transform.position+(currentTarget.transform.forward*2));
                 spawnedBullet.GetComponent<bulletScript>().launcherName = "TeamWill";
                 Physics.IgnoreCollision(GetComponent<BoxCollider>(), spawnedBullet.GetComponent<CapsuleCollider>());
             }
