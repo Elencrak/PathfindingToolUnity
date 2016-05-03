@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-public class RodrigueAgent : MonoBehaviour {
+public class RodrigueAgent1 : MonoBehaviour {
 
     public float speed = 10.0f;
     public float acceleration = 20.0f;
@@ -61,18 +61,6 @@ public class RodrigueAgent : MonoBehaviour {
 
     void OnCollisionEnter(Collision collision)
     {
-        //if (collision.collider.tag == "Target")
-        //{
-        //    for (int i = 0; i < listOfTarget.Count; i++)
-        //    {
-        //        if(listOfTarget[i] == collision.gameObject)
-        //        {
-        //            listOfTarget.RemoveAt(i);
-        //        } 
-        //    }
-        //    ChangeTarget();
-        //}
-
         if (collision.gameObject.tag == "Bullet")
         {
             navMeshAgent.Warp(spawnPoint);
