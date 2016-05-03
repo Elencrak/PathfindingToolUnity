@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class JordanAgent : MonoBehaviour {
+public class JordanKamikazeAgent : MonoBehaviour {
 
     private GameObject bullet;
     private List<GameObject> enemies;
@@ -13,19 +13,22 @@ public class JordanAgent : MonoBehaviour {
     private NavMeshAgent nav;
     private float startFireCoolDown;
     private float fireCoolDown = 1.0f;
+    private Transform target;
 
     void OnCollisionEnter(Collision col)
     {
-        if(col.gameObject.tag == "Bullet")
+        if (col.gameObject.tag == "Bullet")
         {
             if (col.gameObject.GetComponent<bulletScript>().launcherName != "Pelolance")
                 this.transform.position = initPos;
+
+            target = col.gameObject.transform;
+            fire();
         }
     }
 
-	// Use this for initialization
-	void Start () {
-
+    // Use this for initialization
+    void Start () {
         bullet = Resources.Load("Bullet") as GameObject;
 
         initPos = this.transform.position;
@@ -39,26 +42,24 @@ public class JordanAgent : MonoBehaviour {
         count = 0;
 
         nav = gameObject.GetComponent<NavMeshAgent>();
+
+        target = null;
     }
 	
 	// Update is called once per frame
 	void Update () {
-
-        if (fireCoolDown + startFireCoolDown < Time.time)
-            fire();
-
-        if(transform.position.x != points[0].position.x && transform.position.z != points[0].position.z)
+        if (transform.position.x != points[0].position.x && transform.position.z != points[0].position.z)
         {
             nav.SetDestination(points[0].position);
         }
-	}
+    }
 
     void fire()
     {
         startFireCoolDown = Time.time;
         Object temp = Instantiate(bullet);
         ((GameObject)temp).transform.position = this.transform.position - this.transform.forward;
-        ((GameObject)temp).transform.LookAt(points[1].transform);
+        ((GameObject)temp).transform.LookAt(target.position - target.forward);
         ((GameObject)temp).GetComponent<bulletScript>().launcherName = "Pelolance";
     }
 }
