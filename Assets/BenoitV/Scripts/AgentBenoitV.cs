@@ -14,11 +14,12 @@ public class AgentBenoitV : MonoBehaviour {
     public Transform[] points;
     public List<Vector3> pointOfInterest;
     int index;
+    string myTeamName;
 
     float coolDown = 1.0f;
     public float currentCoolDown;
+    
 
-	// Use this for initialization
 	void Start () {
         index = 0;
         coolDown = 1.0f;
@@ -26,6 +27,7 @@ public class AgentBenoitV : MonoBehaviour {
         spawnPosition = transform.position;
         distanceMin = Mathf.Infinity;
         myAgent = GetComponent<NavMeshAgent>();
+        myTeamName = transform.parent.GetComponent<TeamNumber>().teamName;
 
         pointOfInterest = new List<Vector3>();
         for(int i = 0; i < points.Length; ++i)
@@ -44,9 +46,10 @@ public class AgentBenoitV : MonoBehaviour {
     {
         GameObject[] tempTargets;
         tempTargets = GameObject.FindGameObjectsWithTag("Target");
+        Debug.Log(myTeamName);
         foreach (GameObject target in tempTargets)
         {
-            if (target.gameObject != this.gameObject)
+            if (target.gameObject != this.gameObject && target.transform.parent.GetComponent<TeamNumber>().teamName != myTeamName)
             {
                 targets.Add(target);
             }
