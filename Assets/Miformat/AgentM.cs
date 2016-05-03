@@ -35,14 +35,17 @@ public class AgentM : MonoBehaviour {
 		}
 		switch (ID) 
 		{
-			case 0:
-				agent.destination = new Vector3 (74,1,-5); 
+			case 0: 
+				agent.destination = new Vector3 (74,1,-5);
+				//agent.destination = new Vector3 (-40,15,2.5f);
 				break;
 			case 1:
 				agent.destination = new Vector3 (51,1,-4);
+				//agent.destination = new Vector3 (35,15,2.5f);
 				break;
 			case 2:
 				agent.destination = new Vector3 (58,1,-12);
+				//agent.destination = new Vector3 (30,15,2.5f);
 				break;
 		}
 		/*if (target != null) 
@@ -86,20 +89,24 @@ public class AgentM : MonoBehaviour {
 		switch (ID) 
 		{
 		case 0:
-			agent.destination = new Vector3 (74,1,-5); 
+			agent.destination = new Vector3 (74,1,-5);
+			//agent.destination = new Vector3 (-40,15,2.5f);
 			break;
 		case 1:
-			agent.destination = new Vector3 (51,1,-4);
+			agent.destination = new Vector3 (51,1,-4); 
+			//agent.destination = new Vector3 (35,15,2.5f);
 			break;
 		case 2:
 			if (state == 0) 
 			{
 				agent.destination = new Vector3 (50,1,-24);
+				//agent.destination = new Vector3 (-30,15,2.5f);
 				state = 1;
 			} 
 			else 
 			{
 				agent.destination = new Vector3 (58,1,-12);
+				//agent.destination = new Vector3 (30,15,2.5f);
 				state = 0;
 			}
 			isArrived = false;
@@ -143,24 +150,41 @@ public class AgentM : MonoBehaviour {
 		}
 	}
 
-
-
 	GameObject FindCloseTarget()
 	{
 		GameObject T = null;
 		float dist = 999999;
-		foreach (GameObject go in tabTarget) 
-		{
-			if (go != null) 
+		//if (ID != 1) 
+		//{
+			foreach (GameObject go in tabTarget) 
 			{
-				float actualDist = Vector3.Distance (this.gameObject.transform.position, go.transform.position);
-				if (actualDist < dist) 
+				if (go != null) 
 				{
-					dist = actualDist;
-					T = go;
+					float actualDist = Vector3.Distance (this.gameObject.transform.position, go.transform.position);
+					if (actualDist < dist) 
+					{
+						dist = actualDist;
+						T = go;
+					}
 				}
 			}
-		}
+		//} 
+		/*else 
+		{
+			GameObject[] tabBull = GameObject.FindGameObjectsWithTag ("Bullet");
+			foreach (GameObject go in tabBull) 
+			{
+				if (go != null) 
+				{
+					float actualDist = Vector3.Distance (this.gameObject.transform.position, go.transform.position);
+					if (actualDist < dist) 
+					{
+						dist = actualDist;
+						T = go;
+					}
+				}
+			}
+		}*/
 		return T;
 	}
 
