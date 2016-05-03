@@ -20,7 +20,7 @@ public class JordanAgentNPlanque : MonoBehaviour {
         if (col.gameObject.tag == "Bullet")
         {
             if(col.gameObject.GetComponent<bulletScript>().launcherName != "Pelolance")
-                this.transform.position = initPos;
+                nav.Warp(initPos);
         }
     }
 
@@ -69,7 +69,7 @@ public class JordanAgentNPlanque : MonoBehaviour {
         startFireCoolDown = Time.time;
         Object temp = Instantiate(bullet);
         ((GameObject)temp).transform.position = this.transform.position - this.transform.forward;
-        ((GameObject)temp).transform.LookAt(target.position + target.forward);
+        ((GameObject)temp).transform.LookAt(target.position + target.forward * 3);
         ((GameObject)temp).GetComponent<bulletScript>().launcherName = "Pelolance";
     }
 
