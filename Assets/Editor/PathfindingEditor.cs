@@ -209,6 +209,7 @@ public class PathfindingEditor : EditorWindow
         {
             GameObject instance = Instantiate(nodeRepresentation, node.getPosition(), Quaternion.identity) as GameObject;
             instance.GetComponent<NodeRepresentation>().node = node;
+            instance.name = "Node "+node.nodeId;
             instance.transform.parent = GameObject.Find("Nodes").transform;
             if (nodeId <= node.nodeId)
                 nodeId = node.nodeId + 1;
@@ -267,6 +268,7 @@ public class PathfindingEditor : EditorWindow
             GameObject instance = Instantiate(nodeRepresentation, hit.point+Vector3.up*0.5f, Quaternion.identity) as GameObject;
             Node newNode = new Node(hit.point, nodeId++);
             instance.GetComponent<NodeRepresentation>().node = newNode;
+            instance.name = "Node " + newNode.nodeId;
             PathfindingManager.GetInstance().currentPathfinding.nodes.Add(newNode);
             instance.transform.parent = GameObject.Find("Nodes").transform;
             Selection.activeGameObject = instance.transform.parent.parent.gameObject;
