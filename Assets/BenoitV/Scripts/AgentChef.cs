@@ -137,7 +137,6 @@ public class AgentChef : MonoBehaviour {
             Vector3 _velocity = _target.GetComponent<NavMeshAgent>().velocity;
 
             bullet.transform.LookAt(_target.transform.position + _velocity * ratio);
-            Debug.DrawLine(transform.position, _target.transform.position + _velocity * ratio, Color.red, 0.5f);
             currentCoolDown = 0;
         }
         else
@@ -165,9 +164,6 @@ public class AgentChef : MonoBehaviour {
     {
         if (Vector3.Distance(myTarget, transform.position) < 1.5f )
         {
-            anim.SetBool("Patrouille", true);
-            anim.SetBool("Deplacement", false);
-
             if (index == points.Length - 1)
             {
                 index = 0;
