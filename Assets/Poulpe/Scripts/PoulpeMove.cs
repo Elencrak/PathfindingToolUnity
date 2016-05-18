@@ -3,13 +3,20 @@ using System.Collections;
 
 public class PoulpeMove : PoulpeState
 {
-	// Use this for initialization
-	void Start ()
+    NavMeshAgent agent;
+
+    public PoulpeMove(NavMeshAgent Agent)
     {
-	}
-	
-	// Update is called once per frame
-	void Update ()
+        agent = Agent;
+    }
+
+    public override void Step()
     {
-	}
+        if(target == null)
+        {
+            int rand = Random.Range(0, targets.Length);
+            target = targets[rand];
+        }
+        agent.SetDestination(target.transform.position);
+    }
 }

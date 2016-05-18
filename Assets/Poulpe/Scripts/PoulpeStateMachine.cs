@@ -4,17 +4,18 @@ using System.Collections.Generic;
 
 public class PoulpeStateMachine : PoulpeState
 {
-    List<PoulpeState> states;
     PoulpeState currentState;
+
+    List<PoulpeState> states;
 
     public PoulpeStateMachine(List<PoulpeState> States, PoulpeState CurrentState)
     {
         states = States;
         currentState = CurrentState;
     }
-	
-	// Update is called once per frame
-	void Update ()
+
+    public override void Step()
     {
-	}
+        currentState.Step();
+    }
 }
