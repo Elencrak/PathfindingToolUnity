@@ -5,6 +5,7 @@ public class PathfindingEditor : EditorWindow
 {
     GameObject nodeRepresentation;
     GameObject edgeRepresentation;
+    int nodeId = 1;
     bool addNode = false;
     bool createEdge = false;
     GameObject FirstNodeOfEdge;
@@ -161,7 +162,8 @@ public class PathfindingEditor : EditorWindow
         {
             // DestroyImmediate c'est comme Destroy dans les MonoBehavior
             DestroyImmediate(obj);
-        } 
+        }
+        nodeId = 1;
         GameObject[] edges = GameObject.FindGameObjectsWithTag("Edge");
         foreach (GameObject obj in edges)
         {
@@ -207,7 +209,10 @@ public class PathfindingEditor : EditorWindow
         {
             GameObject instance = Instantiate(nodeRepresentation, node.getPosition(), Quaternion.identity) as GameObject;
             instance.GetComponent<NodeRepresentation>().node = node;
+            instance.name = "Node "+node.nodeId;
             instance.transform.parent = GameObject.Find("Nodes").transform;
+            if (nodeId <= node.nodeId)
+                nodeId = node.nodeId + 1;
         }
         foreach (Edge edge in current.edges)
         {
@@ -241,12 +246,10 @@ public class PathfindingEditor : EditorWindow
                 if (!firstNode.neighborsNode.Contains(secondNode))
                 {
                     firstNode.neighborsNode.Add(secondNode);
-                    Debug.Log(firstNode.neighborsNode.Count);
                 }
                 if (!secondNode.neighborsNode.Contains(firstNode))
                 {
                     secondNode.neighborsNode.Add(firstNode);
-                    Debug.Log(secondNode.neighborsNode.Count);
                 }
             }
         }
@@ -263,8 +266,10 @@ public class PathfindingEditor : EditorWindow
         if (Physics.Raycast(ray, out hit))
         {
             GameObject instance = Instantiate(nodeRepresentation, hit.point+Vector3.up*0.5f, Quaternion.identity) as GameObject;
-            instance.GetComponent<NodeRepresentation>().node = new Node(hit.point,PathfindingManager.GetInstance().currentPathfinding.nodes.Count);
-            PathfindingManager.GetInstance().currentPathfinding.nodes.Add(instance.GetComponent<NodeRepresentation>().node);
+            Node newNode = new Node(hit.point, nodeId++);
+            instance.GetComponent<NodeRepresentation>().node = newNode;
+            instance.name = "Node " + newNode.nodeId;
+            PathfindingManager.GetInstance().currentPathfinding.nodes.Add(newNode);
             instance.transform.parent = GameObject.Find("Nodes").transform;
             Selection.activeGameObject = instance.transform.parent.parent.gameObject;
         }
