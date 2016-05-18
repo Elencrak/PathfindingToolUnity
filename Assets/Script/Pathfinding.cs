@@ -23,6 +23,7 @@ public class Pathfinding {
         edges = new List<Edge>();
         PathfindingManager.GetInstance().currentPathfinding = this;
     }
+
     public void Save(string name)
     {
         string path = Application.dataPath + "/Save/" + name + ".txt";
@@ -33,6 +34,7 @@ public class Pathfinding {
         stream.Close();
         Debug.Log("saved at "+path);
     }
+
     public void Load(string name)
     {
         string path = Application.dataPath + "/Save/" + name + ".txt";
@@ -41,7 +43,6 @@ public class Pathfinding {
         copy(serializer.Deserialize(stream) as Pathfinding);
         stream.Close();
         SetNodesOnEdge();
-        
     }
 
     void copy(Pathfinding pathToCopy)
@@ -67,8 +68,8 @@ public class Pathfinding {
     {
         foreach(Edge edge in edges)
         {
-            edge.firstNode = nodes[edge.firstNodeId];
-            edge.secondNode = nodes[edge.secondNodeId];
+            edge.firstNode = nodes.Find(p => p.nodeId == edge.firstNodeId);
+            edge.secondNode = nodes.Find(p => p.nodeId == edge.secondNodeId);
         }
     }
 }

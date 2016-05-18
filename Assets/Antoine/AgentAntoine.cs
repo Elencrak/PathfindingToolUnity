@@ -33,6 +33,9 @@ public class AgentAntoine : MonoBehaviour
 
     private float offset = 0;
 
+    public GameObject bro1;
+    public GameObject bro2;
+
     // Use this for initialization
     void Start()
     {
@@ -89,7 +92,7 @@ public class AgentAntoine : MonoBehaviour
 
             GameObject go = Instantiate(bullet, spawnBullet.transform.position, Quaternion.identity) as GameObject;
             go.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
-            go.transform.LookAt(target.transform.position/* + target.transform.forward*/);
+            go.transform.LookAt(target.transform.position + target.transform.forward);
             canShoot = false;
             lastShoot = 0.0f;
         }
@@ -151,7 +154,7 @@ public class AgentAntoine : MonoBehaviour
             FindInTargets(other.gameObject);
         }*/
 
-        if (other.gameObject.tag == "Bullet")
+        if (other.gameObject.tag == "Bullet" && other.transform.GetComponent<bulletScript>().launcherName != transform.parent.GetComponent<TeamNumber>().teamName)
         {
             GetComponent<NavMeshAgent>().Warp(SpawnPos);
             GetComponent<NavMeshAgent>().SetDestination(points[index].transform.position);
@@ -187,7 +190,7 @@ public class AgentAntoine : MonoBehaviour
                 {
                     Vector3 fwd = enemies[i].transform.position - transform.position;
                     RaycastHit hit;
-                    if (Physics.Raycast(transform.position, fwd, out hit) && hit.transform.tag == "Target")
+                    if (Physics.Raycast(transform.position, fwd, out hit) && hit.transform.tag == "Target" && hit.transform.gameObject != bro1 && hit.transform.gameObject != bro2)
                     {
                         target = enemies[i];
                         //transform.LookAt(target.transform.position);
