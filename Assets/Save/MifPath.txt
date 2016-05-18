@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<Pathfinding xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Nodes>
+    <Node positionX="-67.48403" positionY="0.5" positionZ="-19.1622753" nodeId="0" />
+    <Node positionX="-73.12965" positionY="0.5" positionZ="-19.1962547" nodeId="1" />
+    <Node positionX="-62.9404831" positionY="0.5" positionZ="-24.263876" nodeId="3" />
+    <Node positionX="-72.80022" positionY="0.5" positionZ="-24.45499" nodeId="3" />
+    <Node positionX="-63.0868454" positionY="0.5" positionZ="-16.9533558" nodeId="4" />
+    <Node positionX="-52.08598" positionY="0.5" positionZ="-13.2695313" nodeId="5" />
+    <Node positionX="-51.86118" positionY="0.5" positionZ="-19.9020443" nodeId="6" />
+    <Node positionX="-59.36643" positionY="0.5" positionZ="-13.2055016" nodeId="7" />
+    <Node positionX="-50.09939" positionY="0.5" positionZ="-24.5087872" nodeId="8" />
+    <Node positionX="-48.96232" positionY="0.5" positionZ="-13.0994015" nodeId="9" />
+    <Node positionX="-48.7396545" positionY="0.5" positionZ="-19.91643" nodeId="10" />
+    <Node positionX="-41.03054" positionY="0.5" positionZ="-13.2709179" nodeId="11" />
+    <Node positionX="-39.7044334" positionY="0.5" positionZ="-24.58581" nodeId="12" />
+    <Node positionX="-27.11034" positionY="0.5" positionZ="-24.39231" nodeId="13" />
+    <Node positionX="-29.68109" positionY="0.5" positionZ="-12.7147713" nodeId="14" />
+    <Node positionX="-27.99084" positionY="0.5" positionZ="-1.662449" nodeId="15" />
+    <Node positionX="-27.6262569" positionY="0.5" positionZ="7.49740648" nodeId="16" />
+    <Node positionX="-26.8507824" positionY="0.5" positionZ="16.7776852" nodeId="18" />
+    <Node positionX="-27.2211552" positionY="0.5" positionZ="21.6589413" nodeId="19" />
+    <Node positionX="-33.88098" positionY="0.5" positionZ="21.8555984" nodeId="20" />
+    <Node positionX="-26.9933319" positionY="0.5" positionZ="13.6625366" nodeId="21" />
+    <Node positionX="-32.7038155" positionY="0.5" positionZ="16.3757267" nodeId="22" />
+    <Node positionX="-38.0758362" positionY="0.5" positionZ="18.16122" nodeId="23" />
+    <Node positionX="-34.7855225" positionY="0.5" positionZ="12.4689808" nodeId="23" />
+    <Node positionX="-31.8043633" positionY="0.5" positionZ="7.55179071" nodeId="24" />
+    <Node positionX="-31.8514233" positionY="0.5" positionZ="0.869664669" nodeId="25" />
+    <Node positionX="-44.1543465" positionY="0.5" positionZ="0.905304432" nodeId="26" />
+    <Node positionX="-44.3153419" positionY="0.5" positionZ="7.590859" nodeId="27" />
+    <Node positionX="-40.5284157" positionY="0.5" positionZ="7.811237" nodeId="28" />
+    <Node positionX="-49.55116" positionY="0.5" positionZ="18.17899" nodeId="29" />
+    <Node positionX="-49.4881058" positionY="0.5" positionZ="11.082798" nodeId="30" />
+    <Node positionX="-41.05022" positionY="0.5" positionZ="10.8285751" nodeId="31" />
+    <Node positionX="-42.9339523" positionY="0.5" positionZ="21.7891216" nodeId="32" />
+    <Node positionX="-50.3351173" positionY="0.5" positionZ="22.0208282" nodeId="33" />
+  </Nodes>
+  <Edges>
+    <Edge firstNodeId="0" secondNodeId="1" />
+    <Edge firstNodeId="1" secondNodeId="3" />
+    <Edge firstNodeId="3" secondNodeId="3" />
+    <Edge firstNodeId="0" secondNodeId="3" />
+    <Edge firstNodeId="3" secondNodeId="4" />
+    <Edge firstNodeId="3" secondNodeId="7" />
+    <Edge firstNodeId="4" secondNodeId="7" />
+    <Edge firstNodeId="4" secondNodeId="5" />
+    <Edge firstNodeId="4" secondNodeId="6" />
+    <Edge firstNodeId="4" secondNodeId="8" />
+    <Edge firstNodeId="3" secondNodeId="8" />
+    <Edge firstNodeId="7" secondNodeId="5" />
+    <Edge firstNodeId="7" secondNodeId="6" />
+    <Edge firstNodeId="6" secondNodeId="5" />
+    <Edge firstNodeId="8" secondNodeId="6" />
+    <Edge firstNodeId="7" secondNodeId="8" />
+    <Edge firstNodeId="3" secondNodeId="6" />
+    <Edge firstNodeId="3" secondNodeId="5" />
+    <Edge firstNodeId="8" secondNodeId="10" />
+    <Edge firstNodeId="8" secondNodeId="12" />
+    <Edge firstNodeId="8" secondNodeId="11" />
+    <Edge firstNodeId="10" secondNodeId="9" />
+    <Edge firstNodeId="10" secondNodeId="11" />
+    <Edge firstNodeId="9" secondNodeId="11" />
+    <Edge firstNodeId="9" secondNodeId="12" />
+    <Edge firstNodeId="12" secondNodeId="11" />
+    <Edge firstNodeId="12" secondNodeId="14" />
+    <Edge firstNodeId="11" secondNodeId="14" />
+    <Edge firstNodeId="11" secondNodeId="13" />
+    <Edge firstNodeId="13" secondNodeId="14" />
+    <Edge firstNodeId="13" secondNodeId="12" />
+    <Edge firstNodeId="8" secondNodeId="14" />
+    <Edge firstNodeId="9" secondNodeId="13" />
+    <Edge firstNodeId="14" secondNodeId="15" />
+    <Edge firstNodeId="15" secondNodeId="16" />
+    <Edge firstNodeId="21" secondNodeId="16" />
+    <Edge firstNodeId="19" secondNodeId="18" />
+    <Edge firstNodeId="22" secondNodeId="19" />
+    <Edge firstNodeId="18" secondNodeId="22" />
+    <Edge firstNodeId="20" secondNodeId="19" />
+    <Edge firstNodeId="23" secondNodeId="20" />
+    <Edge firstNodeId="23" secondNodeId="23" />
+    <Edge firstNodeId="23" secondNodeId="16" />
+    <Edge firstNodeId="23" secondNodeId="21" />
+    <Edge firstNodeId="23" secondNodeId="24" />
+    <Edge firstNodeId="24" secondNodeId="28" />
+    <Edge firstNodeId="28" secondNodeId="23" />
+    <Edge firstNodeId="23" secondNodeId="31" />
+    <Edge firstNodeId="25" secondNodeId="24" />
+    <Edge firstNodeId="24" secondNodeId="26" />
+    <Edge firstNodeId="26" secondNodeId="27" />
+    <Edge firstNodeId="27" secondNodeId="28" />
+    <Edge firstNodeId="27" secondNodeId="25" />
+    <Edge firstNodeId="28" secondNodeId="25" />
+    <Edge firstNodeId="26" secondNodeId="25" />
+    <Edge firstNodeId="26" secondNodeId="23" />
+    <Edge firstNodeId="23" secondNodeId="31" />
+    <Edge firstNodeId="23" secondNodeId="29" />
+    <Edge firstNodeId="29" secondNodeId="30" />
+    <Edge firstNodeId="30" secondNodeId="31" />
+    <Edge firstNodeId="30" secondNodeId="23" />
+    <Edge firstNodeId="31" secondNodeId="29" />
+    <Edge firstNodeId="32" secondNodeId="29" />
+    <Edge firstNodeId="32" secondNodeId="30" />
+    <Edge firstNodeId="31" secondNodeId="32" />
+    <Edge firstNodeId="32" secondNodeId="23" />
+    <Edge firstNodeId="20" secondNodeId="32" />
+    <Edge firstNodeId="32" secondNodeId="33" />
+    <Edge firstNodeId="33" secondNodeId="29" />
+    <Edge firstNodeId="23" secondNodeId="33" />
+    <Edge firstNodeId="23" secondNodeId="33" />
+    <Edge firstNodeId="31" secondNodeId="33" />
+  </Edges>
+</Pathfinding>
