@@ -34,11 +34,10 @@ public class RodrigueAgent : MonoBehaviour {
         {
             if(temp != this.gameObject)
             {
-                //if(temp.transform.parent.GetComponent<TeamNumber>().teamName != "RektByRodrigue")
-                //{
-                    listOfTarget.Add(temp);
-                //}
-                
+                if(temp.transform.parent.GetComponent<TeamNumber>().teamName != "RektByRodrigue")
+                {
+                  listOfTarget.Add(temp);
+                }
             }
         }
         //InvokeRepeating("GetTarget", 0.5f, 0.5f);

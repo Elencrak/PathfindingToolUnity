@@ -22,6 +22,8 @@ public class RodrigueAgent1 : MonoBehaviour
     public bool canShoot;
     public string teamName = "RektByRodrigue";
 
+    public List<GameObject> interestPoint2 = new List<GameObject>();
+
     // Use this for initialization
     void Start()
     {
@@ -35,7 +37,6 @@ public class RodrigueAgent1 : MonoBehaviour
                 //{
                 listOfTarget.Add(temp);
                 //}
-
             }
         }
         //InvokeRepeating("GetTarget", 0.5f, 0.5f);
@@ -48,6 +49,24 @@ public class RodrigueAgent1 : MonoBehaviour
         navMeshAgent.SetDestination(interestPoints[0].transform.position);
         rateOfFire = 1;
         InvokeRepeating("FindTarget", 0.1f, 0.1f);
+    }
+
+    void Patrol()
+    {
+        for(int i =0; i < interestPoint2.Count; i++)
+        {
+            if(Vector3.Distance(interestPoint2[i].transform.position, transform.position) < 2)
+            {
+                if(i == interestPoint2.Count-1)
+                {
+                    navMeshAgent.SetDestination(interestPoint2[0].transform.position);
+                }
+                else
+                {
+                    navMeshAgent.SetDestination(interestPoint2[i + 1].transform.position);
+                }
+            }
+        }
     }
 
     void OnTriggerEnter(Collider parOther)
