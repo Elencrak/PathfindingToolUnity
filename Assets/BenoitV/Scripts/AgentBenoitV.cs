@@ -14,11 +14,12 @@ public class AgentBenoitV : MonoBehaviour {
     public Transform[] points;
     public List<Vector3> pointOfInterest;
     int index;
+    string myTeamName;
 
     float coolDown = 1.0f;
     public float currentCoolDown;
+    
 
-	// Use this for initialization
 	void Start () {
         index = 0;
         coolDown = 1.0f;
@@ -26,6 +27,7 @@ public class AgentBenoitV : MonoBehaviour {
         spawnPosition = transform.position;
         distanceMin = Mathf.Infinity;
         myAgent = GetComponent<NavMeshAgent>();
+        myTeamName = transform.parent.GetComponent<TeamNumber>().teamName;
 
         pointOfInterest = new List<Vector3>();
         for(int i = 0; i < points.Length; ++i)
@@ -35,7 +37,7 @@ public class AgentBenoitV : MonoBehaviour {
         myTarget = pointOfInterest[0];
 
         FindTargets();
-        InvokeRepeating("MoveToTarget", 0.1f, 0.5f);
+        InvokeRepeating("MoveToTarget", 0.1f, 0.1f);
         InvokeRepeating("FindTarget", 0.1f, 0.1f);
         InvokeRepeating("SwitchPosition", 0.1f, 0.1f);
     }
@@ -46,7 +48,7 @@ public class AgentBenoitV : MonoBehaviour {
         tempTargets = GameObject.FindGameObjectsWithTag("Target");
         foreach (GameObject target in tempTargets)
         {
-            if (target.gameObject != this.gameObject)
+            if (target.gameObject != this.gameObject && !target.name.Contains("BenoitV")/* && target.transform.parent.GetComponent<TeamNumber>().teamName != myTeamName*/)
             {
                 targets.Add(target);
             }
@@ -63,7 +65,8 @@ public class AgentBenoitV : MonoBehaviour {
         }*/
         if(otherCollider.gameObject.tag == "Bullet")
         {
-            transform.position = spawnPosition;
+            myAgent.Warp(spawnPosition);
+            //transform.position = spawnPosition;
             myTargetShoot = null;
         }
     }
@@ -96,17 +99,13 @@ public class AgentBenoitV : MonoBehaviour {
         }
         if (myTargetShoot != null)
         {
-            if(currentCoolDown >= coolDown)
+            if (currentCoolDown >= coolDown)
             {
-                Shoot(myTargetShoot);
-                currentCoolDown = 0;
-            }
-            else
-            {
-                currentCoolDown += Time.deltaTime;
-
-            }
                 
+                    Shoot(myTargetShoot);
+                    
+            }
+            currentCoolDown += 0.1f;
         }
 
 
@@ -114,10 +113,26 @@ public class AgentBenoitV : MonoBehaviour {
 
     void Shoot(GameObject _target)
     {
-        transform.LookAt(new Vector3(_target.transform.position.x, transform.position.y, _target.transform.position.z));
-       GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position+ transform.forward*2.0f, Quaternion.identity) as GameObject;
 
-        bullet.transform.LookAt(_target.transform.position);
+        RaycastHit _hit;
+        Physics.Raycast(transform.position, myTargetShoot.transform.position - transform.position, out _hit);
+        if (_hit.collider.gameObject == myTargetShoot)
+        {
+                transform.LookAt(new Vector3(_target.transform.position.x, transform.position.y, _target.transform.position.z));
+
+                GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position + transform.forward * 2.0f, Quaternion.identity) as GameObject;
+                bullet.GetComponent<bulletScript>().launcherName = "TeamTank";
+                float distanceToTarget = Vector3.Distance(transform.position, _target.transform.position);
+                float ratio = distanceToTarget / 40f;
+                Vector3 _velocity = _target.GetComponent<NavMeshAgent>().velocity;
+
+                bullet.transform.LookAt(_target.transform.position + _velocity*ratio);
+                Debug.DrawLine(transform.position, _target.transform.position + _velocity * ratio, Color.red, 0.5f);
+                currentCoolDown = 0;
+        }else
+        {
+            myTargetShoot = null;
+        }
     }
     /*void ChangeTarget()
     {
@@ -146,7 +161,6 @@ public class AgentBenoitV : MonoBehaviour {
             {
                 index++;
             }
-            Debug.Log(index);
            myTarget = pointOfInterest[index];
         }
     }

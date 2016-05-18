@@ -18,12 +18,15 @@ public class AgentPoulpe : MonoBehaviour
     private float delayShoot = 1;
     private GameObject bot1;
     private GameObject bot2;
+    private int index;
+    public Vector3[] patrol;
 
     public GameObject[] temp;
 
 	// Use this for initialization
 	void Start ()
     {
+        GetComponent<Renderer>().material.color = Color.blue;
         /*
         //Select your pathfinding
         graph = new Pathfinding();
@@ -36,8 +39,8 @@ public class AgentPoulpe : MonoBehaviour
         road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position,graph);
         InvokeRepeating("UpdateRoad", 0.5f, 0.5f);
         Debug.Log(PathfindingManager.GetInstance().test);*/
-        bot1 = transform.parent.GetChild(1).gameObject;
-        bot2 = transform.parent.GetChild(2).gameObject;
+        //bot1 = transform.parent.GetChild(1).gameObject;
+        //bot2 = transform.parent.GetChild(2).gameObject;
         players = new List<GameObject>();
         temp = GameObject.FindGameObjectsWithTag("Target");
         foreach(GameObject pla in temp)
@@ -48,8 +51,14 @@ public class AgentPoulpe : MonoBehaviour
             }
         }
         begin = transform.position;
-        bot1.GetComponent<Poulpe2>().GetTargets(players);
-        bot2.GetComponent<Poulpe3>().GetTargets(players);
+        //bot1.GetComponent<Poulpe2>().GetTargets(players);
+        //bot2.GetComponent<Poulpe3>().GetTargets(players);
+        patrol = new Vector3[4];
+        patrol[0] = new Vector3(-67, 1, -67);
+        patrol[1] = new Vector3(67, 1, -67);
+        patrol[2] = new Vector3(67, 1, 67);
+        patrol[3] = new Vector3(-67, 1, 67);
+        index = 0;
     }
 	
 	// Update is called once per frame
@@ -77,7 +86,6 @@ public class AgentPoulpe : MonoBehaviour
 
     void Update()
     {
-        bool canHit = false;
         foreach (GameObject pla in players)
         {
             RaycastHit hit;
@@ -86,43 +94,16 @@ public class AgentPoulpe : MonoBehaviour
             {
                 if(startShoot + delayShoot <= Time.time)
                 {
-                    Shoot(hit.transform.position);
+                    Shoot(hit.transform.gameObject);
                 }
-                canHit = true;
                 break;
             }
         }
-        if(!canHit)
+        if(Vector3.Distance(transform.position, patrol[index]) <= 1.0f)
         {
-            bool first = false;
-            GameObject nearest = this.gameObject;
-            float dist = 0;
-            float tempdist;
-            //road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position, graph);
-            foreach(GameObject pla in players)
-            {
-                tempdist = Mathf.Abs(transform.position.x - pla.transform.position.x) + Mathf.Abs(transform.position.y - pla.transform.position.y) + Mathf.Abs(transform.position.z - pla.transform.position.z);
-                if (!first)
-                {
-                    first = true;
-                    nearest = pla;
-                    dist = tempdist;
-                }
-                else
-                {
-                    if(tempdist < dist && pla.transform.position.y <= transform.position.y)
-                    {
-                        dist = tempdist;
-                        nearest = pla;
-                    }
-                }
-            }
-            gameObject.GetComponent<NavMeshAgent>().SetDestination(nearest.transform.position);
+            index = Random.Range(0, patrol.Length);
         }
-        else
-        {
-            gameObject.GetComponent<NavMeshAgent>().SetDestination(transform.position);
-        }
+        GetComponent<NavMeshAgent>().SetDestination(patrol[index]);
     }
 
     void OnCollisionEnter(Collision collision)
@@ -137,11 +118,49 @@ public class AgentPoulpe : MonoBehaviour
         }
     }
 
-    void Shoot(Vector3 hit)
+    void Shoot(GameObject hit)
     {
         startShoot = Time.time;
-        transform.LookAt(hit);
+        transform.LookAt(CalcShootAngle(hit));
         GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position + transform.forward * 2, Quaternion.Euler(this.transform.eulerAngles)) as GameObject;
         bullet.GetComponent<bulletScript>().launcherName = "Poulpe";
+    }
+
+    Vector3 CalcShootAngle(GameObject hit)
+    {
+        Vector3 hitPos = hit.transform.position;
+        float hitSpeed = hit.GetComponent<NavMeshAgent>().speed;
+        float distance = Vector3.Distance(transform.position, hitPos);
+        float bulletSpeed = 40;
+        float erreur = 0.5f;
+        float temps = distance / bulletSpeed;
+        Vector3 hitPosArrive = hitPos + hit.transform.forward * hitSpeed * temps;
+        float newDist = Vector3.Distance(transform.position, hitPosArrive);
+        while (newDist - distance > erreur)
+        {
+            hitPos = hitPosArrive;
+            distance = Vector3.Distance(transform.position, hitPos) - distance;
+            temps = distance / bulletSpeed;
+            hitPosArrive = hitPos + hit.transform.forward * hitSpeed * temps;
+            newDist = Vector3.Distance(transform.position, hitPosArrive);
+            distance = Vector3.Distance(transform.position, hitPos);
+        }
+        Vector3 point = hitPosArrive;
+        return point;
+    }
+
+    void OnTriggerStay(Collider collider)
+    {
+        if(collider.tag == "Target" && collider.gameObject != bot1 && collider.gameObject != bot2)
+        {
+            if(startShoot + delayShoot <= Time.time)
+            {
+                Shoot(collider.gameObject);
+            }
+        }
+        else if(collider.tag == "Bullet")
+        {
+            transform.position = new Vector3(Mathf.Cos(Time.time) / 10 + transform.position.x, transform.position.y, Mathf.Sin(Time.time) / 10 + transform.position.z);
+        }
     }
 }

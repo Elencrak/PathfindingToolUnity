@@ -11,15 +11,19 @@ public class AgentM : MonoBehaviour {
 	GameObject currentBullet = null;
 	float distToTarget;
 	NavMeshAgent agent;
-	Vector3 startPos;
+	Vector3 startPos = new Vector3(58,1,-38);
 	float fireRate = 1;
 	public int ID;
+	int state = 1;
+	bool isArrived = false;
+	bool isAvoiding = false;
+	GameObject toAvoid = null;
 
 	// Use this for initialization
 	void Start () 
 	{
 		bullet = Resources.Load ("Bullet") as GameObject;
-		startPos = this.gameObject.transform.position;
+		//startPos = this.gameObject.transform.position;
 		agent = GetComponent<NavMeshAgent>();
 		tabTarget = GameObject.FindGameObjectsWithTag ("Target");
 		RemoveTargetFromTab (this.gameObject);
@@ -32,13 +36,13 @@ public class AgentM : MonoBehaviour {
 		switch (ID) 
 		{
 			case 0:
-				agent.destination = new Vector3 (51,1,-31); 
+				agent.destination = new Vector3 (74,1,-5); 
 				break;
 			case 1:
-				agent.destination = new Vector3 (51,1,-45);
+				agent.destination = new Vector3 (51,1,-4);
 				break;
 			case 2:
-				agent.destination = new Vector3 (82,1,-39); 
+				agent.destination = new Vector3 (58,1,-12);
 				break;
 		}
 		/*if (target != null) 
@@ -52,6 +56,7 @@ public class AgentM : MonoBehaviour {
 	{
 		if (target != null)
         {
+			LookAtTarget ();
             Cheat ();
             //agent.destination = target.transform.position;
         }
@@ -67,7 +72,78 @@ public class AgentM : MonoBehaviour {
 		{
 			Debug.Log ("Miformat Have Finish");
 		}
+		if (agent.remainingDistance < 0.5f) 
+		{
+			isArrived = true;
+			isAvoiding = false;
+		}
+		if (!isAvoiding && isArrived) {Patrol ();}
+		if (!isArrived){Avoid ();}
 	}
+
+	void Patrol()
+	{
+		switch (ID) 
+		{
+		case 0:
+			agent.destination = new Vector3 (74,1,-5); 
+			break;
+		case 1:
+			agent.destination = new Vector3 (51,1,-4);
+			break;
+		case 2:
+			if (state == 0) 
+			{
+				agent.destination = new Vector3 (50,1,-24);
+				state = 1;
+			} 
+			else 
+			{
+				agent.destination = new Vector3 (58,1,-12);
+				state = 0;
+			}
+			isArrived = false;
+			break;
+		}
+	}
+
+	void Suicide()
+	{
+		GameObject[] tabBullet;
+		tabBullet = GameObject.FindGameObjectsWithTag ("Bullet");
+		foreach (GameObject go in tabBullet) 
+		{
+			float distBull = Vector3.Distance (this.gameObject.transform.position, go.transform.position);
+			if (go.GetComponent<bulletScript> ().launcherName != "OSOK" && distBull < 2) {Death ();}
+		}
+	}
+
+	void Avoid()
+	{
+		Collider[] closeBullet = Physics.OverlapSphere (this.gameObject.transform.position, 5);
+		foreach (Collider go in closeBullet) 
+		{
+			if (go.gameObject != toAvoid && go.gameObject.tag == "Bullet" && go.gameObject.GetComponent<bulletScript> ().launcherName != "OSOK") 
+			{
+				Vector3 newDest = this.gameObject.transform.position;
+				if (go.gameObject.transform.position.x > this.gameObject.transform.position.x) {newDest += go.gameObject.transform.right*2;}
+				else if(go.gameObject.transform.position.x < this.gameObject.transform.position.x) {newDest -= go.gameObject.transform.right*2;}
+
+				if (go.gameObject.transform.position.z > this.gameObject.transform.position.z) {newDest += go.gameObject.transform.forward;}
+				else if(go.gameObject.transform.position.z < this.gameObject.transform.position.z) {newDest -= go.gameObject.transform.forward;}
+
+				//newDest = this.gameObject.transform.position + go.gameObject.transform.right * 2 + go.gameObject.transform.forward;
+				agent.destination = newDest;
+				isAvoiding = true;
+				isArrived = false;
+				toAvoid = go.gameObject;
+				//Debug.Log (this.gameObject.name + " avoiding " + go.gameObject.name + " to : " + newDest);
+				break;
+			}
+		}
+	}
+
+
 
 	GameObject FindCloseTarget()
 	{
@@ -128,6 +204,11 @@ public class AgentM : MonoBehaviour {
 		}
 	}
 
+	void LookAtTarget()
+	{
+		this.gameObject.GetComponentInChildren<Transform> ().LookAt (target.transform.position);
+	}
+
 	void Coloring(GameObject toColor)
 	{
 		float r = Random.Range (0.0f,1.0f);
@@ -166,13 +247,16 @@ public class AgentM : MonoBehaviour {
 
 	void Death()
 	{
+		agent.Warp (startPos);
 		this.gameObject.transform.position = startPos;
+		target = FindCloseTarget();
+		agent.destination = target.transform.position;
 	}
 
 	void Shoot()
 	{
 		Vector3 asmodunk = this.gameObject.transform.position;
-		asmodunk.y += 3;
+		asmodunk.y += 1.8f;
 		currentBullet = Instantiate (bullet, asmodunk, Quaternion.identity) as GameObject;
 		target = FindCloseTarget();
 		while (target.GetComponent<AgentM> ()) 

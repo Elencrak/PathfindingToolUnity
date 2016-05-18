@@ -4,6 +4,15 @@ using System.Collections.Generic;
 
 public class PierreAgent : MonoBehaviour {
 
+    public enum Strat
+    {
+        Offensive,
+        Defensive,
+        IDontKnow
+    }
+
+    public Strat strat;
+
     TeamNumber team;
 
     public List<GameObject> targets;
@@ -46,6 +55,11 @@ public class PierreAgent : MonoBehaviour {
         targets.Remove(gameObject);
 
         //road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position,graph);
+        if (strat == Strat.IDontKnow)
+        {
+            InvokeRepeating("UpdateRoadRandom", 0.1f, 5f);
+        }
+
         InvokeRepeating("UpdateRoad", 0.1f, 0.1f);
         //Debug.Log(PathfindingManager.GetInstance().test);
         InvokeRepeating("Fire", 0f, 1f);
@@ -53,29 +67,30 @@ public class PierreAgent : MonoBehaviour {
 
     void Fire()
     {
-        transform.LookAt(currentTargetFire + (currentTargetFire -lastTargetPosition)*5);
+        transform.LookAt(currentTargetFire + (currentTargetFire -lastTargetPosition)*Vector3.Distance(currentTargetFire,transform.position)/4);
 
-        GameObject b = Instantiate(bullet, transform.position + transform.forward * 3, Quaternion.identity) as GameObject;
+        GameObject b = Instantiate(bullet, transform.position + transform.forward * 1.5f, Quaternion.identity) as GameObject;
 
-        b.transform.LookAt(currentTargetFire + (currentTargetFire - lastTargetPosition)*5);
+        b.transform.LookAt(currentTargetFire + (currentTargetFire - lastTargetPosition) * Vector3.Distance(currentTargetFire, transform.position)/4);
         b.GetComponent<bulletScript>().launcherName = team.teamName;
     }
 
 	// Update is called once per frame
 	void Update () {
 
-
-
-        Collider[] hitColliders = Physics.OverlapSphere(transform.position, 20);
-        
-        foreach (Collider col in hitColliders)
+        if(strat == Strat.Defensive)
         {
-            if (col.tag == "Bullet")
+            Collider[] hitColliders = Physics.OverlapSphere(transform.position, 20);
+
+            foreach (Collider col in hitColliders)
             {
-                nav.SetDestination(transform.position + col.transform.right*20);
+                if (col.tag == "Bullet" && col.GetComponent<bulletScript>().launcherName != team.teamName)
+                {
+                    nav.SetDestination(transform.position + col.transform.right * 20);
+                }
             }
         }
-
+        
         //Debug.Log(currentTarget + " " + transform.position);
 
         /*if(road.Count > 0)
@@ -117,13 +132,24 @@ public class PierreAgent : MonoBehaviour {
             {
                 currentTarget = target.transform.position;
             }
-            if (Vector3.Distance(target.transform.position, transform.position) < Vector3.Distance(currentTarget, transform.position) || (currentTarget == transform.position && transform.position != target.transform.position))
+            if ((Vector3.Distance(target.transform.position, transform.position) < Vector3.Distance(currentTargetFire, transform.position) || (currentTargetFire == transform.position && transform.position != target.transform.position)) && !target.GetComponent<PierreAgent>())
             {
                 currentTargetFire = target.transform.position;
             }
         }
         
-        //nav.SetDestination(currentTargetFire);
+        if(strat == Strat.Offensive)
+        {
+            nav.SetDestination(currentTargetFire);
+        }
+    }
+
+    void UpdateRoadRandom()
+    {
+        if (strat == Strat.IDontKnow)
+        {
+            nav.SetDestination(targets[Random.Range(0, targets.Count - 1)].transform.position);
+        }
     }
 
     void OnCollisionEnter(Collision col)
