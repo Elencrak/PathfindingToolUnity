@@ -10,7 +10,7 @@ public class AgentM : MonoBehaviour {
 	GameObject[] tabTarget;
 	GameObject currentBullet = null;
 	float distToTarget;
-	NavMeshAgent agent;
+	//NavMeshAgent agent;
 	Vector3 startPos = new Vector3(58,1,-38);
 	float fireRate = 1;
 	public int ID;
@@ -19,12 +19,22 @@ public class AgentM : MonoBehaviour {
 	bool isAvoiding = false;
 	GameObject toAvoid = null;
 
+	float speed = 10.0f;
+	float closeEnoughRange = 1.0f;
+	Vector3 currentTarget;
+	Pathfinding graph;
+	List<Vector3> road = new List<Vector3>();
+
 	// Use this for initialization
 	void Start () 
 	{
+		graph = new Pathfinding();
+		graph.Load("MifPath");
+		graph.setNeighbors();
+
 		bullet = Resources.Load ("Bullet") as GameObject;
 		//startPos = this.gameObject.transform.position;
-		agent = GetComponent<NavMeshAgent>();
+		//agent = GetComponent<NavMeshAgent>();
 		tabTarget = GameObject.FindGameObjectsWithTag ("Target");
 		RemoveTargetFromTab (this.gameObject);
 		target = FindCloseTarget();
@@ -33,7 +43,7 @@ public class AgentM : MonoBehaviour {
 			RemoveTargetFromTab (target);
 			target = FindCloseTarget();
 		}
-		switch (ID) 
+		/*switch (ID) 
 		{
 			case 0:
 				agent.destination = new Vector3 (74,1,-5); 
@@ -44,13 +54,21 @@ public class AgentM : MonoBehaviour {
 			case 2:
 				agent.destination = new Vector3 (58,1,-12);
 				break;
-		}
+		}*/
+
+		road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position,graph);
+		//InvokeRepeating("UpdateRoad", 0.5f, 0.5f);
 		/*if (target != null) 
 		{
 			agent.destination = target.transform.position; 
 		}*/
     }
-	
+
+	void UpdateRoad()
+	{
+		road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position, graph);
+	}
+
 	// Update is called once per frame
 	void Update () 
 	{
@@ -59,6 +77,7 @@ public class AgentM : MonoBehaviour {
 			LookAtTarget ();
             Cheat ();
             //agent.destination = target.transform.position;
+			Move ();
         }
 		if (currentBullet != null) {Dunk ();}
 		fireRate -= Time.deltaTime;
@@ -72,13 +91,37 @@ public class AgentM : MonoBehaviour {
 		{
 			Debug.Log ("Miformat Have Finish");
 		}
-		if (agent.remainingDistance < 0.5f) 
+		if (Vector3.Distance(this.gameObject.transform.position, target.transform.position) < 0.5f) 
 		{
 			isArrived = true;
 			isAvoiding = false;
 		}
-		if (!isAvoiding && isArrived) {Patrol ();}
+		if (!isAvoiding && isArrived) 
+		{
+			//Patrol ();
+		}
 		if (!isArrived){Avoid ();}
+	}
+
+	void Move()
+	{
+		if(road.Count > 0)
+		{
+			currentTarget = road[0];
+			if (Vector3.Distance(transform.position, currentTarget) < closeEnoughRange)
+			{
+				road.RemoveAt(0);
+				currentTarget = road[0];
+			}
+			else
+			{
+				transform.position = Vector3.MoveTowards(transform.position, currentTarget, speed * Time.deltaTime);
+			}
+		}
+		else
+		{
+			transform.position = Vector3.MoveTowards(transform.position, target.transform.position, speed * Time.deltaTime);
+		}
 	}
 
 	void Patrol()
@@ -86,20 +129,20 @@ public class AgentM : MonoBehaviour {
 		switch (ID) 
 		{
 		case 0:
-			agent.destination = new Vector3 (74,1,-5); 
+			//agent.destination = new Vector3 (74,1,-5); 
 			break;
 		case 1:
-			agent.destination = new Vector3 (51,1,-4);
+			//agent.destination = new Vector3 (51,1,-4);
 			break;
 		case 2:
 			if (state == 0) 
 			{
-				agent.destination = new Vector3 (50,1,-24);
+				//agent.destination = new Vector3 (50,1,-24);
 				state = 1;
 			} 
 			else 
 			{
-				agent.destination = new Vector3 (58,1,-12);
+				//agent.destination = new Vector3 (58,1,-12);
 				state = 0;
 			}
 			isArrived = false;
@@ -133,7 +176,7 @@ public class AgentM : MonoBehaviour {
 				else if(go.gameObject.transform.position.z < this.gameObject.transform.position.z) {newDest -= go.gameObject.transform.forward;}
 
 				//newDest = this.gameObject.transform.position + go.gameObject.transform.right * 2 + go.gameObject.transform.forward;
-				agent.destination = newDest;
+				//agent.destination = newDest;
 				isAvoiding = true;
 				isArrived = false;
 				toAvoid = go.gameObject;
@@ -187,8 +230,8 @@ public class AgentM : MonoBehaviour {
 
 	void Danger()
 	{
-		Vector3 dir = target.GetComponent<NavMeshAgent> ().destination;
-		agent.destination = this.transform.position + dir;
+		//Vector3 dir = target.GetComponent<NavMeshAgent> ().destination;
+		//agent.destination = this.transform.position + dir;
 	}
 
 	void RemoveTargetFromTab(GameObject toRemove)
@@ -247,10 +290,10 @@ public class AgentM : MonoBehaviour {
 
 	void Death()
 	{
-		agent.Warp (startPos);
+		//agent.Warp (startPos);
 		this.gameObject.transform.position = startPos;
 		target = FindCloseTarget();
-		agent.destination = target.transform.position;
+		//agent.destination = target.transform.position;
 	}
 
 	void Shoot()
