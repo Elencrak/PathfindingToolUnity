@@ -23,8 +23,8 @@ public class Will_IA_M2 : MonoBehaviour {
 
         //target = GameObject.FindGameObjectWithTag("Target");
         road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position,graph);
-        //road = PathfindingManager.GetInstance().SmoothRoad(road);
-        InvokeRepeating("UpdateRoad", 0.5f, 0.5f);
+        road = PathfindingManager.GetInstance().SmoothRoad(road);
+        InvokeRepeating("UpdateRoad", 0.5f, 1f);
         //Debug.Log(PathfindingManager.GetInstance().test);
     }
 	
@@ -36,8 +36,11 @@ public class Will_IA_M2 : MonoBehaviour {
             currentTarget = road[0];
             if (Vector3.Distance(transform.position, currentTarget) < closeEnoughRange)
             {
+                
                 road.RemoveAt(0);
                 currentTarget = road[0];
+
+                
             }
             else
             {
@@ -55,5 +58,7 @@ public class Will_IA_M2 : MonoBehaviour {
     void UpdateRoad()
     {
         road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position, graph);
+        road = PathfindingManager.GetInstance().SmoothRoad(road);
+        
     }
 }

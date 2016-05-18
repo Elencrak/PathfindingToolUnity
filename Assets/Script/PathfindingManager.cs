@@ -66,7 +66,6 @@ public class PathfindingManager  {
         if (destination != endNode.getPosition())
             resultPath.Add(destination);
         return resultPath;
-
     }
 
     public List<Vector3> SmoothRoad(List<Vector3> road)
