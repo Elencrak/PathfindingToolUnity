@@ -124,7 +124,7 @@ public class Will_IA_m : MonoBehaviour {
         if (Physics.Raycast(transform.position, dir, out hit))
         {
             //Debug.Log("ray " + hit.collider.name);
-            if (hit.collider.tag == currentTarget.tag)
+            if (hit.collider.gameObject == currentTarget)
             {
                 strafe();
                 shootBullet(currentTarget);     
@@ -140,7 +140,7 @@ public class Will_IA_m : MonoBehaviour {
                     dir = obj.transform.position - transform.position;
                     if (Physics.Raycast(transform.position, dir, out hit))
                     {
-                        if (hit.collider.tag == obj.tag)
+                        if (hit.collider.gameObject == obj)
                         {
                             shootBullet(obj);
                             return;

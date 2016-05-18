@@ -46,7 +46,6 @@ public class AgentBenoitV : MonoBehaviour {
     {
         GameObject[] tempTargets;
         tempTargets = GameObject.FindGameObjectsWithTag("Target");
-        Debug.Log(myTeamName);
         foreach (GameObject target in tempTargets)
         {
             if (target.gameObject != this.gameObject && !target.name.Contains("BenoitV")/* && target.transform.parent.GetComponent<TeamNumber>().teamName != myTeamName*/)
@@ -66,7 +65,6 @@ public class AgentBenoitV : MonoBehaviour {
         }*/
         if(otherCollider.gameObject.tag == "Bullet")
         {
-            Debug.Log("test");
             myAgent.Warp(spawnPosition);
             //transform.position = spawnPosition;
             myTargetShoot = null;
@@ -101,20 +99,13 @@ public class AgentBenoitV : MonoBehaviour {
         }
         if (myTargetShoot != null)
         {
-            RaycastHit _hit;
-            Physics.Raycast(transform.position, transform.position+ myTargetShoot.transform.position, out _hit);
             if (currentCoolDown >= coolDown)
             {
+                
                     Shoot(myTargetShoot);
-                    currentCoolDown = 0;
-            }else
-            {
-                currentCoolDown += 0.1f;
+                    
             }
-
-            
-
-
+            currentCoolDown += 0.1f;
         }
 
 
@@ -122,12 +113,26 @@ public class AgentBenoitV : MonoBehaviour {
 
     void Shoot(GameObject _target)
     {
-        transform.LookAt(new Vector3(_target.transform.position.x, transform.position.y, _target.transform.position.z));
-       GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position+ transform.forward*2.0f, Quaternion.identity) as GameObject;
-        Vector3 _velocity = _target.GetComponent<NavMeshAgent>().velocity;
-        _velocity.Normalize();
-        bullet.transform.LookAt(_target.transform.position + _target.transform.position + _velocity * _target.GetComponent<NavMeshAgent>().speed);
-        Debug.DrawLine(transform.position, _target.transform.position + _velocity * _target.GetComponent<NavMeshAgent>().speed, Color.red, 0.5f);
+
+        RaycastHit _hit;
+        Physics.Raycast(transform.position, myTargetShoot.transform.position - transform.position, out _hit);
+        if (_hit.collider.gameObject == myTargetShoot)
+        {
+                transform.LookAt(new Vector3(_target.transform.position.x, transform.position.y, _target.transform.position.z));
+
+                GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position + transform.forward * 2.0f, Quaternion.identity) as GameObject;
+                bullet.GetComponent<bulletScript>().launcherName = "TeamTank";
+                float distanceToTarget = Vector3.Distance(transform.position, _target.transform.position);
+                float ratio = distanceToTarget / 40f;
+                Vector3 _velocity = _target.GetComponent<NavMeshAgent>().velocity;
+
+                bullet.transform.LookAt(_target.transform.position + _velocity*ratio);
+                Debug.DrawLine(transform.position, _target.transform.position + _velocity * ratio, Color.red, 0.5f);
+                currentCoolDown = 0;
+        }else
+        {
+            myTargetShoot = null;
+        }
     }
     /*void ChangeTarget()
     {
@@ -156,7 +161,6 @@ public class AgentBenoitV : MonoBehaviour {
             {
                 index++;
             }
-            Debug.Log(index);
            myTarget = pointOfInterest[index];
         }
     }
