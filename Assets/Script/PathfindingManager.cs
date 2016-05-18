@@ -53,16 +53,46 @@ public class PathfindingManager  {
         }
     }
 
-    public List<Vector3> GetRoad(Vector3 startPosition, Vector3 destination,Pathfinding path)
+    public List<Vector3> GetRoad(Vector3 startPosition, Vector3 destination, Pathfinding path)
     {
         List<Vector3> road = new List<Vector3>();
         Node startNode = FindNearNode(startPosition,path);
         startNode.distance = 0;
         Node endNode = FindNearNode(destination,path);
 
+        List<Vector3> resultPath = FindPathFromNode(startNode, endNode);
+        if (startPosition != startNode.getPosition())
+            resultPath.Insert(0, startPosition);
+        if (destination != endNode.getPosition())
+            resultPath.Add(destination);
+        return resultPath;
 
-        return FindPathFromNode(startNode,endNode);
+    }
 
+    public List<Vector3> SmoothRoad(List<Vector3> road)
+    {
+        Vector3 up = new Vector3(0, 1f, 0);
+        List<Vector3> r = new List<Vector3>(road.Count);
+        IEnumerator<Vector3> it = road.GetEnumerator();
+        if (!it.MoveNext())
+            return road;
+        Vector3 currentNode = it.Current;
+        r.Add(currentNode);
+        if (!it.MoveNext())
+            return road;
+        Vector3 formerNode = it.Current;
+        int layerMask = 1 << 20;
+        while (it.MoveNext())
+        {
+            if (Physics.Raycast(currentNode + up, it.Current - currentNode, Vector3.Distance(it.Current, currentNode), layerMask))
+            {
+                currentNode = formerNode;
+                r.Add(formerNode);
+            }
+            formerNode = it.Current;
+        }
+        r.Add(it.Current);
+        return r;
     }
 
     private Node FindNearNode(Vector3 position, Pathfinding path)
@@ -99,11 +129,10 @@ public class PathfindingManager  {
         tryNode.Add(Vector3.Distance(startNode.getPosition(), endNode.getPosition()), startNode);
         while((currentNode != endNode)&& tryNode.Count > 0)
         {
-
             currentNode = tryNode.ElementAt(0).Value;
             tryNode.RemoveAt(0);
             listNode = currentNode.neighborsNode;
-            foreach(Node node in listNode)
+            foreach (Node node in listNode)
             {
                 if(!checkNode.Contains(node))
                 {
@@ -141,11 +170,12 @@ public class PathfindingManager  {
     private List<Vector3> ReturnRoad(Node currentNode)
     {
         List<Vector3> tmpList = new List<Vector3>();
-        while(currentNode.previousNode != null)
+        do
         {
             tmpList.Insert(0, currentNode.getPosition());
             currentNode = currentNode.previousNode;
         }
+        while (currentNode != null);
         return tmpList;
     }
 
