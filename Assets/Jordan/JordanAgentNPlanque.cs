@@ -15,12 +15,17 @@ public class JordanAgentNPlanque : MonoBehaviour {
     private float startFireCoolDown;
     private float fireCoolDown = 1.0f;
 
+    void OnTriggerEnter(Collider col)
+    {
+        if (col.tag == "Target" && col.transform.parent.name != "Pelolance")
+            target = col.transform;
+    }
+
     void OnCollisionEnter(Collision col)
     {
         if (col.gameObject.tag == "Bullet")
         {
-            if(col.gameObject.GetComponent<bulletScript>().launcherName != "Pelolance")
-                this.transform.position = initPos;
+                nav.Warp(initPos);
         }
     }
 
@@ -49,11 +54,19 @@ public class JordanAgentNPlanque : MonoBehaviour {
     void Update()
     {
         RaycastHit hit;
-        Physics.Raycast(transform.position, points[1].position - transform.position, out hit, 10000.0f);
+
+        if(target == null)
+            Physics.Raycast(transform.position, points[1].position - transform.position, out hit, 10000.0f);
+        else
+            Physics.Raycast(transform.position, target.position - transform.position, out hit, 10000.0f);
+
         if (hit.collider.tag == "Target" && hit.collider.transform.parent.name != "Pelolance")
         {
             target = hit.collider.gameObject.transform;
         }
+
+        if (target != null && hit.collider.tag != "Target")
+            target = null;
 
         if (fireCoolDown + startFireCoolDown < Time.time && target != null)
             fire();
@@ -68,8 +81,8 @@ public class JordanAgentNPlanque : MonoBehaviour {
     {
         startFireCoolDown = Time.time;
         Object temp = Instantiate(bullet);
-        ((GameObject)temp).transform.position = this.transform.position - this.transform.forward;
-        ((GameObject)temp).transform.LookAt(target.position + target.forward);
+        ((GameObject)temp).transform.LookAt(target.position + target.forward * nav.speed * Vector3.Distance(transform.position, target.position));
+        ((GameObject)temp).transform.position = this.transform.position + target.forward;
         ((GameObject)temp).GetComponent<bulletScript>().launcherName = "Pelolance";
     }
 

@@ -18,6 +18,7 @@ public class AgentLefevre : MonoBehaviour
     NavMeshAgent agent;
     public GameObject bullet;
     float fireRate;
+    float bulletSpeed = 40f;
 
     // Use this for initialization
     void Start()
@@ -39,11 +40,13 @@ public class AgentLefevre : MonoBehaviour
             
         }
         spawn = transform.position;
-        coverPoints = new Vector3[4];
+        coverPoints = new Vector3[6];
         coverPoints[0] = transform.GetChild(0).position;
         coverPoints[1] = transform.GetChild(1).position;
         coverPoints[2] = transform.GetChild(2).position;
         coverPoints[3] = transform.GetChild(3).position;
+        coverPoints[4] = transform.GetChild(4).position;
+        coverPoints[5] = transform.GetChild(5).position;
         currentCover = 0;
 
         /*
@@ -64,7 +67,7 @@ public class AgentLefevre : MonoBehaviour
     }
     void Init()
     {
-        transform.position = spawn;
+        agent.Warp(spawn);
         currentCover = 0;
     }
 
@@ -144,12 +147,47 @@ public class AgentLefevre : MonoBehaviour
         {
             agent.Resume();
             agent.SetDestination(coverPoints[coverPointIndex + 1]);
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.4f);
+            target = GetTarget(coverPointIndex);
+            Vector3 startPos = target.transform.position;
             agent.Stop();
-            Vector3 relativePos = target.transform.position - coverPoints[coverPointIndex + 1];
-            Quaternion rotation = Quaternion.LookRotation(relativePos);
+            yield return new WaitForSeconds(0.1f);
+            Vector3 direction = target.transform.position-startPos;
+            float dist = Vector3.Distance(transform.position, target.transform.position);
+            float timeToHit = dist/ bulletSpeed;
+            Vector3 posToShoot = startPos+(direction*10f)*timeToHit;
+            dist = Vector3.Distance(transform.position, posToShoot);
+            timeToHit = dist / bulletSpeed;
+            posToShoot = startPos + (direction * 10f) * timeToHit;
+            float targetY = target.transform.position.y;
+            float Y = transform.position.y;
+            if (targetY - Y > 1f)
+                posToShoot += Vector3.up * 0.4f;
+            GameObject instance;
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position, target.transform.position, out hit))
+            {
+                if (hit.transform != null && hit.transform.gameObject != target)
+                {
+                    ChangeCover();
+                    yield return null;
+                }
+            }
+            if (timeToHit > 0.5f)
+            {
+                Vector3 relativePos = posToShoot - transform.position;
+                Quaternion rotation = Quaternion.LookRotation(relativePos);
+                Debug.DrawLine(transform.position, posToShoot, Color.blue, 2f);
+                instance = Instantiate(bullet, transform.position+ relativePos.normalized*2.0f, rotation) as GameObject;
 
-            GameObject instance = Instantiate(bullet, transform.position+ relativePos.normalized*2.0f, rotation) as GameObject;
+            }
+            else
+            {
+                Vector3 relativePos = target.transform.position+direction - transform.position;
+                Quaternion rotation = Quaternion.LookRotation(relativePos);
+                Debug.DrawLine(transform.position, posToShoot, Color.blue, 2f);
+                instance = Instantiate(bullet, transform.position + relativePos.normalized * 2.0f, rotation) as GameObject;
+            }
             instance.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
         }
         agent.Resume();

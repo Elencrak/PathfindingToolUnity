@@ -4,12 +4,22 @@ using System.Collections.Generic;
 
 public class PierreAgent : MonoBehaviour {
 
+    public enum Strat
+    {
+        Offensive,
+        Defensive,
+        IDontKnow
+    }
+
+    public Strat strat;
+
     TeamNumber team;
 
     public List<GameObject> targets;
     public float speed = 10.0f;
     public float closeEnoughRange = 1.0f;
     private Vector3 currentTarget;
+    private Vector3 currentTargetFire;
     //private Pathfinding graph;
     public List<Vector3> road = new List<Vector3>();
 
@@ -18,6 +28,8 @@ public class PierreAgent : MonoBehaviour {
     NavMeshAgent nav;
 
     Vector3 startPos;
+
+    Vector3 lastTargetPosition;
 
     // Use this for initialization
     void Start() {
@@ -43,37 +55,42 @@ public class PierreAgent : MonoBehaviour {
         targets.Remove(gameObject);
 
         //road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position,graph);
-        InvokeRepeating("UpdateRoad", 0.5f, 0.5f);
+        if (strat == Strat.IDontKnow)
+        {
+            InvokeRepeating("UpdateRoadRandom", 0.1f, 5f);
+        }
+
+        InvokeRepeating("UpdateRoad", 0.1f, 0.1f);
         //Debug.Log(PathfindingManager.GetInstance().test);
         InvokeRepeating("Fire", 0f, 1f);
     } 
 
     void Fire()
     {
-        transform.LookAt(currentTarget);
+        transform.LookAt(currentTargetFire + (currentTargetFire -lastTargetPosition)*Vector3.Distance(currentTargetFire,transform.position)/4);
 
-        GameObject b = Instantiate(bullet, transform.position + transform.forward * 3, Quaternion.identity) as GameObject;
+        GameObject b = Instantiate(bullet, transform.position + transform.forward * 1.5f, Quaternion.identity) as GameObject;
 
-        b.transform.LookAt(currentTarget);
+        b.transform.LookAt(currentTargetFire + (currentTargetFire - lastTargetPosition) * Vector3.Distance(currentTargetFire, transform.position)/4);
         b.GetComponent<bulletScript>().launcherName = team.teamName;
     }
 
 	// Update is called once per frame
 	void Update () {
 
-        nav.SetDestination(currentTarget);
-
-        Collider[] hitColliders = Physics.OverlapSphere(transform.position, 4);
-        
-        foreach (Collider col in hitColliders)
+        if(strat == Strat.Defensive)
         {
-            if (col.tag == "Bullet")
+            Collider[] hitColliders = Physics.OverlapSphere(transform.position, 20);
+
+            foreach (Collider col in hitColliders)
             {
-                col.transform.LookAt(currentTarget);
-                col.GetComponent<bulletScript>().launcherName = team.teamName;
+                if (col.tag == "Bullet" && col.GetComponent<bulletScript>().launcherName != team.teamName)
+                {
+                    nav.SetDestination(transform.position + col.transform.right * 20);
+                }
             }
         }
-
+        
         //Debug.Log(currentTarget + " " + transform.position);
 
         /*if(road.Count > 0)
@@ -100,18 +117,38 @@ public class PierreAgent : MonoBehaviour {
         //road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position, graph);
 
         if (targets.Count <= 0) return;
+        
+        lastTargetPosition = currentTargetFire;
 
         if(targets[0] != gameObject)
         {
             currentTarget = targets[0].transform.position;
+            currentTargetFire = targets[0].transform.position;
         }
 
         foreach(GameObject target in targets)
         {
-            if(Vector3.Distance(target.transform.position,transform.position) < Vector3.Distance(currentTarget, transform.position) || (currentTarget == transform.position && transform.position != target.transform.position))
+            if(Vector3.Distance(target.transform.position,transform.position) > Vector3.Distance(currentTarget, transform.position) || (currentTarget == transform.position && transform.position != target.transform.position))
             {
                 currentTarget = target.transform.position;
             }
+            if ((Vector3.Distance(target.transform.position, transform.position) < Vector3.Distance(currentTargetFire, transform.position) || (currentTargetFire == transform.position && transform.position != target.transform.position)) && !target.GetComponent<PierreAgent>())
+            {
+                currentTargetFire = target.transform.position;
+            }
+        }
+        
+        if(strat == Strat.Offensive)
+        {
+            nav.SetDestination(currentTargetFire);
+        }
+    }
+
+    void UpdateRoadRandom()
+    {
+        if (strat == Strat.IDontKnow)
+        {
+            nav.SetDestination(targets[Random.Range(0, targets.Count - 1)].transform.position);
         }
     }
 
@@ -129,7 +166,7 @@ public class PierreAgent : MonoBehaviour {
         }
         else if(col.transform.tag == "Bullet" && col.transform.GetComponent<bulletScript>().launcherName != team.teamName)
         {
-            transform.position = startPos;
+            nav.Warp(startPos);
         }
     }
 }

@@ -18,8 +18,7 @@ public class JordanAgent : MonoBehaviour {
     {
         if(col.gameObject.tag == "Bullet")
         {
-            if (col.gameObject.GetComponent<bulletScript>().launcherName != "Pelolance")
-                this.transform.position = initPos;
+                nav.Warp(initPos);
         }
     }
 
@@ -44,7 +43,11 @@ public class JordanAgent : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-        if (fireCoolDown + startFireCoolDown < Time.time)
+        RaycastHit hit;
+        
+        Physics.Raycast(transform.position, points[1].position - transform.position, out hit, 10000.0f);
+
+        if (fireCoolDown + startFireCoolDown < Time.time && (hit.collider.tag != "Target" || (hit.collider.tag == "Target" && hit.collider.transform.parent.name != "Pelolance")))
             fire();
 
         if(transform.position.x != points[0].position.x && transform.position.z != points[0].position.z)
