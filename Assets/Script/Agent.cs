@@ -51,6 +51,6 @@ public class Agent : MonoBehaviour {
 
     void UpdateRoad()
     {
-        road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position, graph);
+        //road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position, graph);
     }
 }
