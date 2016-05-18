@@ -36,8 +36,8 @@ public class AgentPoulpe : MonoBehaviour
         road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position,graph);
         InvokeRepeating("UpdateRoad", 0.5f, 0.5f);
         Debug.Log(PathfindingManager.GetInstance().test);*/
-        bot1 = transform.parent.GetChild(1).gameObject;
-        bot2 = transform.parent.GetChild(2).gameObject;
+       // bot1 = transform.parent.GetChild(1).gameObject;
+        //bot2 = transform.parent.GetChild(2).gameObject;
         players = new List<GameObject>();
         temp = GameObject.FindGameObjectsWithTag("Target");
         foreach(GameObject pla in temp)
@@ -48,8 +48,8 @@ public class AgentPoulpe : MonoBehaviour
             }
         }
         begin = transform.position;
-        bot1.GetComponent<Poulpe2>().GetTargets(players);
-        bot2.GetComponent<Poulpe3>().GetTargets(players);
+       // bot1.GetComponent<Poulpe2>().GetTargets(players);
+       // bot2.GetComponent<Poulpe3>().GetTargets(players);
     }
 	
 	// Update is called once per frame
