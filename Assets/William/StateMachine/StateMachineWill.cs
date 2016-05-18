@@ -20,7 +20,7 @@ public class StateMachineWill : StateWill {
 
     public override void execute()
     {
-        check();
+        checkTransition();
         currentState.execute();
     }
 
@@ -29,11 +29,17 @@ public class StateMachineWill : StateWill {
         currentState = newState;
     }
 
-    protected override void check()
+    protected override void checkTransition()
     {
+        StateWill next = null;
         foreach (TransitionWill trans in transition)
         {
-
+            next = trans.check();
+            if (next!=null)
+            {
+                changeState(next);
+                return;
+            }
         }
     }
 

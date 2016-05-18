@@ -6,5 +6,5 @@ public abstract class StateWill : MonoBehaviour {
 
     public List<TransitionWill> transition;
     public abstract void execute();
-    protected abstract void check();
+    protected abstract void checkTransition();
 }

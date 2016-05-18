@@ -2,6 +2,6 @@
 using System.Collections;
 
 public abstract class TransitionWill : MonoBehaviour {
-
-    public abstract void check();
+    StateWill nextState;
+    public abstract StateWill check();
 }
