@@ -16,7 +16,7 @@ public class Agent : MonoBehaviour {
 
         //Select your pathfinding
         graph = new Pathfinding();
-        graph.Load("poulpe");
+        graph.Load("PoulpeNavMesh");
         graph.setNeighbors();
         //
 
