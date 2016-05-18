@@ -4,68 +4,78 @@ using System.Collections.Generic;
 
 public class PierreStateMachine : PierreState
 {
-    List<PierreState> states;
-
     public PierreState currentState;
 
-    Pathfinding myPathfinding;
+    //Pathfinding myPathfinding;
 
     Vector3 currentTarget;
-
-    public Transform target;
-
+    
     List<Vector3> road;
+
+    NavMeshAgent nav;
+
+    public enum Strat
+    {
+        Offensive,
+        Defensive,
+        IDontKnow
+    }
+
+    public Strat basicStrat;
 
     // Use this for initialization
     void Start ()
     {
-        myPathfinding = new Pathfinding();
-        myPathfinding.Load("PierrePathFinding2");
-        myPathfinding.setNeighbors();
+        /* myPathfinding = new Pathfinding();
+         myPathfinding.Load("PierrePathFinding2");
+         myPathfinding.setNeighbors();
 
+         road = PathfindingManager.GetInstance().GetRoad(transform.position, target.position, myPathfinding);
 
+         road = PathfindingManager.GetInstance().SmoothRoad(road);*/
 
-        road = PathfindingManager.GetInstance().GetRoad(transform.position, target.position, myPathfinding);
+        switch (basicStrat)
+        {
+            case Strat.Offensive:
+                currentState = gameObject.AddComponent<PierreOffensif>();
+                break;
+            case Strat.Defensive:
+                currentState = gameObject.AddComponent<PierreDefensif>();
+                break;
+            case Strat.IDontKnow:
+                currentState = gameObject.AddComponent<PierreRandom>();
+                break;
+        }
 
-        road = PathfindingManager.GetInstance().SmoothRoad(road);
+        nav = GetComponent<NavMeshAgent>();
+        nav.speed = 10;
+        nav.acceleration = 20;
+        nav.stoppingDistance = 5;
     }
 	
 	// Update is called once per frame
 	void Update ()
     {
-
-        Move();
-
-        Fire();
-
+        
 	}
 
-    public override void Move() 
+    public override void Move(NavMeshAgent nav) 
     {
-        
-        if (road.Count > 0)
-        {
-            currentTarget = road[0];
-            if (Vector3.Distance(transform.position, currentTarget) < .1f)
-            {
-                road.RemoveAt(0);
-                currentTarget = road[0];
-            }
-            else
-            {
-                transform.position = Vector3.MoveTowards(transform.position, currentTarget, 10 * Time.deltaTime);
-            }
-        }
-        else
-        {
-            transform.position = Vector3.MoveTowards(transform.position, target.position, 10 * Time.deltaTime);
-        }
-
-        //currentState.Move();
+        currentState.Move(nav);
     }
 
     public override void Fire()
     {
-        //currentState.Fire();
+        currentState.Fire();
+    }
+
+    public override Vector3 UpdateTarget(Vector3 myTarget, List<GameObject> targets)
+    {
+        return currentState.UpdateTarget(myTarget,targets);
+    }
+
+    public override Vector3 UpdateTargetMove(Vector3 myTargetMove, List<GameObject> targets)
+    {
+        return currentState.UpdateTargetMove(myTargetMove, targets);
     }
 }
