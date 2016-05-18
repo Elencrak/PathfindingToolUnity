@@ -21,7 +21,7 @@ public class Will_IA_soldier : MonoBehaviour {
         spawn = transform.position;
         agent = GetComponent<NavMeshAgent>();
         Chief = GameObject.Find("Agent_Will").GetComponent<Will_IA_m>();
-        targets = transform.parent.GetComponent<TeamWillScript>().ennemis;
+        targets = transform.parent.GetComponent<TeamManagerWill>().ennemis;
         //targets = new List<GameObject>(GameObject.FindGameObjectsWithTag("Target"));
         //targets.Remove(this.gameObject);
         bullet = new GameObject();

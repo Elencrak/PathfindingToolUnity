@@ -13,8 +13,6 @@
     <Node positionX="-36.89424" positionY="0.5" positionZ="-2.40610027" nodeId="18" />
     <Node positionX="-46.65601" positionY="2.69999981" positionZ="-2.532719" nodeId="19" />
     <Node positionX="-46.6292229" positionY="2.69999981" positionZ="-9.993462" nodeId="20" />
-    <Node positionX="-58.7980728" positionY="0.5" positionZ="-7.10329771" nodeId="22" />
-    <Node positionX="-42.95739" positionY="0.5" positionZ="5.47669935" nodeId="24" />
     <Node positionX="-63.7975349" positionY="0.5" positionZ="1.13844943" nodeId="27" />
     <Node positionX="-63.6433067" positionY="0.5" positionZ="7.62232637" nodeId="28" />
     <Node positionX="-63.7776871" positionY="0.5" positionZ="21.561451" nodeId="29" />
@@ -38,6 +36,7 @@
     <Node positionX="-36.8967323" positionY="0.5" positionZ="-9.168865" nodeId="64" />
     <Node positionX="-54.3623047" positionY="0.5" positionZ="-14.9847145" nodeId="65" />
     <Node positionX="-55.36155" positionY="0.5" positionZ="10.9459419" nodeId="66" />
+    <Node positionX="-31.45183" positionY="0.5" positionZ="-0.07904959" nodeId="67" />
   </Nodes>
   <Edges>
     <Edge firstNodeId="48" secondNodeId="8" />
@@ -51,9 +50,6 @@
     <Edge firstNodeId="9" secondNodeId="48" />
     <Edge firstNodeId="12" secondNodeId="14" />
     <Edge firstNodeId="13" secondNodeId="12" />
-    <Edge firstNodeId="50" secondNodeId="24" />
-    <Edge firstNodeId="24" secondNodeId="13" />
-    <Edge firstNodeId="24" secondNodeId="14" />
     <Edge firstNodeId="13" secondNodeId="14" />
     <Edge firstNodeId="27" secondNodeId="58" />
     <Edge firstNodeId="28" secondNodeId="54" />
@@ -66,14 +62,10 @@
     <Edge firstNodeId="20" secondNodeId="19" />
     <Edge firstNodeId="19" secondNodeId="54" />
     <Edge firstNodeId="58" secondNodeId="20" />
-    <Edge firstNodeId="61" secondNodeId="22" />
     <Edge firstNodeId="58" secondNodeId="61" />
     <Edge firstNodeId="61" secondNodeId="20" />
     <Edge firstNodeId="61" secondNodeId="19" />
-    <Edge firstNodeId="22" secondNodeId="39" />
     <Edge firstNodeId="39" secondNodeId="37" />
-    <Edge firstNodeId="22" secondNodeId="38" />
-    <Edge firstNodeId="22" secondNodeId="37" />
     <Edge firstNodeId="37" secondNodeId="38" />
     <Edge firstNodeId="36" secondNodeId="38" />
     <Edge firstNodeId="28" secondNodeId="36" />
