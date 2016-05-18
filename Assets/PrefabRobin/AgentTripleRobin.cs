@@ -34,18 +34,20 @@ public class AgentTripleRobin : Entity
 
     void UpdateTarget()
     {
-
-        GameObject target = tankUnit.targets[Random.Range(0, tankUnit.targets.Count - 1)];
-
-        if (target)
+        if (tankUnit.targets.Count > 0)
         {
-            Target = target;
-            TargetCollider = target.GetComponent<BoxCollider>();
-        }
-        else
-        {
-            Target = null;
-            TargetCollider = null;
+            GameObject target = tankUnit.targets[Random.Range(0, tankUnit.targets.Count - 1)];
+
+            if (target)
+            {
+                Target = target;
+                TargetCollider = target.GetComponent<BoxCollider>();
+            }
+            else
+            {
+                Target = null;
+                TargetCollider = null;
+            }
         }
     }
 
@@ -56,7 +58,8 @@ public class AgentTripleRobin : Entity
         {
             if (TargetCollider)
             {
-                NavMeshAgent targ = Target.GetComponent<NavMeshAgent>();
+                //NavMeshAgent targ = Target.GetComponent<NavMeshAgent>();
+                Agent targ = Target.GetComponent<Agent>();
 
                 Vector3 positionPredicted = TargetCollider.transform.position + Vector3.up * 0.5f;
 
@@ -64,7 +67,7 @@ public class AgentTripleRobin : Entity
 
                 while (Vector3.Distance(transform.position, positionPredicted) - distanceParcourue > float.Epsilon)
                 {
-                    positionPredicted += targ.velocity * Time.fixedDeltaTime;
+                    positionPredicted += (targ.target.transform.position - targ.transform.position) * Time.fixedDeltaTime;
                     distanceParcourue += Time.fixedDeltaTime * bullet.speed;
                 }
 

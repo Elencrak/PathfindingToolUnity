@@ -54,7 +54,8 @@ public class AgentSimpleRobin : AgentRobinMathieu
         {
             if (nearTargetCollider)
             {
-                NavMeshAgent targ = nearestTarget.GetComponent<NavMeshAgent>();
+                //NavMeshAgent targ = nearestTarget.GetComponent<NavMeshAgent>();
+                Agent targ = nearestTarget.GetComponent<Agent>();
 
                 Vector3 positionPredicted = nearTargetCollider.transform.position + Vector3.up * 0.5f;
 
@@ -62,7 +63,7 @@ public class AgentSimpleRobin : AgentRobinMathieu
 
                 while (Vector3.Distance(transform.position, positionPredicted) - distanceParcourue > float.Epsilon)
                 {
-                    positionPredicted += targ.velocity * Time.fixedDeltaTime;
+                    positionPredicted += (targ.target.transform.position - targ.transform.position) * Time.fixedDeltaTime;
                     distanceParcourue += Time.fixedDeltaTime * bullet.speed;
                 }
 

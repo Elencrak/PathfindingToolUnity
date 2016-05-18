@@ -63,7 +63,8 @@ public class AgentDoubleRobin : Entity
         {
             if (TargetCollider)
             {
-                NavMeshAgent targ = Target.GetComponent<NavMeshAgent>();
+                //NavMeshAgent targ = Target.GetComponent<NavMeshAgent>();
+                Agent targ = Target.GetComponent<Agent>();
 
                 Vector3 positionPredicted = TargetCollider.transform.position + Vector3.up * 0.5f;
 
@@ -71,7 +72,7 @@ public class AgentDoubleRobin : Entity
 
                 while (Vector3.Distance(transform.position, positionPredicted) - distanceParcourue > float.Epsilon)
                 {
-                    positionPredicted += targ.velocity * Time.fixedDeltaTime;
+                    positionPredicted += (targ.target.transform.position - targ.transform.position) * Time.fixedDeltaTime;
                     distanceParcourue += Time.fixedDeltaTime * bullet.speed;
                 }
 
