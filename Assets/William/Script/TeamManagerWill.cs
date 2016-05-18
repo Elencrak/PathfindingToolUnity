@@ -3,14 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class TeamManagerWill : MonoBehaviour {
-
-    List<Will_IA_M2> members;
+    public static TeamManagerWill instance;
+    public List<Will_IA_M2> members;
     public List<GameObject> ennemis;
-
+    public GameObject mainTarget;
     GameObject mainEnnemie;
 
     // Use this for initialization
     void Awake () {
+        instance = this;
         members = new List<Will_IA_M2>(GetComponentsInChildren<Will_IA_M2>());
         ennemis = new List<GameObject>(GameObject.FindGameObjectsWithTag("Target"));
         ennemis.Remove(members[0].gameObject);

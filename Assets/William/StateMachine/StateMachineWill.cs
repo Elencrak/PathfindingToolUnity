@@ -1,46 +1,57 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using System;
 
 public class StateMachineWill : StateWill {
 
-    List<StateWill> states;
+    public List<StateWill> states;
     StateWill currentState;
 
-	void Start () {
-	
-	}
-	
-
-	
-	void Update () {
-	
-	}
-
-    public override void execute()
+    public StateMachineWill(List<StateWill> listState, int indexFirstState =0)
     {
-        checkTransition();
-        currentState.execute();
+        transition = new List<TransitionWill>();
+        states = listState;
+        currentState = states[indexFirstState];
+    }
+
+    public StateMachineWill(StateWill state)
+    {
+        currentState = state;
+    }
+
+
+    public override StateWill execute()
+    {
+        StateWill next = checkTransition();
+        if (next!=null)return next;
+        
+        changeState(currentState.execute());
+        
+        
+
+        return null;
     }
 
     public void changeState(StateWill newState)
     {
+        if(newState!=null)
         currentState = newState;
     }
 
-    protected override void checkTransition()
+    protected override StateWill checkTransition()
     {
         StateWill next = null;
         foreach (TransitionWill trans in transition)
         {
+            
             next = trans.check();
             if (next!=null)
             {
                 changeState(next);
-                return;
+                return next;
             }
         }
+        return null;
     }
 
 }
