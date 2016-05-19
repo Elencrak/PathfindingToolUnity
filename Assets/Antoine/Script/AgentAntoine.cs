@@ -11,9 +11,12 @@ public class AgentAntoine : MonoBehaviour
 
     public GameObject[] enemies;
 
+    public GameObject nodes;
+
     public float rate = 1.0f;
     public float lastShoot = 0.0f;
-    public bool canShoot = true;
+    private bool canShoot = true;
+    private bool isShooting = false;
 
     bool finished = false;
 
@@ -22,14 +25,14 @@ public class AgentAntoine : MonoBehaviour
     public Vector3 SpawnPos;
 
     public GameObject[] points;
-    public int index = 0;
+    private int index = 0;
     private Vector3 PathPoint;
 
     public GameObject bullet;
     public GameObject spawnBullet;
     public GameObject spawnBulletRotation;
 
-    public bool esquive;
+    private bool esquive;
 
     private float offset = 0;
 
@@ -39,27 +42,35 @@ public class AgentAntoine : MonoBehaviour
     private Pathfinding graph;
     public List<Vector3> road = new List<Vector3>();
 
+    private bool isMoving = false;
+    private Vector3 lastPoint;
+
+    StateMachineAntoine theStateMachine;
+
     // Use this for initialization
     void Start()
     {
+        theStateMachine = new StateMachineAntoine(gameObject);
+
         graph = new Pathfinding();
         graph.Load("antoinePathFinding");
         graph.setNeighbors();
 
         SpawnPos = transform.position;
 
+        int rand = Random.Range(0, nodes.transform.childCount - 1);
+
+        target = nodes.transform.GetChild(rand).gameObject;
+
         //PathPoint = points[index].transform.position;
 
         InvokeRepeating("ChangeColor", 0.5f, 0.1f);
 
-        InvokeRepeating("FindNewTarget", 0.5f, 0.5f);
+        //InvokeRepeating("FindNewTarget", 0.5f, 0.5f);
+
+        InvokeRepeating("Calc", 0f, 1.0f);
 
         enemies = GameObject.FindGameObjectsWithTag("Target");
-        target = GameObject.FindGameObjectWithTag("Target");
-
-
-        road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position, graph);
-        road = PathfindingManager.GetInstance().SmoothRoad(road);
 
         for (int i = 0; i < enemies.Length; i++)
         {
@@ -67,97 +78,168 @@ public class AgentAntoine : MonoBehaviour
             {
                 enemies[i] = null;
             }
+            else if (enemies[i] == bro1)
+            {
+                enemies[i] = null;
+            }
+            else if (enemies[i] == bro2)
+            {
+                enemies[i] = null;
+            }
         }
 
-
-        /*GameObject lol = GameObject.Find("PointsAntoine");
-        points = new GameObject[lol.transform.childCount];
-        for(int i = 0; i<lol.transform.childCount; i++)
-        {
-            points[i] = lol.transform.GetChild(i).gameObject;
-        }*/
-
+        isMoving = false;
+        isShooting = false;
+        canShoot = true;
         bullet = Resources.Load("Bullet") as GameObject;
         finished = false;
-        //FindNewTarget();
     }
 
     // Update is called once per frame
     void Update()
     {
+        Debug.Log(theStateMachine.GetCurrentState().currentType);
+        theStateMachine.Update();
+
         offset = 7 * Mathf.Sin(Time.time * 5);
-        //target = GameObject.FindGameObjectWithTag("Target");
-        //road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position, graph);
-        // road = PathfindingManager.GetInstance().SmoothRoad(road);
-        if(road.Count > 0)
-        {
 
-            transform.position = Vector3.MoveTowards(transform.position, road[0], speed * Time.deltaTime);
-            transform.LookAt(road[0]);
-            if (Vector3.Distance(transform.position, road[0]) <= 0.1f)
-            {
-                road.RemoveAt(0);
-            }
-
-        }
-        /* if (canShoot && target != null)
+         if (canShoot && target != null)
          {
-             spawnBulletRotation.transform.LookAt(target.transform.position);
+            RaycastHit hit;
+            if (Physics.Raycast(spawnBullet.transform.position, (target.transform.position - transform.position).normalized, out hit, 5000.0f))
+            {
+                if (hit.transform.tag == "Target" && hit.transform.gameObject != bro1 && hit.transform.gameObject != bro2 && hit.transform.gameObject != gameObject)
+                { 
+                    spawnBulletRotation.transform.LookAt(target.transform.position);
+                    isShooting = true;
 
-             /*Vector3 D = target.transform.position - transform.position;
-             Vector3 D2 = target.transform.position - transform.position;
-
-
-             float top = (D.x * D2.x) + (D.y * D2.y) + (D.z * D2.z);
-             float leftBot = Mathf.Sqrt((D.x * D.x) + (D.y * D.y) + (D.z * D.z));
-             float rightBot = Mathf.Sqrt((D2.x * D2.x) + (D2.y * D2.y) + (D2.z * D2.z));
-             float alpha = Mathf.Acos(top / (leftBot * rightBot));
-
-             spawnBulletRotation.transform.Rotate(Vector3.up, alpha);
-
-             GameObject go = Instantiate(bullet, spawnBullet.transform.position, Quaternion.identity) as GameObject;
-             go.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
-             go.transform.LookAt(target.transform.position + target.transform.forward);
-             canShoot = false;
-             lastShoot = 0.0f;
+                    GameObject go = Instantiate(bullet, spawnBullet.transform.position, Quaternion.identity) as GameObject;
+                    go.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
+                    go.transform.LookAt(target.transform.position + target.transform.forward);
+                    canShoot = false;
+                    lastShoot = 0.0f;
+                }
+            }
          }
          else
          {
+             isShooting = false;
              lastShoot += Time.deltaTime;
              if (lastShoot >= rate)
              {
                  lastShoot = 0.0f;
                  canShoot = true;
              }
-             if(!target)
-                 spawnBulletRotation.transform.LookAt(PathPoint);
-         }*/
-
-
-        /* if (!finished)
-         {
-             if(Vector3.Distance(transform.position, PathPoint) <= 3f)
-             {
-                 index = Random.Range(0, points.Length);
-                 if (index >= points.Length)
-                     index = 0;
-                 PathPoint = points[index].transform.position;
-             }
-             //GetComponent<NavMeshAgent>().SetDestination(PathPoint);
-             target = GameObject.FindGameObjectWithTag("Target");
-             road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position, graph);
-            // road = PathfindingManager.GetInstance().SmoothRoad(road);
-             transform.position = Vector3.MoveTowards(transform.position, road[0], 10.0f * Time.deltaTime);
-             if(Vector3.Distance(transform.position, road[0]) <= 0.1f)
-             {
-                 road.RemoveAt(0);
-             }
-             //transform.position = transform.position + /*new Vector3(0f, 0f, offset * 0.02f); transform.right * offset * 0.02f;
+             if (!target)
+                 spawnBulletRotation.transform.LookAt(lastPoint);
          }
-         else
-         {
-             transform.Rotate(Vector3.up, Time.deltaTime * 50f);
-         }*/
+    }
+
+    void Calc()
+    {
+        road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position, graph);
+        road = PathfindingManager.GetInstance().SmoothRoad(road);
+    }
+
+    public bool MustChase()
+    {
+        foreach (GameObject g in enemies)
+        {
+            RaycastHit hit;
+            if (g != null && Physics.Raycast(spawnBullet.transform.position, (target.transform.position - transform.position).normalized, out hit, 5000.0f))
+            {
+                if (hit.transform.gameObject.tag == "Target" && hit.transform.gameObject != bro1 && hit.transform.gameObject != bro2 && hit.transform.gameObject != gameObject)
+                {
+                    Debug.Log("must chase");
+                    target = hit.transform.gameObject;
+                    return true;
+                }
+                else
+                {
+                    Debug.Log(hit.transform.name);
+                }
+            }
+        }
+        return false;
+    }
+
+    public void Chase()
+    {
+       // Debug.Log("chase");
+        transform.position = Vector3.MoveTowards(transform.position, road[0], speed * Time.deltaTime);
+        transform.LookAt(road[0]);
+        if (Vector3.Distance(transform.position, road[0]) <= 0.1f)
+        {
+            // Debug.Log("change point");
+            road.RemoveAt(0);
+        }
+    }
+
+    public void Patrol()
+    {
+       // Debug.Log("patrol");
+        if (Vector3.Distance(transform.position, target.transform.position) <= 0.1f)
+        {
+            //Debug.Log("change target");
+            int rand = Random.Range(0, nodes.transform.childCount - 1);
+
+            target = nodes.transform.GetChild(rand).gameObject;
+
+            road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position, graph);
+            road = PathfindingManager.GetInstance().SmoothRoad(road);
+        }
+        else if(Vector3.Distance(transform.position, road[0]) <= 0.1f)
+        {
+           // Debug.Log("change point");
+            road.RemoveAt(0);
+            
+        }
+        else
+        {
+           // Debug.Log("move to point");
+            transform.position = Vector3.MoveTowards(transform.position, road[0], speed * Time.deltaTime);
+            transform.LookAt(road[0]);
+        }
+    }
+
+    public bool NoTarget()
+    {
+       // Debug.Log("no target");
+        foreach (GameObject g in enemies)
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(spawnBullet.transform.position, (target.transform.position - transform.position).normalized, out hit, 1000.0f))
+            {
+                if (hit.transform.tag == "Target" && hit.transform.gameObject != bro1 && hit.transform.gameObject != bro2 && hit.transform.gameObject != gameObject)
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public bool HaveShoot()
+    {
+        return !canShoot;
+    }
+
+    public bool GetCanShoot()
+    {
+        return canShoot;
+    }
+
+    public void Shoot()
+    {
+        Debug.Log("shoot");
+        spawnBulletRotation.transform.LookAt(target.transform.position);
+        isShooting = true;
+
+        GameObject go = Instantiate(bullet, spawnBullet.transform.position, Quaternion.identity) as GameObject;
+        // go.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
+        go.transform.LookAt(target.transform.position + target.transform.forward);
+        canShoot = false;
+        lastShoot = 0.0f;
     }
 
     void ChangeColor()
@@ -189,6 +271,12 @@ public class AgentAntoine : MonoBehaviour
 
         if (other.gameObject.tag == "Bullet" && other.transform.GetComponent<bulletScript>().launcherName != transform.parent.GetComponent<TeamNumber>().teamName)
         {
+            transform.position = SpawnPos;
+            int rand = Random.Range(0, nodes.transform.childCount - 1);
+
+            target = nodes.transform.GetChild(rand).gameObject;
+
+            //Calc();
             //GetComponent<NavMeshAgent>().Warp(SpawnPos);
             //GetComponent<NavMeshAgent>().SetDestination(points[index].transform.position);
         }
@@ -205,7 +293,7 @@ public class AgentAntoine : MonoBehaviour
         }
     }*/
 
-    void FindNewTarget()
+    /*void FindNewTarget()
     {
         target = null;
         float dist = Mathf.Infinity;
@@ -233,7 +321,7 @@ public class AgentAntoine : MonoBehaviour
                 }
             }
         }
-    }
+    }*/
 
     public void Dodge(Vector3 pos, Vector3 v, Vector3 forward)
     {

@@ -2,39 +2,47 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public abstract class StateAntoine : MonoBehaviour
+public abstract class StateAntoine /*: MonoBehaviour*/
 {
     public enum type
     {
         PARENT,
         IDLE,
         WALK,
-        FIRE,
+        PATROL,
     }
 
     public type currentType;
     public List<TransitionAntoine> transitions;
 
-    
-
-    public void Step()
+    public StateAntoine Step()
     {
-
+        if (transitions.Count > 0)
+        {
+            foreach (TransitionAntoine t in transitions)
+            {
+                if (t.Check() != null)
+                {
+                    return t.GetNextState();
+                }
+            }
+        }
+        return null;
     }
 
     public bool End()
     {
-        foreach(TransitionAntoine t in transitions)
+        /*foreach(TransitionAntoine t in transitions)
         {
             if(t.Check())
             {
                 return t.GetNextState();
             }
-        }
+        }*/
         return false;
     }
 
-    public abstract StateAntoine Execute();
+    public abstract void Execute(GameObject pl);
     public abstract void Initialise();
 
     public void AddTransition(TransitionAntoine aTransition)
@@ -54,8 +62,8 @@ public abstract class StateAntoine : MonoBehaviour
                 Debug.Log("state : WALK");
                 break;
 
-            case type.FIRE:
-                Debug.Log("state : FIRE");
+            case type.PATROL:
+                Debug.Log("state : PATROL");
                 break;
 
             case type.PARENT:

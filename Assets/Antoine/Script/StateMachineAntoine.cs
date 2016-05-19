@@ -9,16 +9,25 @@ public class StateMachineAntoine : StateAntoine
     public List<StateAntoine.type> initStates;
     public StateAntoine currentState;
 
-    void Start()
+    public GameObject player;
+
+    public StateMachineAntoine(GameObject pl)
     {
+        player = pl;
+        states = new List<StateAntoine>();
         InitStateMachine();
         InitTransitions();
         currentState = states[0];
     }
 
-    public override StateAntoine Execute()
+    public StateAntoine GetCurrentState()
     {
-        return null;
+        return currentState;
+    }
+
+    public override void Execute(GameObject pl)
+    {
+    
     }
 
     public override void Initialise()
@@ -26,12 +35,16 @@ public class StateMachineAntoine : StateAntoine
         currentType = type.PARENT;
     }
 
-    void Update()
+    public void Update()
     {
-        StateAntoine s = currentState.Execute();
+        StateAntoine s = currentState.Step();
         if (s != null)
         {
             currentState = s;
+        }
+        else
+        {
+            currentState.Execute(player);
         }
     }
 
@@ -39,8 +52,9 @@ public class StateMachineAntoine : StateAntoine
     {
         states.Add(new IdleAntoine());
         states.Add(new WalkAntoine());
+        states.Add(new PatrolAntoine());
 
-        foreach(StateAntoine s in states)
+        foreach (StateAntoine s in states)
         {
             s.Initialise();
         }
@@ -48,8 +62,17 @@ public class StateMachineAntoine : StateAntoine
     
     public void InitTransitions()
     {
-        TransitionAntoine t1 = new TransitionAntoine();
-        t1.Init(states[1]);
-        states[0].AddTransition(t1);
+        TransitionAntoine idleToChase = new TransitionAntoine(player.GetComponent<AgentAntoine>().MustChase, states[1], 0);
+        TransitionAntoine idleToPatrol = new TransitionAntoine(player.GetComponent<AgentAntoine>().NoTarget, states[2], 1);
+        states[0].AddTransition(idleToChase);
+        states[0].AddTransition(idleToPatrol);
+        TransitionAntoine chaseToIdle = new TransitionAntoine(player.GetComponent<AgentAntoine>().HaveShoot, states[0], 6);
+        TransitionAntoine chaseToPatrol = new TransitionAntoine(player.GetComponent<AgentAntoine>().NoTarget, states[2], 1);
+        states[1].AddTransition(chaseToIdle);
+        states[1].AddTransition(chaseToPatrol);
+        TransitionAntoine patrolToIdle = new TransitionAntoine(player.GetComponent<AgentAntoine>().HaveShoot, states[0], 6);
+        TransitionAntoine patrolToChase = new TransitionAntoine(player.GetComponent<AgentAntoine>().MustChase, states[1], 0);
+        states[2].AddTransition(patrolToChase);
+        states[2].AddTransition(patrolToIdle);
     }
 }

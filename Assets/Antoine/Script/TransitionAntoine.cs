@@ -2,13 +2,26 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class TransitionAntoine : MonoBehaviour
+public delegate bool Check();
+
+public class TransitionAntoine /*: MonoBehaviour*/
 {
     public StateAntoine nextState;
+    public Check theDelegate;
 
-    public void Init(StateAntoine next)
+    public int theIndex;
+    public bool theState = false;
+
+    public TransitionAntoine(Check adelegate, StateAntoine theNextState, int ind)
     {
-        nextState = next;
+        nextState = theNextState;
+        theDelegate += adelegate;
+        theIndex = ind;
+    }
+
+    static public bool CheckCoolDown()
+    {
+        return false;
     }
 
     public StateAntoine GetNextState()
@@ -16,10 +29,13 @@ public class TransitionAntoine : MonoBehaviour
         return nextState;
     }
 
-    public bool Check()
+    public StateAntoine Check()
     {
-        Debug.Log("je suis checke !");
-        return true;
+        if (theDelegate() == true)
+        {
+            return nextState;
+        }
+        return null;
     }
 
 }
