@@ -20,48 +20,17 @@ public class PierreStateMachine : PierreState
         Defensive,
         IDontKnow
     }
-
-    public Strat basicStrat;
-
-    // Use this for initialization
-    void Start ()
+    
+    public override void Check()
     {
-        /* myPathfinding = new Pathfinding();
-         myPathfinding.Load("PierrePathFinding2");
-         myPathfinding.setNeighbors();
+        base.Check();
 
-         road = PathfindingManager.GetInstance().GetRoad(transform.position, target.position, myPathfinding);
-
-         road = PathfindingManager.GetInstance().SmoothRoad(road);*/
-
-        switch (basicStrat)
-        {
-            case Strat.Offensive:
-                currentState = gameObject.AddComponent<PierreOffensif>();
-                break;
-            case Strat.Defensive:
-                currentState = gameObject.AddComponent<PierreDefensif>();
-                break;
-            case Strat.IDontKnow:
-                currentState = gameObject.AddComponent<PierreRandom>();
-                break;
-        }
-
-        nav = GetComponent<NavMeshAgent>();
-        nav.speed = 10;
-        nav.acceleration = 20;
-        nav.stoppingDistance = 5;
+        currentState.Check();
     }
-	
-	// Update is called once per frame
-	void Update ()
-    {
-        
-	}
 
-    public override void Move(NavMeshAgent nav) 
+    public override void Move(NewPierreAgent agent, NavMeshAgent nav) 
     {
-        currentState.Move(nav);
+        currentState.Move(agent, nav);
     }
 
     public override void Fire()
@@ -69,13 +38,13 @@ public class PierreStateMachine : PierreState
         currentState.Fire();
     }
 
-    public override Vector3 UpdateTarget(Vector3 myTarget, List<GameObject> targets)
+    public override Vector3 UpdateTarget(NewPierreAgent agent, Vector3 myTarget, List<GameObject> targets)
     {
-        return currentState.UpdateTarget(myTarget,targets);
+        return currentState.UpdateTarget(agent, myTarget,targets);
     }
 
-    public override Vector3 UpdateTargetMove(Vector3 myTargetMove, List<GameObject> targets)
+    public override Vector3 UpdateTargetMove(NewPierreAgent agent, Vector3 myTargetMove, List<GameObject> targets)
     {
-        return currentState.UpdateTargetMove(myTargetMove, targets);
+        return currentState.UpdateTargetMove(agent, myTargetMove, targets);
     }
 }
