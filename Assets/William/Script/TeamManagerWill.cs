@@ -19,7 +19,8 @@ public class TeamManagerWill : MonoBehaviour {
             ennemis.Remove(members[1].gameObject);
             ennemis.Remove(members[2].gameObject);
         }
-        InvokeRepeating("defineTarget", 0, 0.5f);
+        mainTarget = ennemis[0];
+        InvokeRepeating("defineTarget", 0, 0.6f);
     }
 
     void defineTarget()
