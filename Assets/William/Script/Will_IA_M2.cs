@@ -52,6 +52,6 @@ public class Will_IA_M2 : MonoBehaviour {
         spawnedBullet.GetComponent<bulletScript>().launcherName = teamName;
 
         Physics.IgnoreCollision(GetComponent<BoxCollider>(), spawnedBullet.GetComponent<CapsuleCollider>());
-        Physics.IgnoreCollision(GetComponent<CharacterController>(), spawnedBullet.GetComponent<CapsuleCollider>());
+        //Physics.IgnoreCollision(GetComponent<CharacterController>(), spawnedBullet.GetComponent<CapsuleCollider>());
     }
 }
