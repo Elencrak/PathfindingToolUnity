@@ -1,10 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using System;
 
-public class StateMachineBenoitV : MonoBehaviour {
+public class StateMachineBenoitV : StateBenoitV {
+    
+    public StateBenoitV _currentState;
 
-	public virtual void step()
+    public override void Execute(GameObject parAgent)
     {
-
+        _currentState = _currentState.step(parAgent);
     }
+    
 }

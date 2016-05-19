@@ -21,7 +21,7 @@ public class AgentGraphBenoitV : MonoBehaviour {
         //
 
         road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position,graph);
-        InvokeRepeating("UpdateRoad", 0.5f, 0.1f);
+        InvokeRepeating("UpdateRoad", 0.5f,1f);
         Debug.Log(PathfindingManager.GetInstance().test);
     }
 	
@@ -50,7 +50,7 @@ public class AgentGraphBenoitV : MonoBehaviour {
         else
         {
 
-            transform.position = Vector3.MoveTowards(transform.position, target.transform.position, speed * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(transform.position, new Vector3(target.transform.position.x, transform.position.y, target.transform.position.z), speed * Time.deltaTime);
         }
 	}
 
