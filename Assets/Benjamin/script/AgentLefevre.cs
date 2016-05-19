@@ -1,53 +1,41 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using benjamin;
 
 public class AgentLefevre : MonoBehaviour
 {
+    public static AgentLefevre instance = null;
+    
+    void Awake()
+    {
+        if (instance == null)
+            instance = this;
+    }
+
+
 
     public GameObject target;
     public float speed = 10.0f;
     public float closeEnoughRange = 1.0f;
-    private Vector3 currentTarget;
-    private Pathfinding graph;
+    public Vector3 currentTarget;
+    public Pathfinding graph;
     public List<Vector3> road = new List<Vector3>();
     public List<GameObject> targets = new List<GameObject>();
-    Vector3[] coverPoints;
     Vector3 spawn;
-    int currentCover;
-    NavMeshAgent agent;
     public GameObject bullet;
-    float fireRate;
-    float bulletSpeed = 40f;
+    public float fireRate;
+    public float bulletSpeed = 40f;
+
+    public StateMachine sm;
 
     // Use this for initialization
     void Start()
     {
-        agent = GetComponent<NavMeshAgent>();
-        float dist = Mathf.Infinity;
-        GameObject[] test = GameObject.FindGameObjectsWithTag("Target");
-        foreach (GameObject obj in test)
-        {
-            if (obj == gameObject)
-                continue;
-            float tmp = Vector3.Distance(transform.position, obj.transform.position);
-            if (tmp < dist)
-            {
-                dist = tmp;
-                target = obj;
-            }
-            targets.Add(obj);
-            
-        }
+        sm = new StateMachine();
+        sm.SetCurrentState(new MoveToState());
+
         spawn = transform.position;
-        coverPoints = new Vector3[6];
-        coverPoints[0] = transform.GetChild(0).position;
-        coverPoints[1] = transform.GetChild(1).position;
-        coverPoints[2] = transform.GetChild(2).position;
-        coverPoints[3] = transform.GetChild(3).position;
-        coverPoints[4] = transform.GetChild(4).position;
-        coverPoints[5] = transform.GetChild(5).position;
-        currentCover = 0;
 
         /*
         //Select your pathfinding
@@ -62,43 +50,15 @@ public class AgentLefevre : MonoBehaviour
         Debug.Log(PathfindingManager.GetInstance().test);
 
         */
-        InvokeRepeating("Fire", 0f, 1f);
 
-    }
-    void Init()
-    {
-        agent.Warp(spawn);
-        currentCover = 0;
     }
 
     // Update is called once per frame
     void Update()
     {
-        /*if (targets.Count > 0)
-            agent.SetDestination(target.transform.position);
-        else
-        {
-            Debug.Log("Benjamin à fini !");
-            Destroy(this);
-        }*/
-        /*
-        if (road.Count > 0)
-        {
-            currentTarget = road[0];
-            if (Vector3.Distance(transform.position, currentTarget) < closeEnoughRange)
-            {
-                road.RemoveAt(0);
-                currentTarget = road[0];
-            }
-            else
-            {
-                transform.position = Vector3.MoveTowards(transform.position, currentTarget, speed * Time.deltaTime);
-            }
-        }
-        else
-        {
-            transform.position = Vector3.MoveTowards(transform.position, target.transform.position, speed * Time.deltaTime);
-        }*/
+        sm.Check();
+        sm.StateUpdate();
+        
     }
 
     void UpdateRoad()
@@ -124,33 +84,32 @@ public class AgentLefevre : MonoBehaviour
         }
         if (col.transform.tag == "Bullet")
         {
-            Init();
+            transform.position = spawn;
         }
     }
-
+    
     public void Fire()
     {
-        StartCoroutine(fireRoutine(currentCover));
+        Debug.Log("FIRE");
+        if (target == null)
+            return;
+        Vector3 relativePos = target.transform.position - transform.position;
+        Quaternion rotation = Quaternion.LookRotation(relativePos);
+        GameObject instanceBul = Instantiate(bullet, transform.position+relativePos.normalized*2f, rotation) as GameObject;
+        instanceBul.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
+        //StartCoroutine(fireRoutine());
     }
 
-    public IEnumerator fireRoutine(int coverPointIndex)
+    public IEnumerator fireRoutine()
     {
-        agent.Stop();
-        target = GetTarget(coverPointIndex);
+        target = GetTarget();
         if (target == null)
         {
-
-            ChangeCover();
             yield return null;
         }
         else
-        {
-            agent.Resume();
-            agent.SetDestination(coverPoints[coverPointIndex + 1]);
-            yield return new WaitForSeconds(0.4f);
-            target = GetTarget(coverPointIndex);
+        {   //Avec anticipation
             Vector3 startPos = target.transform.position;
-            agent.Stop();
             yield return new WaitForSeconds(0.1f);
             Vector3 direction = target.transform.position-startPos;
             float dist = Vector3.Distance(transform.position, target.transform.position);
@@ -161,6 +120,7 @@ public class AgentLefevre : MonoBehaviour
             posToShoot = startPos + (direction * 10f) * timeToHit;
             float targetY = target.transform.position.y;
             float Y = transform.position.y;
+            //tirer un peu plus haut quand il y a une difference de hauteur
             if (targetY - Y > 1f)
                 posToShoot += Vector3.up * 0.4f;
             GameObject instance;
@@ -169,7 +129,6 @@ public class AgentLefevre : MonoBehaviour
             {
                 if (hit.transform != null && hit.transform.gameObject != target)
                 {
-                    ChangeCover();
                     yield return null;
                 }
             }
@@ -189,20 +148,27 @@ public class AgentLefevre : MonoBehaviour
                 instance = Instantiate(bullet, transform.position + relativePos.normalized * 2.0f, rotation) as GameObject;
             }
             instance.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
+
+            // sans anticipation
+            /*Vector3 relativePos = target.transform.position + direction - transform.position;
+            Quaternion rotation = Quaternion.LookRotation(relativePos);
+            Debug.DrawLine(transform.position, posToShoot, Color.blue, 2f);
+            instance = Instantiate(bullet, transform.position + relativePos.normalized * 2.0f, rotation) as GameObject;
+            instance.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;*/
+
         }
-        agent.Resume();
-        agent.SetDestination(coverPoints[coverPointIndex]);
         yield return null;
     }
-
-    GameObject GetTarget(int coverPointIndex)
+    
+    GameObject GetTarget()
     {
         float dist = Mathf.Infinity;
         GameObject target = null;
-        foreach(GameObject obj in targets)
+        foreach(GameObject obj in GameObject.FindGameObjectsWithTag("Target"))
         {
             RaycastHit hit;
-            if (Physics.Raycast(coverPoints[coverPointIndex + 1], obj.transform.position - coverPoints[coverPointIndex + 1], out hit))
+            Vector3 direction = (obj.transform.position - transform.position).normalized;
+            if (Physics.Raycast(transform.position+ direction, direction, out hit))
             {
                 if (hit.transform.gameObject == obj)
                 {
@@ -216,14 +182,5 @@ public class AgentLefevre : MonoBehaviour
             }
         }
         return target;
-        
-
-    }
-    void ChangeCover()
-    {
-        agent.Resume();
-        currentCover+=2;
-        currentCover %= coverPoints.Length;
-        agent.SetDestination(coverPoints[currentCover]);
     }
 }
