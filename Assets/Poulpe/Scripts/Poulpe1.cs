@@ -2,54 +2,110 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class Poulpe2 : MonoBehaviour
+public class Poulpe1 : MonoBehaviour
 {
-    private Vector3 begin;
-    private GameObject leader;
-    private GameObject bot2;
+
+    public GameObject target;
+    public float speed = 10.0f;
+    public float closeEnoughRange = 1.0f;
+    private Vector3 currentTarget;
+    private Pathfinding graph;
+    public List<Vector3> road = new List<Vector3>();
+
     private List<GameObject> players;
+    private Vector3 begin;
     private float startShoot;
     private float delayShoot = 1;
-    private Vector3[] patrol;
+    private GameObject bot1;
+    private GameObject bot2;
     private int index;
     private float startDogge;
     private float delayDogge = 0.25f;
-    // Use this for initialization
-    void Start ()
+    public Vector3[] patrol;
+
+    public GameObject[] temp;
+
+	// Use this for initialization
+	void Start ()
     {
         GetComponent<Renderer>().material.color = Color.blue;
-        begin = transform.position;
-        leader = transform.parent.GetChild(0).gameObject;
+        /*
+        //Select your pathfinding
+        graph = new Pathfinding();
+        graph.Load("poulpe");
+        graph.setNeighbors();
+        //
+
+
+        target = GameObject.FindGameObjectWithTag("Target");
+        road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position,graph);
+        InvokeRepeating("UpdateRoad", 0.5f, 0.5f);
+        Debug.Log(PathfindingManager.GetInstance().test);*/
+        bot1 = transform.parent.GetChild(1).gameObject;
         bot2 = transform.parent.GetChild(2).gameObject;
+        players = new List<GameObject>();
+        temp = GameObject.FindGameObjectsWithTag("Target");
+        foreach(GameObject pla in temp)
+        {
+            if(pla != this.gameObject && pla != bot1 && pla != bot2)
+            {
+                players.Add(pla);
+            }
+        }
+        begin = transform.position;
+        bot1.GetComponent<Poulpe2>().GetTargets(players);
+        bot2.GetComponent<Poulpe3>().GetTargets(players);
         patrol = new Vector3[4];
-        patrol[0] = new Vector3(18, 5.7f, -16);
-        patrol[1] = new Vector3(-18, 5.7f, -16);
-        patrol[2] = new Vector3(-18, 5.7f, 21);
-        patrol[3] = new Vector3(18, 5.7f, 21);
+        patrol[0] = new Vector3(-67, 1, -67);
+        patrol[1] = new Vector3(67, 1, -67);
+        patrol[2] = new Vector3(67, 1, 67);
+        patrol[3] = new Vector3(-67, 1, 67);
         index = Random.Range(0, patrol.Length);
     }
 	
 	// Update is called once per frame
-	void Update ()
+	/*void Update ()
+    {
+        
+        if(road.Count > 0)
+        {
+            currentTarget = road[0];
+            if (Vector3.Distance(transform.position, currentTarget) < closeEnoughRange)
+            {
+                road.RemoveAt(0);
+                currentTarget = road[0];
+            }
+            else
+            {
+                transform.position = Vector3.MoveTowards(transform.position, currentTarget, speed * Time.deltaTime);
+            }
+        }
+        else
+        {
+            transform.position = Vector3.MoveTowards(transform.position, target.transform.position, speed * Time.deltaTime);
+        }
+	}*/
+
+    void Update()
     {
         foreach (GameObject pla in players)
         {
             RaycastHit hit;
             Physics.Raycast(transform.position, pla.transform.position - transform.position, out hit);
-            if (hit.collider.tag == "Target" && hit.collider.gameObject != leader && hit.collider.gameObject != bot2)
+            if (hit.collider.tag == "Target" && hit.collider.gameObject != bot1 && hit.collider.gameObject != bot2)
             {
-                if (startShoot + delayShoot <= Time.time)
+                if(startShoot + delayShoot <= Time.time)
                 {
                     Shoot(hit.transform.gameObject);
                 }
                 break;
             }
         }
-        if (Vector3.Distance(transform.position, patrol[index]) <= 1.0f)
+        if(Vector3.Distance(transform.position, patrol[index]) <= 1.0f)
         {
             index = Random.Range(0, patrol.Length);
         }
-        if (startDogge + delayDogge <= Time.time)
+        if(startDogge + delayDogge <= Time.time)
         {
             GetComponent<NavMeshAgent>().SetDestination(patrol[index]);
         }
@@ -57,15 +113,14 @@ public class Poulpe2 : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        if(collision.gameObject.tag == "Bullet")
+        switch(collision.gameObject.tag)
         {
-            GetComponent<NavMeshAgent>().Warp(begin);
+            case "Bullet":
+                GetComponent<NavMeshAgent>().Warp(begin);
+                break;
+            case "Target":
+                break;
         }
-    }
-
-    public void GetTargets(List<GameObject> pla)
-    {
-        players = pla;
     }
 
     void Shoot(GameObject hit)
@@ -101,9 +156,9 @@ public class Poulpe2 : MonoBehaviour
 
     void OnTriggerStay(Collider collider)
     {
-        if (collider.tag == "Target" && collider.gameObject != leader && collider.gameObject != bot2)
+        if(collider.tag == "Target" && collider.gameObject != bot1 && collider.gameObject != bot2)
         {
-            if (startShoot + delayShoot <= Time.time)
+            if(startShoot + delayShoot <= Time.time)
             {
                 Shoot(collider.gameObject);
             }
@@ -119,7 +174,7 @@ public class Poulpe2 : MonoBehaviour
         {
             startDogge = Time.time;
             Vector3 point = transform.position + transform.forward * 1.0f;
-            if (Vector3.Distance(collider.transform.position, point) <= 2f)
+            if(Vector3.Distance(collider.transform.position, point) <= 2f)
             {
                 GetComponent<NavMeshAgent>().SetDestination(transform.position + transform.right * 2);
                 return;

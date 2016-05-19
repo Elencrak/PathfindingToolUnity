@@ -1,11 +1,25 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
-public class StateMachineValentin : MonoBehaviour {
+public class StateMachineValentin : StateValentin{
 
+    //List<StateValentin> listState = new List<StateValentin>(); 
+    StateValentin currentState;
 
-    public virtual void  Step()
+    public StateMachineValentin(StateValentin current)
     {
-
+        currentState = current;
     }
+
+
+    protected override void execute()
+    {
+        StateValentin SV = currentState.Step();
+        if (SV != null)
+        {
+            currentState = SV;
+        }
+    }
+
 }
