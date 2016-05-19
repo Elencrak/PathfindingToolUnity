@@ -20,12 +20,16 @@ public class NewPierreAgent : MonoBehaviour {
 
     Vector3 lastTargetPosition;
 
-    PierreStateMachine stateMachine;
+    public int nbTimeTouched;
+
+    [HideInInspector]public PierreStateMachine stateMachine;
+    
+    public PierreStateMachine.Strat basicStrat;
 
     // Use this for initialization
     void Start() {
 
-        stateMachine = GetComponent<PierreStateMachine>();
+        InitStateMachine();
 
         team = transform.parent.GetComponent<TeamNumber>();
 
@@ -47,20 +51,47 @@ public class NewPierreAgent : MonoBehaviour {
         InvokeRepeating("Fire", 0f, 1f);
     } 
 
+    void InitStateMachine()
+    {
+        stateMachine = new PierreStateMachine();
+
+        switch (basicStrat)
+        {
+            case PierreStateMachine.Strat.Offensive:
+                stateMachine.currentState = new PierreOffensif(stateMachine);
+                break;
+            case PierreStateMachine.Strat.Defensive:
+                stateMachine.currentState = new PierreDefensif(stateMachine);
+                break;
+            case PierreStateMachine.Strat.IDontKnow:
+                stateMachine.currentState = new PierreRandom(stateMachine);
+                break;
+        }
+    }
+
     void Fire()
     {
         transform.LookAt(currentTarget + (currentTarget - lastTargetPosition)*Vector3.Distance(currentTarget, transform.position)/4);
 
-        GameObject b = Instantiate(bullet, transform.position + transform.forward * 1.5f, Quaternion.identity) as GameObject;
+        RaycastHit hit;
 
-        b.transform.LookAt(currentTarget + (currentTarget - lastTargetPosition) * Vector3.Distance(currentTarget, transform.position)/4);
-        b.GetComponent<bulletScript>().launcherName = team.teamName;
+        if (!(Physics.Raycast(transform.position, transform.forward, out hit, 200) && hit.transform.GetComponent<NewPierreAgent>()))
+        {
+            GameObject b = Instantiate(bullet, transform.position + transform.forward * 1.5f, Quaternion.identity) as GameObject;
+
+            b.transform.LookAt(currentTarget + (currentTarget - lastTargetPosition) * Vector3.Distance(currentTarget, transform.position) / 4);
+            b.GetComponent<bulletScript>().launcherName = team.teamName;
+        }
     }
 
 	// Update is called once per frame
 	void Update () {
 
-        stateMachine.Move(nav);
+        stateMachine.Move(this, nav);
+
+        stateMachine.Check();
+
+        //Debug.Log(name + " STATE = " + stateMachine.currentState);
 
     }
 
@@ -70,9 +101,9 @@ public class NewPierreAgent : MonoBehaviour {
         
         lastTargetPosition = currentTarget;
 
-        currentTarget = stateMachine.UpdateTarget(currentTarget, targets);
+        currentTarget = stateMachine.UpdateTarget(this, currentTarget, targets);
 
-        currentTargetMove = stateMachine.UpdateTargetMove(currentTargetMove, targets);
+        currentTargetMove = stateMachine.UpdateTargetMove(this, currentTargetMove, targets);
 
         nav.SetDestination(currentTargetMove);
     }
@@ -86,9 +117,10 @@ public class NewPierreAgent : MonoBehaviour {
                 Debug.Log("Pierre a gagné !");
             }
         }
-        else if(col.transform.tag == "Bullet" && col.transform.GetComponent<bulletScript>().launcherName != team.teamName)
+        else if(col.transform.tag == "Bullet"/* && col.transform.GetComponent<bulletScript>().launcherName != team.teamName*/)
         {
             nav.Warp(startPos);
+            nbTimeTouched++;
         }
     }
 }
