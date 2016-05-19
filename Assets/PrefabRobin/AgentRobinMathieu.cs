@@ -128,7 +128,7 @@ namespace IARobin
         }
     }
 
-    public class AgentRobinMathieu : Entity
+    public class AgentRobinMathieu : MonoBehaviour
     {
 
         [Header("IA")]
@@ -156,7 +156,7 @@ namespace IARobin
 
         StateMachine _stateMachine;
 
-        protected override void Start()
+        protected virtual void Start()
         {
             InitStateMachine();
 
@@ -177,12 +177,12 @@ namespace IARobin
                 }
             }
             InvokeRepeating("UpdateSM", 0.1f, 0.2f);
-            base.Start();
         }
 
         void UpdateSM()
         {
             _stateMachine.Step();
+            UpdateTarget();
         }
 
         private void InitStateMachine()
@@ -199,27 +199,9 @@ namespace IARobin
                 UpdateRoadEsquive();
             });
 
-            State.Init randomInit = new State.Init(() =>
-            {
-                Debug.Log("Entrée de : RANDOM");
-            });
-            State.Init esquiveInit = new State.Init(() =>
-            {
-                Debug.Log("Entrée de : ESQUIVE");
-            });
-
-            State.Finish randomFinish = new State.Finish(() =>
-            {
-                Debug.Log("Sortie de : RANDOM");
-            });
-            State.Finish esquiveFinish = new State.Finish(() =>
-            {
-                Debug.Log("Sortie de : ESQUIVE");
-            });
-
-            State random = new State(_stateMachine, randomAction, randomInit, randomFinish);
+            State random = new State(_stateMachine, randomAction);
             random.name = "Random";
-            State esquive = new State(_stateMachine, esquiveAction, esquiveInit, esquiveFinish);
+            State esquive = new State(_stateMachine, esquiveAction);
             random.name = "Esquive";
 
             Transition.IsTransitioning transitionBullet = new Transition.IsTransitioning(() =>
@@ -304,6 +286,19 @@ namespace IARobin
             }
         }
 
+        void Respawn()
+        {
+            agent.Warp(startPoint);
+        }
+
+        void OnCollisionEnter(Collision coll)
+        {
+            if (coll.gameObject.CompareTag("Bullet") && coll.gameObject.GetComponent<bulletScript>().launcherName != playerID)
+            {
+                Respawn();
+            }
+        }
+
         void OnTriggerEnter(Collider coll)
         {
             if (coll.CompareTag("Bullet") && coll.GetComponent<bulletScript>().launcherName != playerID)
@@ -315,7 +310,7 @@ namespace IARobin
 
         void OnTriggerExit(Collider coll)
         {
-            _bullets = _bullets.Where(bull => bull != null).ToList();
+            //_bullets = _bullets.Where(bull => bull != null).ToList();
             if (coll.CompareTag("Bullet") && coll.GetComponent<bulletScript>().launcherName != playerID)
             {
                 _bullets.Remove(coll.gameObject);
