@@ -36,18 +36,30 @@ public class AgentAntoine : MonoBehaviour
     public GameObject bro1;
     public GameObject bro2;
 
+    private Pathfinding graph;
+    public List<Vector3> road = new List<Vector3>();
+
     // Use this for initialization
     void Start()
     {
+        graph = new Pathfinding();
+        graph.Load("antoinePathFinding");
+        graph.setNeighbors();
+
         SpawnPos = transform.position;
 
-        PathPoint = points[index].transform.position;
+        //PathPoint = points[index].transform.position;
 
         InvokeRepeating("ChangeColor", 0.5f, 0.1f);
 
         InvokeRepeating("FindNewTarget", 0.5f, 0.5f);
 
         enemies = GameObject.FindGameObjectsWithTag("Target");
+        target = GameObject.FindGameObjectWithTag("Target");
+
+
+        road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position, graph);
+        road = PathfindingManager.GetInstance().SmoothRoad(road);
 
         for (int i = 0; i < enemies.Length; i++)
         {
@@ -58,15 +70,15 @@ public class AgentAntoine : MonoBehaviour
         }
 
 
-        GameObject lol = GameObject.Find("PointsAntoine");
+        /*GameObject lol = GameObject.Find("PointsAntoine");
         points = new GameObject[lol.transform.childCount];
         for(int i = 0; i<lol.transform.childCount; i++)
         {
             points[i] = lol.transform.GetChild(i).gameObject;
-        }
+        }*/
 
         bullet = Resources.Load("Bullet") as GameObject;
-
+        finished = false;
         //FindNewTarget();
     }
 
@@ -74,57 +86,78 @@ public class AgentAntoine : MonoBehaviour
     void Update()
     {
         offset = 7 * Mathf.Sin(Time.time * 5);
-
-        if (canShoot && target != null)
+        //target = GameObject.FindGameObjectWithTag("Target");
+        //road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position, graph);
+        // road = PathfindingManager.GetInstance().SmoothRoad(road);
+        if(road.Count > 0)
         {
-            spawnBulletRotation.transform.LookAt(target.transform.position);
 
-            /*Vector3 D = target.transform.position - transform.position;
-            Vector3 D2 = target.transform.position - transform.position;
-
-
-            float top = (D.x * D2.x) + (D.y * D2.y) + (D.z * D2.z);
-            float leftBot = Mathf.Sqrt((D.x * D.x) + (D.y * D.y) + (D.z * D.z));
-            float rightBot = Mathf.Sqrt((D2.x * D2.x) + (D2.y * D2.y) + (D2.z * D2.z));
-            float alpha = Mathf.Acos(top / (leftBot * rightBot));
-
-            spawnBulletRotation.transform.Rotate(Vector3.up, alpha);*/
-
-            GameObject go = Instantiate(bullet, spawnBullet.transform.position, Quaternion.identity) as GameObject;
-            go.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
-            go.transform.LookAt(target.transform.position + target.transform.forward);
-            canShoot = false;
-            lastShoot = 0.0f;
-        }
-        else
-        {
-            lastShoot += Time.deltaTime;
-            if (lastShoot >= rate)
+            transform.position = Vector3.MoveTowards(transform.position, road[0], speed * Time.deltaTime);
+            transform.LookAt(road[0]);
+            if (Vector3.Distance(transform.position, road[0]) <= 0.1f)
             {
-                lastShoot = 0.0f;
-                canShoot = true;
+                road.RemoveAt(0);
             }
-            if(!target)
-                spawnBulletRotation.transform.LookAt(PathPoint);
+
         }
+        /* if (canShoot && target != null)
+         {
+             spawnBulletRotation.transform.LookAt(target.transform.position);
+
+             /*Vector3 D = target.transform.position - transform.position;
+             Vector3 D2 = target.transform.position - transform.position;
 
 
-        if (!finished)
-        {
-            if(Vector3.Distance(transform.position, PathPoint) <= 3f)
-            {
-                index = Random.Range(0, points.Length);
-                if (index >= points.Length)
-                    index = 0;
-                PathPoint = points[index].transform.position;
-            }
-            GetComponent<NavMeshAgent>().SetDestination(PathPoint);
-            //transform.position = transform.position + /*new Vector3(0f, 0f, offset * 0.02f);*/ transform.right * offset * 0.02f;
-        }
-        else
-        {
-            transform.Rotate(Vector3.up, Time.deltaTime * 50f);
-        }
+             float top = (D.x * D2.x) + (D.y * D2.y) + (D.z * D2.z);
+             float leftBot = Mathf.Sqrt((D.x * D.x) + (D.y * D.y) + (D.z * D.z));
+             float rightBot = Mathf.Sqrt((D2.x * D2.x) + (D2.y * D2.y) + (D2.z * D2.z));
+             float alpha = Mathf.Acos(top / (leftBot * rightBot));
+
+             spawnBulletRotation.transform.Rotate(Vector3.up, alpha);
+
+             GameObject go = Instantiate(bullet, spawnBullet.transform.position, Quaternion.identity) as GameObject;
+             go.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
+             go.transform.LookAt(target.transform.position + target.transform.forward);
+             canShoot = false;
+             lastShoot = 0.0f;
+         }
+         else
+         {
+             lastShoot += Time.deltaTime;
+             if (lastShoot >= rate)
+             {
+                 lastShoot = 0.0f;
+                 canShoot = true;
+             }
+             if(!target)
+                 spawnBulletRotation.transform.LookAt(PathPoint);
+         }*/
+
+
+        /* if (!finished)
+         {
+             if(Vector3.Distance(transform.position, PathPoint) <= 3f)
+             {
+                 index = Random.Range(0, points.Length);
+                 if (index >= points.Length)
+                     index = 0;
+                 PathPoint = points[index].transform.position;
+             }
+             //GetComponent<NavMeshAgent>().SetDestination(PathPoint);
+             target = GameObject.FindGameObjectWithTag("Target");
+             road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position, graph);
+            // road = PathfindingManager.GetInstance().SmoothRoad(road);
+             transform.position = Vector3.MoveTowards(transform.position, road[0], 10.0f * Time.deltaTime);
+             if(Vector3.Distance(transform.position, road[0]) <= 0.1f)
+             {
+                 road.RemoveAt(0);
+             }
+             //transform.position = transform.position + /*new Vector3(0f, 0f, offset * 0.02f); transform.right * offset * 0.02f;
+         }
+         else
+         {
+             transform.Rotate(Vector3.up, Time.deltaTime * 50f);
+         }*/
     }
 
     void ChangeColor()
@@ -156,8 +189,8 @@ public class AgentAntoine : MonoBehaviour
 
         if (other.gameObject.tag == "Bullet" && other.transform.GetComponent<bulletScript>().launcherName != transform.parent.GetComponent<TeamNumber>().teamName)
         {
-            GetComponent<NavMeshAgent>().Warp(SpawnPos);
-            GetComponent<NavMeshAgent>().SetDestination(points[index].transform.position);
+            //GetComponent<NavMeshAgent>().Warp(SpawnPos);
+            //GetComponent<NavMeshAgent>().SetDestination(points[index].transform.position);
         }
     }
 
