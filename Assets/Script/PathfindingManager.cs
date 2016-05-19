@@ -18,6 +18,7 @@ public class PathfindingManager  {
         }
         return instance;
     }
+    public static int layerMask = 20;
 
     // protected Class comparer
     protected class DuplicateKeyComparer<TKey>: 
