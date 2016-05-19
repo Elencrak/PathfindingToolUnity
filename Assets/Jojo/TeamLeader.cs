@@ -12,50 +12,37 @@ namespace JojoKiller
         [Header("Target")]
         private List<Transform> targets = new List<Transform>();
 
-        [Header("Navigation")]
-        private NavMeshAgent currentNavMeshAgent;
-
         [Header("Internal")]
-        private Vector3 startPosition;
         bool doOnce = true;
-        bool touch;
 
         [Header("State Machine")]
-        [SerializeField]
         public StateMachine stateTactic;
         public StateMachine statePatrol;
-        public Member myAgent;
-
-        public float regroupeTime;
-        public float reformeTime;
-
-        public float timerReform;
-        public float timerRegroup;
+        public List<Member> agents = new List<Member>();
 
         public bool doTransitionToReform;
         public bool doTransitionToRegroup;
         public bool doTransitionToPatrol;
 
+        [Header("Member")]
         public int teamCount;
 
         // Use this for initialization
         void Start()
-        {
-            currentNavMeshAgent = GetComponent<NavMeshAgent>();           
-            startPosition = transform.position;
-            timerReform = reformeTime;
-            timerRegroup = regroupeTime;
+        {          
+            
+            // initialize the agent
+            for(int i = 0; i < transform.childCount; i++)
+            {
+                agents.Add(transform.GetChild(i).GetComponent<Member>());
+            }
 
-            // Decorator
-            //(SSM) statePatrol = new SSM(new StateMachine(states, transitions1), transitions2)
-
-            myAgent = transform.GetChild(0).GetComponent<Member>();
-
+            // State machine for member
             statePatrol = new StateMachine();
 
             Idle monIdle = new Idle(myAgent);
-            Walk monWalk = new Walk(myAgent);
-            Fire monFire = new Fire(myAgent);
+            Search monWalk = new Search(myAgent);
+            Chase monFire = new Chase(myAgent);
 
             //from Idle to...
             Transition transitionIdle = new Transition(myAgent.changeToWalk, monWalk);
@@ -68,13 +55,14 @@ namespace JojoKiller
 
             statePatrol.currentState = monIdle;
 
+            // State machine for team
             stateTactic = new StateMachine();
 
             Regroup regroup = new Regroup(this);
             Reform reform = new Reform(this);
             StateMachineWrapper stateWrapper = new StateMachineWrapper(statePatrol);
 
-            Transition transitionRegroup = new Transition(() => { return doTransitionToReform; }, reform);
+            Transition transitionRegroup = new Transition(checkNeedToReform, reform);
             Transition transitionReform = new Transition(() => { return doTransitionToPatrol; }, stateWrapper);
             Transition transitionPatrol = new Transition(() => { return doTransitionToRegroup; }, regroup);
 
@@ -85,14 +73,11 @@ namespace JojoKiller
             stateTactic.currentState = regroup;
         }
 
-        public bool transitionTimerReform()
+        public bool checkNeedToReform()
         {
-            return timerReform <= 0;
-        }
 
-        public bool transitionTimerPatrol()
-        {
-            return timerRegroup <= 0;
+
+            return false;
         }
 
         public bool patrol()
@@ -105,13 +90,11 @@ namespace JojoKiller
         public void reformAction()
         {
             Debug.Log("reformAction");
-            timerReform = reformeTime;
         }
 
         public void regroupAction()
         {
             Debug.Log("regroupAction");
-            timerRegroup = regroupeTime;
         }
 
         // Update is called once per frame
@@ -132,30 +115,11 @@ namespace JojoKiller
                 }
             }
 
-
             stateTactic.execution();
 
             doTransitionToPatrol = false;
             doTransitionToReform = false;
             doTransitionToRegroup = false;
-        }
-
-
-        void OnCollisionEnter(Collision collision)
-        {
-            /*if (collision.transform.GetInstanceID() != transform.GetInstanceID() && collision.transform.tag == "Target")
-            {
-                needToChangeTarget = true;
-                targetPosition.position = new Vector3(100000, 100000, 100000);        
-            } else if(collision.transform.tag == "Bullet")
-            {
-                toto();
-            }*/
-        }
-
-        void deadPosition()
-        {
-            currentNavMeshAgent.Warp(startPosition);
         }
     }
 }

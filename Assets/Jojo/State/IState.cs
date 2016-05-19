@@ -10,15 +10,8 @@ namespace JojoKiller {
     /// cible, distance target ....
     /// </summary>
     [System.Serializable]
-    public class IState {
+    public class IState {       
 
-        [HideInInspector]
-        public static float coolDown = 2f;
-
-        protected List<Transform> stateTargets;
-        protected NavMeshAgent currentNavMeshAgent;
-        protected Vector3 startPosition;
-        protected Transform targetPosition;
         protected List<Transition> transition = new List<Transition>();
 
         public virtual IState execution()
@@ -37,11 +30,6 @@ namespace JojoKiller {
         public void addTransition(Transition p_transmission)
         {
             transition.Add(p_transmission);
-        }
-
-        public float getCoolDown()
-        {
-            return coolDown;
         }
     }
 

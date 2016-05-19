@@ -5,9 +5,9 @@ using System;
 namespace JojoKiller
 {
     // Prendre la décision
-    public class Walk : IStateAgent
+    public class Search : IStateAgent
     {
-        public Walk(Member currentAgent)
+        public Search(Member currentAgent)
         {
             member = currentAgent;
         }
