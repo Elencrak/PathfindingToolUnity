@@ -12,7 +12,6 @@
     <Node positionX="-46.65601" positionY="2.69999981" positionZ="-2.532719" nodeId="19" />
     <Node positionX="-46.6292229" positionY="2.69999981" positionZ="-9.993462" nodeId="20" />
     <Node positionX="-63.7975349" positionY="0.5" positionZ="1.13844943" nodeId="27" />
-    <Node positionX="-63.6433067" positionY="0.5" positionZ="7.62232637" nodeId="28" />
     <Node positionX="-63.7776871" positionY="0.5" positionZ="21.561451" nodeId="29" />
     <Node positionX="-50.4657" positionY="0.5" positionZ="21.6093025" nodeId="30" />
     <Node positionX="-48.82936" positionY="0.5" positionZ="10.7796078" nodeId="32" />
@@ -35,9 +34,12 @@
     <Node positionX="-72.8120346" positionY="0.5" positionZ="-0.4835524" nodeId="67" />
     <Node positionX="-28.4833031" positionY="0.5" positionZ="-0.7367191" nodeId="68" />
     <Node positionX="-27.8112125" positionY="0.5" positionZ="13.3186646" nodeId="69" />
-    <Node positionX="-72.5202255" positionY="0.5" positionZ="-13.66638" nodeId="70" />
     <Node positionX="-38.2152023" positionY="0.5" positionZ="4.825037" nodeId="72" />
     <Node positionX="-60.72279" positionY="0.5" positionZ="-5.378504" nodeId="73" />
+    <Node positionX="-65.12697" positionY="0.5" positionZ="9.709738" nodeId="74" />
+    <Node positionX="-70.26402" positionY="0.5" positionZ="-14.28747" nodeId="75" />
+    <Node positionX="-72.97548" positionY="0.5" positionZ="-11.5219383" nodeId="76" />
+    <Node positionX="-57.1538124" positionY="0.5" positionZ="-6.897344" nodeId="77" />
   </Nodes>
   <Edges>
     <Edge firstNodeId="48" secondNodeId="8" />
@@ -50,11 +52,9 @@
     <Edge firstNodeId="30" secondNodeId="11" />
     <Edge firstNodeId="9" secondNodeId="48" />
     <Edge firstNodeId="27" secondNodeId="58" />
-    <Edge firstNodeId="28" secondNodeId="54" />
     <Edge firstNodeId="54" secondNodeId="58" />
     <Edge firstNodeId="54" secondNodeId="50" />
     <Edge firstNodeId="58" secondNodeId="50" />
-    <Edge firstNodeId="28" secondNodeId="58" />
     <Edge firstNodeId="50" secondNodeId="19" />
     <Edge firstNodeId="58" secondNodeId="19" />
     <Edge firstNodeId="20" secondNodeId="19" />
@@ -63,16 +63,11 @@
     <Edge firstNodeId="58" secondNodeId="61" />
     <Edge firstNodeId="61" secondNodeId="20" />
     <Edge firstNodeId="61" secondNodeId="19" />
-    <Edge firstNodeId="28" secondNodeId="36" />
-    <Edge firstNodeId="27" secondNodeId="28" />
-    <Edge firstNodeId="29" secondNodeId="28" />
     <Edge firstNodeId="29" secondNodeId="36" />
     <Edge firstNodeId="30" secondNodeId="29" />
-    <Edge firstNodeId="28" secondNodeId="30" />
     <Edge firstNodeId="10" secondNodeId="29" />
     <Edge firstNodeId="10" secondNodeId="36" />
     <Edge firstNodeId="12" secondNodeId="30" />
-    <Edge firstNodeId="10" secondNodeId="28" />
     <Edge firstNodeId="19" secondNodeId="18" />
     <Edge firstNodeId="20" secondNodeId="64" />
     <Edge firstNodeId="18" secondNodeId="64" />
@@ -103,12 +98,18 @@
     <Edge firstNodeId="12" secondNodeId="69" />
     <Edge firstNodeId="69" secondNodeId="68" />
     <Edge firstNodeId="68" secondNodeId="16" />
-    <Edge firstNodeId="67" secondNodeId="70" />
-    <Edge firstNodeId="70" secondNodeId="37" />
     <Edge firstNodeId="67" secondNodeId="36" />
     <Edge firstNodeId="12" secondNodeId="72" />
     <Edge firstNodeId="69" secondNodeId="72" />
-    <Edge firstNodeId="73" secondNodeId="70" />
     <Edge firstNodeId="37" secondNodeId="73" />
+    <Edge firstNodeId="74" secondNodeId="54" />
+    <Edge firstNodeId="74" secondNodeId="27" />
+    <Edge firstNodeId="36" secondNodeId="74" />
+    <Edge firstNodeId="74" secondNodeId="29" />
+    <Edge firstNodeId="74" secondNodeId="66" />
+    <Edge firstNodeId="37" secondNodeId="75" />
+    <Edge firstNodeId="73" secondNodeId="75" />
+    <Edge firstNodeId="75" secondNodeId="76" />
+    <Edge firstNodeId="67" secondNodeId="76" />
   </Edges>
 </Pathfinding>

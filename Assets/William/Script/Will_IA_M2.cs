@@ -3,8 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class Will_IA_M2 : MonoBehaviour {
-    [Range(0,3)]
+    [Range(0,8)]
     public int id;
+    string teamName;
 
     [Header("Walk")]
     public float speed = 10.0f;
@@ -12,28 +13,45 @@ public class Will_IA_M2 : MonoBehaviour {
     public  string graphName ="will";
 
     [Header("Shoot")]
-    public GameObject bullet;
+    GameObject bullet;
     public float shootSpeed=1;
 
-
-    StateMachineWill machine;
+    Rigidbody rigid;
+    MainStateMachineWill machine;
     
 
 	void Start () {
-        List<StateWill> listState = new List<StateWill>();
+        rigid = GetComponent<Rigidbody>();
+        bullet = Resources.Load("Bullet") as GameObject;
+        teamName = GetComponentInParent<TeamNumber>().teamName;
 
-        List<TransitionWill> listTrans= new List<TransitionWill>();
-
-        SW_Shoot shoot = new SW_Shoot(id, bullet, shootSpeed);
-
-        listTrans.Add(new TW_DistanceTarget(shoot, false, 4));
+        // STATE
+        SW_Dodge dodge = new SW_Dodge(id, speed,4,1, graphName);
+        SW_Shoot shoot = new SW_Shoot(id, bullet, shootSpeed, dodge);
+        //FightStateMachineWill fight = new FightStateMachineWill(id, shoot);
+        SW_Walk walk = new SW_Walk(id, speed, closeEnoughRange, graphName);
         
-        listState.Add(new SW_Walk(id,speed, closeEnoughRange, graphName, listTrans));
-        listState.Add(shoot);
-        machine = new StateMachineWill(listState);
+
+        // ADD TRANSITION
+        walk.transitions.Add(new TW_VisionOnTarget(id, shoot, true));
+        shoot.transitions.Add(new TW_VisionOnTarget(id, walk, false));
+
+        // INIT MACHINE
+        machine = new MainStateMachineWill(id,walk);
     }
 	
 	void Update () {
         machine.execute();
-	}
+        rigid.velocity = Vector3.zero;
+    }
+
+    public void shoot(GameObject targ)
+    {
+        GameObject spawnedBullet = (GameObject)Instantiate(bullet, transform.position, transform.rotation);
+        spawnedBullet.transform.LookAt(targ.transform.position);
+        spawnedBullet.GetComponent<bulletScript>().launcherName = teamName;
+
+        Physics.IgnoreCollision(GetComponent<BoxCollider>(), spawnedBullet.GetComponent<CapsuleCollider>());
+        Physics.IgnoreCollision(GetComponent<CharacterController>(), spawnedBullet.GetComponent<CapsuleCollider>());
+    }
 }

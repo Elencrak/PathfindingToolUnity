@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class SW_Walk : StateWill {
-    int idPlayer;
     GameObject player;
     GameObject target;
+    CharacterController playerController;
     Vector3 currentTarget;
     public List<Vector3> road = new List<Vector3>();
     float closeEnoughRange;
@@ -13,18 +13,19 @@ public class SW_Walk : StateWill {
     Pathfinding graph;
     float timerUpdateRoad = 1f;
     float lastUpdate;
-
-    public SW_Walk(int pIdPlayer, float pSpeed, float pRange, string graphName, List<TransitionWill> pTransitions)
+    SW_Walk it;
+    public SW_Walk(int id, float pSpeed, float pRange, string graphName):base(id)
     {
-        idPlayer = pIdPlayer;
+        it = this;
         target = TeamManagerWill.instance.mainTarget;
-        transition = pTransitions;
         closeEnoughRange = pRange;
         speed = pSpeed;
         graph = new Pathfinding();
         graph.Load(graphName);
         graph.setNeighbors();
-        player = TeamManagerWill.instance.members[idPlayer].gameObject;
+
+        player = TeamManagerWill.instance.members[idAgent].gameObject;
+        playerController = player.GetComponent<CharacterController>();
         road = PathfindingManager.GetInstance().GetRoad(player.transform.position, target.transform.position, graph);
         road = PathfindingManager.GetInstance().SmoothRoad(road);
     }
@@ -38,21 +39,8 @@ public class SW_Walk : StateWill {
         walk();
         return null;
     }
+    
 
-    protected override StateWill checkTransition()
-    {
-        StateWill next = null;
-        foreach (TransitionWill trans in transition)
-        {
-            
-            next = trans.check();
-            if (next != null)
-            {
-                return next;
-            }
-        }
-        return null;
-    }
 
     void walk()
     {
@@ -78,11 +66,14 @@ public class SW_Walk : StateWill {
                 pos.y += 0.5f;
                 player.transform.position = Vector3.MoveTowards(player.transform.position, pos, speed * Time.deltaTime);
                 player.transform.LookAt(pos);
+                //playerController.SimpleMove(player.transform.forward * speed * Time.deltaTime);
+                
             }
         }
         else
         {
             player.transform.position = Vector3.MoveTowards(player.transform.position, target.transform.position, speed * Time.deltaTime);
+            //playerController.SimpleMove(target.transform.position.normalized * speed * Time.deltaTime);
             player.transform.LookAt(target.transform.position);
         }
 

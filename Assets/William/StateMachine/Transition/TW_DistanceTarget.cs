@@ -7,15 +7,14 @@ public class TW_DistanceTarget : TransitionWill {
     bool isTargetFurther;
 
 
-    public TW_DistanceTarget(StateWill state,bool pIsTargetFurther, float pRange)
+    public TW_DistanceTarget(int id,StateWill pState, bool pIsTargetFurther, float pRange): base(id, pState)
     {
         
         range = pRange;
-        nextState = state;
         isTargetFurther = pIsTargetFurther;
     }
 
-    public override StateWill check()
+    public override StateWill check(StateWill current = null)
     {
         float dist = Vector3.Distance(TeamManagerWill.instance.members[0].gameObject.transform.position, TeamManagerWill.instance.mainTarget.transform.position);
         if (isTargetFurther)
@@ -26,7 +25,10 @@ public class TW_DistanceTarget : TransitionWill {
         else
         {
             if (dist < range)
+            {
                 return nextState;
+            }
+                
         }
         
         return null;

@@ -1,52 +1,55 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class SW_Shoot : StateWill {
-    
+
+    public SW_Dodge dodge;
     GameObject player;
     GameObject currentTarget;
     GameObject bullet;
     float lastShoot = 0;
     public float shootCooldown;
 
-    public SW_Shoot(int id, GameObject pBullet, float shootSpeed)
+    public SW_Shoot(int id, GameObject pBullet, float shootSpeed, SW_Dodge dodgeState=null) :base(id)
     {
         player = TeamManagerWill.instance.members[id].gameObject;
         shootCooldown = shootSpeed;
         bullet = pBullet;
         currentTarget = TeamManagerWill.instance.mainTarget;
+        if (dodgeState != null)
+        {
+            dodge = dodgeState;
+        }
     }
 
     public override StateWill execute()
     {
+        
         StateWill next = checkTransition();
         if (next != null)
             return next;
-        shoot();
-        return null;
-    }
 
-    protected override StateWill checkTransition()
-    {
-        StateWill next = null;
-        foreach (TransitionWill trans in transition)
+        if (lastShoot + shootCooldown > Time.time)
         {
-            next = trans.check();
-            if (next != null)
-            {
-                return next;
-            }
+            if(dodge!=null)
+            dodge.execute();
         }
+        else
+        {
+            shoot();
+        }
+
         return null;
     }
+    
+    
 
     void shoot()
     {
+        currentTarget = TeamManagerWill.instance.mainTarget;
         if (currentTarget == null)
             return;
-        if (lastShoot + shootCooldown > Time.time)
-            return;
-        currentTarget = TeamManagerWill.instance.mainTarget;
         RaycastHit hit;
         Vector3 dir = currentTarget.transform.position - player.transform.position;
         if (Physics.Raycast(player.transform.position, dir, out hit))
@@ -60,6 +63,9 @@ public class SW_Shoot : StateWill {
             else
             {
                 // test all enemy and shoot anyone we can see
+                GameObject anyTarget = TeamManagerWill.instance.getTargetCanShoot(idAgent);
+                if(anyTarget!=null)
+                shootBullet(anyTarget);
             }
 
         }
@@ -69,10 +75,6 @@ public class SW_Shoot : StateWill {
     void shootBullet(GameObject targ)
     {
         lastShoot = Time.time;
-        GameObject spawnedBullet = (GameObject)Instantiate(bullet, player.transform.position, player.transform.rotation);
-        spawnedBullet.transform.LookAt(targ.transform.position + (targ.GetComponent<NavMeshAgent>().velocity.normalized));
-        spawnedBullet.GetComponent<bulletScript>().launcherName = "TeamWill";
-        Physics.IgnoreCollision(GetComponent<BoxCollider>(), spawnedBullet.GetComponent<CapsuleCollider>());
-
+        player.GetComponent<Will_IA_M2>().shoot(targ);
     }
 }
