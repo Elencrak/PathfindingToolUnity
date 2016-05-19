@@ -2,93 +2,106 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class AgentTripleRobin : Entity
+namespace IARobin
 {
-    GameObject Target;
-    BoxCollider TargetCollider;
-
-    [Header("GUN")]
-
-    public float RoF = 1.0f;
-    public List<GameObject> bullets;
-    public GameObject prefabBullet;
-    public GameObject predictionZone;
-
-
-    AgentSimpleRobin tankUnit;
-
-    protected override void Start()
+    public class AgentTripleRobin : Entity
     {
-        bullets = new List<GameObject>();
-        if (prefabBullet == null)
+        GameObject Target;
+
+        [Header("GUN")]
+
+        public float RoF = 1.0f;
+        public List<GameObject> bullets;
+        public GameObject prefabBullet;
+        public GameObject predictionZone;
+
+
+        AgentSimpleRobin tankUnit;
+
+        protected override void Start()
         {
-            prefabBullet = Resources.Load<GameObject>("Bullet");
-        }
-        tankUnit = transform.parent.parent.GetComponent<AgentSimpleRobin>();
-        predictionZone = GameObject.FindGameObjectWithTag("Prediction");
-        StartCoroutine(Shoot());
-
-        InvokeRepeating("UpdateTarget", 0.0f, 0.5f);
-        base.Start();
-    }
-
-    void UpdateTarget()
-    {
-
-        GameObject target = tankUnit.targets[Random.Range(0, tankUnit.targets.Count - 1)];
-
-        if (target)
-        {
-            Target = target;
-            TargetCollider = target.GetComponent<BoxCollider>();
-        }
-        else
-        {
-            Target = null;
-            TargetCollider = null;
-        }
-    }
-
-    IEnumerator Shoot()
-    {
-        bulletScript bullet = prefabBullet.GetComponent<bulletScript>();
-        while (tankUnit.isShooting)
-        {
-            if (TargetCollider)
+            bullets = new List<GameObject>();
+            if (prefabBullet == null)
             {
-                NavMeshAgent targ = Target.GetComponent<NavMeshAgent>();
+                prefabBullet = Resources.Load<GameObject>("Bullet");
+            }
+            tankUnit = transform.parent.parent.GetComponent<AgentSimpleRobin>();
+            predictionZone = GameObject.FindGameObjectWithTag("Prediction");
+            StartCoroutine(Shoot());
 
-                Vector3 positionPredicted = TargetCollider.transform.position + Vector3.up * 0.5f;
+            InvokeRepeating("UpdateTarget", 0.0f, 0.3f);
+            base.Start();
+        }
 
-                float distanceParcourue = 0.0f;
+        private void ForceUpdateTarget()
+        {
+            GameObject target = tankUnit._bullets[Random.Range(0, tankUnit._bullets.Count - 1)];
 
-                while (Vector3.Distance(transform.position, positionPredicted) - distanceParcourue > float.Epsilon)
+            if (target)
+            {
+                Target = target;
+            }
+            else
+            {
+                Target = null;
+            }
+        }
+
+        void UpdateTarget()
+        {
+            if (tankUnit._bullets.Count > 0 && !Target && !tankUnit._bullets.Contains(Target))
+            {
+                ForceUpdateTarget();
+            }
+        }
+
+        IEnumerator Shoot()
+        {
+            //transform.position + transform.forward * Time.fixedDeltaTime * speed; direction && speed for bullet
+
+            bulletScript bullet = prefabBullet.GetComponent<bulletScript>();
+
+            while (tankUnit.isShooting)
+            {
+                if (Target)
                 {
-                    positionPredicted += targ.velocity * Time.fixedDeltaTime;
-                    distanceParcourue += Time.fixedDeltaTime * bullet.speed;
-                }
+                    bulletScript targ = Target.GetComponent<bulletScript>();
 
-                RaycastHit hit;
+                    Vector3 positionPredicted = Target.transform.position + Vector3.up * 0.5f;
 
-                predictionZone.transform.position = positionPredicted;
-
-                Vector3 direction = (positionPredicted + TargetCollider.center) - transform.position;
-
-                if (Physics.Raycast(transform.position, direction.normalized, out hit, Vector3.Distance(positionPredicted, transform.position)))
-                {
-                    if (hit.collider.gameObject.CompareTag("Prediction") || hit.collider.gameObject.CompareTag("Target"))
+                    float distanceParcourue = 0.0f;
+                    while (Vector3.Distance(transform.position, positionPredicted) - distanceParcourue > float.Epsilon)
                     {
+                        positionPredicted += (targ.transform.position + targ.transform.forward) * Time.fixedDeltaTime * targ.speed;
+                        distanceParcourue += Time.fixedDeltaTime * bullet.speed;
+                    }
 
-                        GameObject go = Instantiate(prefabBullet, transform.position + direction.normalized * 2.0f, Quaternion.LookRotation(direction.normalized)) as GameObject;
+                    RaycastHit hit;
 
-                        go.GetComponent<bulletScript>().launcherName = AgentRobinMathieu.playerID;
+                    predictionZone.transform.position = positionPredicted;
 
-                        bullets.Add(go);
-                        yield return new WaitForSeconds(RoF - RoF / 10.0f);
+                    Vector3 direction = positionPredicted - transform.position;
+
+                    if (Physics.Raycast(transform.position, direction.normalized, out hit, Vector3.Distance(positionPredicted, transform.position)))
+                    {
+                        if (hit.collider.gameObject.CompareTag("Prediction") || hit.collider.gameObject.CompareTag("Bullet"))
+                        {
+                            GameObject go = Instantiate(prefabBullet, transform.position + direction.normalized * 2.0f, Quaternion.LookRotation(direction.normalized)) as GameObject;
+
+                            go.GetComponent<bulletScript>().launcherName = AgentRobinMathieu.playerID;
+
+                            bullets.Add(go);
+                            yield return new WaitForSeconds(RoF - RoF / 10.0f);
+                        }
+                        else
+                        {
+                            ForceUpdateTarget();
+                        }
                     }
                 }
+                yield return new WaitForSeconds(RoF / 10.0f);
             }
-            yield return new WaitForSeconds(RoF / 10.0f);
         }
     }
+
 }

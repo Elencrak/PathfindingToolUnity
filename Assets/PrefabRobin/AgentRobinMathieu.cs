@@ -1,91 +1,327 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+//using System;
 
-public class AgentRobinMathieu : Entity
+namespace IARobin
 {
-
-    [Header("IA")]
-
-    public Vector3 startPoint;
-    public GameObject nearestTarget;
-    public BoxCollider nearTargetCollider;
-    public List<GameObject> targets;
-    public NavMeshAgent agent;
-    bool hasWin = false;
-
-    [Header("Values")]
-
-    float timeFreezeEnemy = 1.0f;
-    public bool isShooting = true;
-    public static string playerID = "Squad Robin";
-    TeamNumber parentNumber;
-
-    protected override void Start()
+    using StateMachineRobin;
+    using System.Linq;
+    namespace StateMachineRobin
     {
-
-        parentNumber = transform.parent.parent.GetComponent<TeamNumber>();
-        parentNumber.teamName = playerID;
-        startPoint = transform.position;
-        targets = new List<GameObject>(GameObject.FindGameObjectsWithTag("Target"));
-        agent = GetComponent<NavMeshAgent>();
-
-        for (int i = targets.Count - 1; i >= 0; --i)
+        public class State
         {
-            if (targets[i].name == "Robin")
+            public string name;
+
+            public delegate void Action();
+
+            public Action _action;
+
+            public delegate void Init();
+
+            public Init _init;
+
+            public delegate void Finish();
+
+            public Finish _finish;
+
+            StateMachine _mother;
+
+            List<Transition> _transitions;
+
+            public State()
             {
-                targets.Remove(targets[i]);
+                _action = null;
+                _mother = null;
+                _transitions = new List<Transition>();
+            }
+
+            public State(StateMachine stateMachine, Action action = null, Init init = null, Finish finish = null)
+            {
+                _action = action;
+                _init = init;
+                _finish = finish;
+                _mother = stateMachine;
+                _transitions = new List<Transition>();
+            }
+
+            public void AddTransition(Transition t)
+            {
+                if (t != null)
+                {
+                    _transitions.Add(t);
+                }
+            }
+
+            public virtual void Step()
+            {
+                State chckd = null;
+                for (int i = 0; i < _transitions.Count; i++)
+                {
+                    chckd = _transitions[i].Check();
+                    if (chckd != null)
+                    {
+                        if (_finish != null)
+                        {
+                            _finish();
+                        }
+                        _mother._currentState = chckd;
+                        if (chckd._init != null)
+                        {
+                            chckd._init();
+                        }
+                        chckd.Step();
+                        break;
+                    }
+                }
+                if (chckd == null)
+                {
+                    if (_action != null)
+                    {
+                        _action();
+                    }
+                }
             }
         }
-        //InvokeRepeating("Gagne", 0.0f, 1.5f);
-        base.Start();
-    }
 
-    void Gagne()
-    {
-        bool isWin = true;
-        if (isWin && !hasWin)
+        public class StateMachine : State
         {
-            hasWin = true;
-            Debug.Log("J'ai gagné : Robin MATHIEU");
-        }
-    }
+            public State _currentState;
 
-    protected virtual void UpdateTarget()
-    {
-
-        GameObject target = null;
-
-        for (int i = targets.Count - 1; i >= 0; --i)
-        {
-            if (target == null || (target && Vector3.Distance(target.transform.position, transform.position) > Vector3.Distance(targets[i].transform.position, transform.position)))
+            public override void Step()
             {
-                target = targets[i];
+                base.Step();
+                _currentState.Step();
             }
         }
-        if (target)
+
+        public class Transition
         {
-            nearestTarget = target;
-            nearTargetCollider = target.GetComponent<BoxCollider>();
+            State _toState;
+
+            public delegate bool IsTransitioning();
+
+            public IsTransitioning _check;
+
+            public Transition()
+            {
+                _toState = null;
+            }
+
+            public Transition(State state)
+            {
+                _toState = state;
+            }
+
+            public Transition(State state, IsTransitioning check = null)
+            {
+                _toState = state;
+                _check = check;
+            }
+
+            public virtual State Check()
+            {
+                if (_check())
+                    return _toState;
+                return null;
+            }
         }
-        else
+    }
+
+    public class AgentRobinMathieu : Entity
+    {
+
+        [Header("IA")]
+
+        public Vector3 startPoint;
+        public GameObject nearestTarget;
+        public BoxCollider nearTargetCollider;
+        public List<GameObject> targets;
+        public NavMeshAgent agent;
+        public AgentRobin agent2;
+
+        SphereCollider detect;
+
+        public float errorMargin = 0.2f;
+
+        bool hasWin = false;
+
+        public List<GameObject> _bullets;
+
+        [Header("Values")]
+
+        public bool isShooting = true;
+        public static string playerID = "Squad Robin";
+        TeamNumber parentNumber;
+
+        StateMachine _stateMachine;
+
+        protected override void Start()
         {
-            nearestTarget = null;
-            nearTargetCollider = null;
+            InitStateMachine();
+
+            detect = transform.FindChild("Trigger").GetComponent<SphereCollider>();
+            _bullets = new List<GameObject>();
+            parentNumber = transform.parent.parent.GetComponent<TeamNumber>();
+            parentNumber.teamName = playerID;
+            startPoint = transform.position;
+            targets = new List<GameObject>(GameObject.FindGameObjectsWithTag("Target"));
+            agent = GetComponent<NavMeshAgent>();
+            agent2 = GetComponent<AgentRobin>();
+
+            for (int i = targets.Count - 1; i >= 0; --i)
+            {
+                if (targets[i].name == "Robin")
+                {
+                    targets.Remove(targets[i]);
+                }
+            }
+            InvokeRepeating("UpdateSM", 0.1f, 0.2f);
+            base.Start();
+        }
+
+        void UpdateSM()
+        {
+            _stateMachine.Step();
+        }
+
+        private void InitStateMachine()
+        {
+            _stateMachine = new StateMachine();
+            _stateMachine.name = "Machine";
+
+            State.Action randomAction = new State.Action(() => 
+            {
+                UpdateRoadRandom();
+            });
+            State.Action esquiveAction = new State.Action(() => 
+            {
+                UpdateRoadEsquive();
+            });
+
+            State.Init randomInit = new State.Init(() =>
+            {
+                Debug.Log("Entrée de : RANDOM");
+            });
+            State.Init esquiveInit = new State.Init(() =>
+            {
+                Debug.Log("Entrée de : ESQUIVE");
+            });
+
+            State.Finish randomFinish = new State.Finish(() =>
+            {
+                Debug.Log("Sortie de : RANDOM");
+            });
+            State.Finish esquiveFinish = new State.Finish(() =>
+            {
+                Debug.Log("Sortie de : ESQUIVE");
+            });
+
+            State random = new State(_stateMachine, randomAction, randomInit, randomFinish);
+            random.name = "Random";
+            State esquive = new State(_stateMachine, esquiveAction, esquiveInit, esquiveFinish);
+            random.name = "Esquive";
+
+            Transition.IsTransitioning transitionBullet = new Transition.IsTransitioning(() =>
+            {
+                return _bullets.Count > 0;
+            });
+            Transition.IsTransitioning transitionNoBullet = new Transition.IsTransitioning(() =>
+            {
+                return _bullets.Count == 0;
+            });
+
+            Transition bulletDetected = new Transition(esquive, transitionBullet);
+            Transition bulletNotDetected = new Transition(random, transitionNoBullet);
+
+            random.AddTransition(bulletDetected);
+            esquive.AddTransition(bulletNotDetected);
+
+            _stateMachine._currentState = random;
+        }
+
+        void Gagne()
+        {
+            bool isWin = true;
+            if (isWin && !hasWin)
+            {
+                hasWin = true;
+                Debug.Log("J'ai gagné : Robin MATHIEU");
+            }
+        }
+
+        protected virtual void UpdateTarget()
+        {
+
+            GameObject target = null;
+
+            for (int i = targets.Count - 1; i >= 0; --i)
+            {
+                if (target == null || (target && Vector3.Distance(target.transform.position, transform.position) > Vector3.Distance(targets[i].transform.position, transform.position)))
+                {
+                    target = targets[i];
+                }
+            }
+            if (target)
+            {
+                nearestTarget = target;
+                nearTargetCollider = target.GetComponent<BoxCollider>();
+            }
+            else
+            {
+                nearestTarget = null;
+                nearTargetCollider = null;
+            }
+        }
+
+        protected virtual void UpdateRoadRandom()
+        {
+            if (targets.Count > 0)
+            {
+                if (agent.enabled)
+                {
+                    agent.SetDestination(targets[Random.Range(0, targets.Count - 1)].transform.position);
+                }
+                if (agent2.enabled)
+                {
+                    agent2.target = targets[Random.Range(0, targets.Count - 1)];
+                }
+            }
+        }
+
+        protected virtual void UpdateRoadEsquive()
+        {
+            if (targets.Count > 0)
+            {
+                if (agent.enabled)
+                {
+                    agent.SetDestination(transform.position + new Vector3(Random.Range(-detect.bounds.size.x, detect.bounds.size.x), 0.0f, Random.Range(-detect.bounds.size.z, detect.bounds.size.z)));
+                }
+                if (agent2.enabled)
+                {
+                    // ???
+                }
+            }
+        }
+
+        void OnTriggerEnter(Collider coll)
+        {
+            if (coll.CompareTag("Bullet") && coll.GetComponent<bulletScript>().launcherName != playerID)
+            {
+                _bullets.Add(coll.gameObject);
+                //coll.GetComponent<bulletScript>().launcherName = AgentRobinMathieu.playerID;
+            }
+        }
+
+        void OnTriggerExit(Collider coll)
+        {
+            _bullets = _bullets.Where(bull => bull != null).ToList();
+            if (coll.CompareTag("Bullet") && coll.GetComponent<bulletScript>().launcherName != playerID)
+            {
+                _bullets.Remove(coll.gameObject);
+                //coll.GetComponent<bulletScript>().launcherName = AgentRobinMathieu.playerID;
+            }
         }
     }
 
-    protected virtual void UpdateRoad()
-    {
-        agent.SetDestination(targets[Random.Range(0, targets.Count - 1)].transform.position);
-    }
-
-    IEnumerator FreezeEnemy(GameObject enemy)
-    {
-        enemy.GetComponent<NavMeshAgent>().Stop();
-
-        yield return new WaitForSeconds(timeFreezeEnemy);
-
-        enemy.GetComponent<NavMeshAgent>().Resume();
-    }
 }
