@@ -2,14 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class Will_IA_m : MonoBehaviour {
+public class Will_IA_soldier : MonoBehaviour {
     
     float shootCooldown= 1f;
     float range = 20;
     Vector3 spawn;
     Rigidbody rigid;
     public List<GameObject> targets;
-    GameObject currentTarget;
+    Will_IA_m Chief;
     NavMeshAgent agent;
     GameObject bullet;
     bool canShoot = false;
@@ -20,8 +20,8 @@ public class Will_IA_m : MonoBehaviour {
         rigid = GetComponent<Rigidbody>();
         spawn = transform.position;
         agent = GetComponent<NavMeshAgent>();
-
-        targets = transform.parent.GetComponent<TeamWillScript>().ennemis;
+        Chief = GameObject.Find("Agent_Will").GetComponent<Will_IA_m>();
+        targets = transform.parent.GetComponent<TeamManagerWill>().ennemis;
         //targets = new List<GameObject>(GameObject.FindGameObjectsWithTag("Target"));
         //targets.Remove(this.gameObject);
         bullet = new GameObject();
@@ -35,7 +35,6 @@ public class Will_IA_m : MonoBehaviour {
         float d = Vector3.Distance(agent.velocity, Vector3.zero);
         if (d < 0.2f)
         {
-            //Debug.Log("Reset Will :"+rigid.velocity+" distance:"+d);
             StopAllCoroutines();
             isStrafing = false;
         }
@@ -44,24 +43,16 @@ public class Will_IA_m : MonoBehaviour {
 
     void targetUpdate()
     {
-        GameObject tempTarget = targets[0];
-        Vector3 myPos = transform.position;
-        float distance = Vector3.Distance(myPos, targets[0].transform.position);
-
-        for (int i = 1; i < targets.Count; i++)
+        float dist = Vector3.Distance(Chief.transform.position, transform.position);
+        if (dist > 10)
         {
-            float tempDist = Vector3.Distance(myPos, targets[i].transform.position);
-            if (tempDist < distance)
-            {
-                distance = tempDist;
-                tempTarget = targets[i];
-            }
+            agent.SetDestination(Chief.transform.position);
         }
-        currentTarget = tempTarget;
-        if (!isStrafing)
+        else
         {
-            agent.SetDestination(currentTarget.transform.position);
+            agent.SetDestination(Chief.transform.position*-1);
         }
+        
     }
     
 
@@ -114,20 +105,20 @@ public class Will_IA_m : MonoBehaviour {
 
     void shoot()
     {
-        if (currentTarget == null)
+        if (Chief.currentTarget == null)
             return;
         if (lastShoot + shootCooldown > Time.time)
             return;
         
         RaycastHit hit;
-        Vector3 dir = currentTarget.transform.position - transform.position;
+        Vector3 dir = Chief.currentTarget.transform.position - transform.position;
         if (Physics.Raycast(transform.position, dir, out hit))
         {
             //Debug.Log("ray " + hit.collider.name);
-            if (hit.collider.gameObject == currentTarget)
+            if (hit.collider.gameObject == Chief.currentTarget)
             {
                 strafe();
-                shootBullet(currentTarget);     
+                shootBullet(Chief.currentTarget);     
             }
             else
             {
@@ -158,8 +149,8 @@ public class Will_IA_m : MonoBehaviour {
     {
         lastShoot = Time.time;
         GameObject spawnedBullet = (GameObject)Instantiate(bullet, transform.position, transform.rotation);
-        spawnedBullet.transform.LookAt(targ.transform.position + (targ.GetComponent<NavMeshAgent>().velocity.normalized));
-        spawnedBullet.GetComponent<bulletScript>().launcherName = "TeamWill";
+        spawnedBullet.transform.LookAt(targ.transform.position + (targ.GetComponent<NavMeshAgent>().velocity));
+        spawnedBullet.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
         Physics.IgnoreCollision(GetComponent<BoxCollider>(), spawnedBullet.GetComponent<CapsuleCollider>());
         
     }

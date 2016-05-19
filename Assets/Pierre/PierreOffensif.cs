@@ -3,20 +3,25 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class PierreOffensif : PierreState {
+    
+    public PierreOffensif(PierreStateMachine psm)
+    {
+        stateMachine = psm;
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+        PierreTransition a = new PierreTransition(this, new PierreDefensif(psm)) ;
+        a.condition = InputKey;
 
-    public override void Move(NavMeshAgent nav)
+        transitions.Add(a);
+    }
+    
+    public override void Move(NewPierreAgent agent, NavMeshAgent nav)
     {
         
+    }
+    
+    bool InputKey()
+    {
+        return Input.GetKeyDown(KeyCode.A);
     }
 
     public override void Fire()
@@ -24,18 +29,24 @@ public class PierreOffensif : PierreState {
         
     }
 
-    public override Vector3 UpdateTarget(Vector3 myTarget, List<GameObject> targets)
+    public override Vector3 UpdateTarget(NewPierreAgent agent, Vector3 myTarget, List<GameObject> targets)
     {
         Vector3 newTarget = myTarget;
 
-        if (targets[0] != gameObject)
+        foreach(NewPierreAgent a in GameObject.FindObjectsOfType<NewPierreAgent>())
+        {
+            targets.Remove(a.gameObject);
+        }
+
+
+        if (targets[0] != agent)
         {
             newTarget = targets[0].transform.position;
         }
 
         foreach (GameObject target in targets)
         {
-            if ((Vector3.Distance(target.transform.position, transform.position) < Vector3.Distance(newTarget, transform.position) || (newTarget == transform.position && transform.position != target.transform.position)) && !target.GetComponent<NewPierreAgent>())
+            if ((Vector3.Distance(target.transform.position, agent.transform.position) < Vector3.Distance(newTarget, agent.transform.position) || (newTarget == agent.transform.position && agent.transform.position != target.transform.position)) && !target.GetComponent<NewPierreAgent>())
             {
                 newTarget = target.transform.position;
             }
@@ -45,10 +56,9 @@ public class PierreOffensif : PierreState {
 
     }
 
-    public override Vector3 UpdateTargetMove(Vector3 myTargetMove, List<GameObject> targets)
+    public override Vector3 UpdateTargetMove(NewPierreAgent agent, Vector3 myTargetMove, List<GameObject> targets)
     {
-        return UpdateTarget(myTargetMove,targets);
+        return UpdateTarget(agent, myTargetMove,targets);
     }
-
-
+    
 }

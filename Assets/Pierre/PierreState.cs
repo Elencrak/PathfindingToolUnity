@@ -2,19 +2,31 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class PierreState : MonoBehaviour {
+public class PierreState{
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+    protected List<PierreTransition> transitions = new List<PierreTransition>();
 
-    public virtual void Move(NavMeshAgent nav)
+    [HideInInspector]public PierreStateMachine stateMachine;
+
+    public PierreState()
+    {
+        
+    }
+
+    public PierreState(PierreStateMachine psm)
+    {
+        stateMachine = psm;
+    }
+
+    public virtual void Check()
+    {
+        foreach(PierreTransition transition in transitions)
+        {
+            transition.Check();
+        }
+    }
+
+    public virtual void Move(NewPierreAgent agent, NavMeshAgent nav)
     {
 
     }
@@ -24,14 +36,24 @@ public class PierreState : MonoBehaviour {
 
     }
 
-    public virtual Vector3 UpdateTarget(Vector3 myTarget, List<GameObject> targets)
+    public virtual Vector3 UpdateTarget(NewPierreAgent agent, Vector3 myTarget, List<GameObject> targets)
     {
         return new Vector3();
     }
 
-    public virtual Vector3 UpdateTargetMove(Vector3 myTargetMove, List<GameObject> targets)
+    public virtual Vector3 UpdateTargetMove(NewPierreAgent agent, Vector3 myTargetMove, List<GameObject> targets)
     {
         return new Vector3();
+    }
+
+    public virtual void StateStart()
+    {
+        stateMachine.currentState = this;
+    }
+
+    public virtual void StateEnd()
+    {
+
     }
 
 }
