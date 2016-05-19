@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace IARobin
 {
-    public class AgentDoubleRobin : Entity
+    public class AgentDoubleRobin : MonoBehaviour
     {
         GameObject Target;
         BoxCollider TargetCollider;
@@ -19,7 +19,7 @@ namespace IARobin
 
         AgentSimpleRobin tankUnit;
 
-        protected override void Start()
+        protected void Start()
         {
             bullets = new List<GameObject>();
             if (prefabBullet == null)
@@ -31,7 +31,6 @@ namespace IARobin
             StartCoroutine(Shoot());
 
             InvokeRepeating("UpdateTarget", 0.0f, 0.3f);
-            base.Start();
         }
 
         void UpdateTarget()
