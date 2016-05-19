@@ -101,57 +101,6 @@ namespace IARobin
                 }
                 yield return new WaitForSeconds(RoF / 10.0f);
             }
-
-            //bulletScript bullet = prefabBullet.GetComponent<bulletScript>();
-            //while (tankUnit.isShooting)
-            //{
-            //    if (TargetCollider)
-            //    {
-            //        NavMeshAgent targ = Target.GetComponent<NavMeshAgent>();
-            //        Agent targAgent = Target.GetComponent<Agent>();
-
-            //        Vector3 positionPredicted = TargetCollider.transform.position + Vector3.up * 0.5f;
-
-            //        float distanceParcourue = 0.0f;
-            //        if (targ)
-            //        {
-            //            while (Vector3.Distance(transform.position, positionPredicted) - distanceParcourue > float.Epsilon)
-            //            {
-            //                positionPredicted += targ.velocity * Time.fixedDeltaTime;
-            //                distanceParcourue += Time.fixedDeltaTime * bullet.speed;
-            //            }
-            //        }
-            //        else if (targAgent)
-            //        {
-            //            while (Vector3.Distance(transform.position, positionPredicted) - distanceParcourue > float.Epsilon)
-            //            {
-            //                positionPredicted += (targAgent.target.transform.position - targAgent.transform.position) * Time.fixedDeltaTime;
-            //                distanceParcourue += Time.fixedDeltaTime * bullet.speed;
-            //            }
-            //        }
-
-            //        RaycastHit hit;
-
-            //        predictionZone.transform.position = positionPredicted;
-
-            //        Vector3 direction = (positionPredicted + TargetCollider.center) - transform.position;
-
-            //        if (Physics.Raycast(transform.position, direction.normalized, out hit, Vector3.Distance(positionPredicted, transform.position)))
-            //        {
-            //            if (hit.collider.gameObject.CompareTag("Prediction") || hit.collider.gameObject.CompareTag("Target"))
-            //            {
-
-            //                GameObject go = Instantiate(prefabBullet, transform.position + direction.normalized * 2.0f, Quaternion.LookRotation(direction.normalized)) as GameObject;
-
-            //                go.GetComponent<bulletScript>().launcherName = AgentRobinMathieu.playerID;
-
-            //                bullets.Add(go);
-            //                yield return new WaitForSeconds(RoF - RoF / 10.0f);
-            //            }
-            //        }
-            //    }
-            //    yield return new WaitForSeconds(RoF / 10.0f);
-            //}
         }
     }
 
