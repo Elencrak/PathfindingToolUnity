@@ -19,11 +19,25 @@ public class PoulpeMove : PoulpeState
         {
             transition.Check();
         }
-        if (player.GetComponent<Poulpe>().target == null)
-        {
-            int rand = Random.Range(0, player.GetComponent<Poulpe>().targets.Count);
-            player.GetComponent<Poulpe>().target = player.GetComponent<Poulpe>().targets[rand];
-        }
+        player.GetComponent<Poulpe>().target = player.GetComponent<Poulpe>().targets[ChooseTarget()];
         agent.SetDestination(player.GetComponent<Poulpe>().target.transform.position);
+    }
+
+    int ChooseTarget()
+    {
+        int index = 0;
+        bool first = false;
+        for(int i = 0; i < player.GetComponent<Poulpe>().targets.Count; i++)
+        {
+            if(!first)
+            {
+                first = true;
+            }
+            if(Vector3.Distance(player.transform.position, player.GetComponent<Poulpe>().targets[i].transform.position) < Vector3.Distance(player.transform.position, player.GetComponent<Poulpe>().targets[index].transform.position))
+            {
+                index = i;
+            }
+        }
+        return index;
     }
 }
