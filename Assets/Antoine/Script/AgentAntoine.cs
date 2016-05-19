@@ -106,8 +106,9 @@ public class AgentAntoine : MonoBehaviour
          if (canShoot && target != null)
          {
             RaycastHit hit;
-            if (Physics.Raycast(spawnBullet.transform.position, (target.transform.position - transform.position).normalized, out hit, 5000.0f))
+            if (Physics.Raycast(spawnBullet.transform.position, (target.transform.position - transform.position).normalized, out hit, 10000.0f))
             {
+                
                 if (hit.transform.tag == "Target" && hit.transform.gameObject != bro1 && hit.transform.gameObject != bro2 && hit.transform.gameObject != gameObject)
                 { 
                     spawnBulletRotation.transform.LookAt(target.transform.position);
@@ -146,17 +147,13 @@ public class AgentAntoine : MonoBehaviour
         foreach (GameObject g in enemies)
         {
             RaycastHit hit;
-            if (g != null && Physics.Raycast(spawnBullet.transform.position, (target.transform.position - transform.position).normalized, out hit, 5000.0f))
+            if (g != null && Physics.Raycast(spawnBullet.transform.position, (g.transform.position - transform.position), out hit, 10000.0f))
             {
                 if (hit.transform.gameObject.tag == "Target" && hit.transform.gameObject != bro1 && hit.transform.gameObject != bro2 && hit.transform.gameObject != gameObject)
                 {
                     Debug.Log("must chase");
                     target = hit.transform.gameObject;
                     return true;
-                }
-                else
-                {
-                    Debug.Log(hit.transform.name);
                 }
             }
         }
@@ -208,7 +205,7 @@ public class AgentAntoine : MonoBehaviour
         foreach (GameObject g in enemies)
         {
             RaycastHit hit;
-            if (Physics.Raycast(spawnBullet.transform.position, (target.transform.position - transform.position).normalized, out hit, 1000.0f))
+            if (Physics.Raycast(spawnBullet.transform.position, (target.transform.position - transform.position).normalized, out hit, 10000.0f))
             {
                 if (hit.transform.tag == "Target" && hit.transform.gameObject != bro1 && hit.transform.gameObject != bro2 && hit.transform.gameObject != gameObject)
                 {
