@@ -16,6 +16,10 @@ public class Will_IA_M2 : MonoBehaviour {
     GameObject bullet;
     public float shootSpeed=1;
 
+    [Header("Dodge")]
+    public float distDodgePos=4;
+    public float timeToPos=1;
+
     Rigidbody rigid;
     MainStateMachineWill machine;
     
@@ -26,7 +30,7 @@ public class Will_IA_M2 : MonoBehaviour {
         teamName = GetComponentInParent<TeamNumber>().teamName;
 
         // STATE
-        SW_Dodge dodge = new SW_Dodge(id, speed,4,1, graphName);
+        SW_Dodge dodge = new SW_Dodge(id, speed, distDodgePos, timeToPos, graphName);
         SW_Shoot shoot = new SW_Shoot(id, bullet, shootSpeed, dodge);
         //FightStateMachineWill fight = new FightStateMachineWill(id, shoot);
         SW_Walk walk = new SW_Walk(id, speed, closeEnoughRange, graphName);
