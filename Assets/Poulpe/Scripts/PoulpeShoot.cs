@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System;
+using System.Collections.Generic;
 
 public class PoulpeShoot : PoulpeState
 {
@@ -12,20 +12,24 @@ public class PoulpeShoot : PoulpeState
 
     public override void Step()
     {
-        Shoot(target);
+        foreach(PoulpeTransition transition in transitions)
+        {
+            transition.Check();
+        }
+        Shoot(player.GetComponent<Poulpe>().target);
     }
 
     void Shoot(GameObject hit)
     {
         player.transform.LookAt(CalcShootAngle(hit));
-        GameObject bullet = Instantiate(Resources.Load("Bullet"), player.transform.position + player.transform.forward * 2, Quaternion.Euler(player.transform.eulerAngles)) as GameObject;
+        GameObject bullet = player.GetComponent<Poulpe>().Instantiation();
         bullet.GetComponent<bulletScript>().launcherName = "Poulpe";
     }
 
     Vector3 CalcShootAngle(GameObject hit)
     {
         Vector3 hitPos = hit.transform.position;
-        float hitSpeed = hit.GetComponent<NavMeshAgent>().speed;
+        float hitSpeed = Vector3.Distance(player.GetComponent<Poulpe>().lastTargetPos, player.GetComponent<Poulpe>().targetPos);
         float distance = Vector3.Distance(player.transform.position, hitPos);
         float bulletSpeed = 40;
         float erreur = 0.3f;

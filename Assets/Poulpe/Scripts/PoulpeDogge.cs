@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System;
+using System.Collections.Generic;
 
 public class PoulpeDogge : PoulpeState
 {
     GameObject player;
+    public Vector3 bullet;
 
     public PoulpeDogge(GameObject Player)
     {
@@ -13,6 +14,10 @@ public class PoulpeDogge : PoulpeState
 
     public override void Step()
     {
-        player.GetComponent<NavMeshAgent>().SetDestination(player.transform.position);
+        foreach (PoulpeTransition transition in transitions)
+        {
+            transition.Check();
+        }
+        player.GetComponent<NavMeshAgent>().SetDestination(player.transform.position + bullet);
     }
 }

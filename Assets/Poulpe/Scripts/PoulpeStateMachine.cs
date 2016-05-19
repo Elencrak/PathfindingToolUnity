@@ -6,16 +6,21 @@ public class PoulpeStateMachine : PoulpeState
 {
     PoulpeState currentState;
 
-    List<PoulpeState> states;
+    //List<PoulpeState> states;
 
-    public PoulpeStateMachine(List<PoulpeState> States, PoulpeState CurrentState)
+    public PoulpeStateMachine(/*List<PoulpeState> States,*/ PoulpeState CurrentState)
     {
-        states = States;
+        //states = States;
         currentState = CurrentState;
     }
 
     public override void Step()
     {
         currentState.Step();
+    }
+
+    public void SetCurrentState(PoulpeState state)
+    {
+        currentState = state;
     }
 }

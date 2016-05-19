@@ -4,8 +4,12 @@ using System.Collections.Generic;
 
 public abstract class PoulpeState
 {
-    public GameObject[] targets;
-    public GameObject target;
+    public List<PoulpeTransition> transitions;
+
+    public void SetTransitions(List<PoulpeTransition> Transitions)
+    {
+        transitions = Transitions;
+    }
 
     public abstract void Step();
 }

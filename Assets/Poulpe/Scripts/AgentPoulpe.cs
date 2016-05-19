@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿/*using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -40,7 +40,7 @@ public class AgentPoulpe : MonoBehaviour
         target = GameObject.FindGameObjectWithTag("Target");
         road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position,graph);
         InvokeRepeating("UpdateRoad", 0.5f, 0.5f);
-        Debug.Log(PathfindingManager.GetInstance().test);*/
+        Debug.Log(PathfindingManager.GetInstance().test);
         //bot1 = transform.parent.GetChild(1).gameObject;
         //bot2 = transform.parent.GetChild(2).gameObject;
         players = new List<GameObject>();
@@ -84,7 +84,7 @@ public class AgentPoulpe : MonoBehaviour
         {
             transform.position = Vector3.MoveTowards(transform.position, target.transform.position, speed * Time.deltaTime);
         }
-	}*/
+	}
 
     void Update()
     {
@@ -188,4 +188,4 @@ public class AgentPoulpe : MonoBehaviour
             GetComponent<NavMeshAgent>().SetDestination(transform.position);
         }
     }
-}
+}*/
