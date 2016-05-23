@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 
-
 public class AgentJ : MonoBehaviour
 {
     Vector3 startPosition;
@@ -152,5 +151,5 @@ public class AgentJ : MonoBehaviour
         }
     }
 }
-
+    
 
