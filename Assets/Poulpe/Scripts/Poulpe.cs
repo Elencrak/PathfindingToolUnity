@@ -121,8 +121,8 @@ public class Poulpe : MonoBehaviour
 
         PoulpeTransition toDogge = new PoulpeTransition(CanDogge, dogge, firstStateMachine);
         PoulpeTransition toShoot = new PoulpeTransition(CanShoot, shoot, firstStateMachine);
-        secondTransitions.Add(toDogge);
         secondTransitions.Add(toShoot);
+        secondTransitions.Add(toDogge);
         secondStateMachine.SetTransitions(secondTransitions);
 
         PoulpeTransition toChase = new PoulpeTransition(HasDogge, secondStateMachine, firstStateMachine);
