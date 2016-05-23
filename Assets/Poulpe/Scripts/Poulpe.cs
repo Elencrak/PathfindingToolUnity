@@ -234,14 +234,6 @@ public class Poulpe : MonoBehaviour
         }
     }
 
-    void OnTriggerStay(Collider collider)
-    {
-        if(collider.tag == "Target" && collider.name != "Poulpe")
-        {
-            target = collider.gameObject;
-        }
-    }
-
     void OnTriggerEnter(Collider collider)
     {
         if (collider.tag == "Bullet")
