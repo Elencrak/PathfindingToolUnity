@@ -6,8 +6,6 @@ public abstract class StateMif
 {
 	public List<TransitionMif> AllTransition = new List<TransitionMif>();
 
-	//public abstract void Init (List<TransitionMif> AllT);
-
 	public void Init (List<TransitionMif> AllT)
 	{
 		AllTransition = AllT;
@@ -15,7 +13,6 @@ public abstract class StateMif
 
 	public abstract void Execute();
 
-	//public abstract StateMif Check ();
 	public StateMif Check ()
 	{
 		foreach (TransitionMif T in AllTransition) 

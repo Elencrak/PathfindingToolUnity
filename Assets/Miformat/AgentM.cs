@@ -21,9 +21,14 @@ public class AgentM : MonoBehaviour {
 
 
 
-	bool isPatrol;
-	TransitionMif idleTransition;
+	bool isPatrol = false;
+	bool isWalk = true;
+	TransitionMif TtoPatrol;
+	TransitionMif TtoWalk;
+	TransitionMif TtoAvoid;
 	PatrolMif patrol;
+	WalkMif walk;
+	AvoidMif avoid;
 	List<TransitionMif> trans;
 	StateMachineMif SMM;
 	StateMachineMif SMM2;
@@ -33,11 +38,24 @@ public class AgentM : MonoBehaviour {
 	void Start () 
 	{
 		patrol = new PatrolMif ();
-		idleTransition = new TransitionMif(patrol, CheckPatrol);
+		walk = new WalkMif ();
+		avoid = new AvoidMif ();
+		TtoPatrol = new TransitionMif(patrol, CheckPatrol);
+		TtoWalk = new TransitionMif(walk, CheckWalk);
+		TtoAvoid = new TransitionMif(avoid, CheckAvoid);
 		trans = new List<TransitionMif>();
-		trans.Add (idleTransition);
+		trans.Add (TtoWalk);
+		trans.Add (TtoAvoid);
 		patrol.Init (trans);
-		SMM = new StateMachineMif (patrol);
+		trans = new List<TransitionMif>();
+		trans.Add (TtoPatrol);
+		trans.Add (TtoAvoid);
+		walk.Init (trans);
+		trans = new List<TransitionMif>();
+		trans.Add (TtoPatrol);
+		trans.Add (TtoWalk);
+		avoid.Init (trans);
+		SMM = new StateMachineMif (walk);
 		SMM2 = new StateMachineMif (SMM);
 
 		bullet = Resources.Load ("Bullet") as GameObject;
@@ -97,6 +115,16 @@ public class AgentM : MonoBehaviour {
 		return isPatrol;
 	}
 
+	bool CheckWalk()
+	{
+		return isWalk;
+	}
+
+	bool CheckAvoid()
+	{
+		return isAvoiding;
+	}
+
 	GameObject M1;
 	GameObject M2;
 	GameObject M3;
@@ -110,6 +138,8 @@ public class AgentM : MonoBehaviour {
 			else if (AM.ID == 1) {M2 = AM.gameObject;}
 			else if (AM.ID == 2) {M3 = AM.gameObject;}
 		}
+		isPatrol = false;
+		isWalk = true;
 	}
 	
 	float timeToSwitch;
@@ -172,11 +202,26 @@ public class AgentM : MonoBehaviour {
 		if (currentBullet != null) {Dunk ();}
 		fireRate -= Time.deltaTime;
 		distToTarget = Vector3.Distance (this.gameObject.transform.position, target.transform.position);
-		if (fireRate < 0 /*&& distToTarget < 15*/) 
+		if (distToTarget < 15) 
 		{
-			Coloring (this.gameObject);
-			fireRate = 1;
-			Shoot ();
+			SphereCollider ball = this.gameObject.transform.GetChild (0).gameObject.GetComponent<SphereCollider> ();
+			ball.enabled = false;
+			if (fireRate < 0 && TargetOnSight ()) 
+			{
+				Coloring (this.gameObject);
+				fireRate = 1;
+				Shoot ();
+			}
+			ball.enabled = true;
+		}
+		else 
+		{
+			target = FindCloseTarget();
+			while (target.GetComponent<AgentM> ()) 
+			{
+				RemoveTargetFromTab (target);
+				target = FindCloseTarget();
+			}
 		}
 		if (target == null) 
 		{
@@ -238,6 +283,8 @@ public class AgentM : MonoBehaviour {
 			//isArrived = false;
 			break;
 		}*/
+		isPatrol = true;
+		isWalk = false;
 		if (state == 0){state = 1;} 
 		else {state = 0;}
 		agent.destination = getVect (ID, state);
@@ -253,6 +300,14 @@ public class AgentM : MonoBehaviour {
 			float distBull = Vector3.Distance (this.gameObject.transform.position, go.transform.position);
 			if (go.GetComponent<bulletScript> ().launcherName != "OSOK" && distBull < 2) {Death ();}
 		}
+	}
+
+	bool TargetOnSight()
+	{
+		RaycastHit hit;
+		Physics.Raycast (this.gameObject.transform.position, this.gameObject.transform.forward, out hit);
+		if (hit.collider.gameObject.tag == "Target" && !hit.collider.gameObject.GetComponent<AgentM> ()) {return true;}
+		else {return false;}
 	}
 
 	void Avoid()
@@ -387,6 +442,8 @@ public class AgentM : MonoBehaviour {
 		this.gameObject.transform.position = startPos;
 		target = FindCloseTarget();
 		agent.destination = target.transform.position;
+		isPatrol = false;
+		isWalk = true;
 	}
 
 	void Shoot()

@@ -11,18 +11,11 @@ public class StateMachineMif : StateMif {
 		currentState = CS;
 	}
 
-	//public override void Init (List<TransitionMif> AllT){}
-
 	public override void Execute ()
 	{
-		currentState.Execute ();
 		currentState = currentState.Check ();
+		currentState.Execute ();
 	}
-
-	/*public override StateMif Check()
-	{
-		return currentState.Check ();
-	}*/
 
 	public override void Finish (){}
 
