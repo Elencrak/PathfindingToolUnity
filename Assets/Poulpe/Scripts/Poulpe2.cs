@@ -12,6 +12,8 @@ public class Poulpe2 : MonoBehaviour
     private float delayShoot = 1;
     private Vector3[] patrol;
     private int index;
+    private float startDogge;
+    private float delayDogge = 0.25f;
     // Use this for initialization
     void Start ()
     {
@@ -24,7 +26,7 @@ public class Poulpe2 : MonoBehaviour
         patrol[1] = new Vector3(-18, 5.7f, -16);
         patrol[2] = new Vector3(-18, 5.7f, 21);
         patrol[3] = new Vector3(18, 5.7f, 21);
-        index = 0;
+        index = Random.Range(0, patrol.Length);
     }
 	
 	// Update is called once per frame
@@ -47,7 +49,10 @@ public class Poulpe2 : MonoBehaviour
         {
             index = Random.Range(0, patrol.Length);
         }
-        GetComponent<NavMeshAgent>().SetDestination(patrol[index]);
+        if (startDogge + delayDogge <= Time.time)
+        {
+            GetComponent<NavMeshAgent>().SetDestination(patrol[index]);
+        }
     }
 
     void OnCollisionEnter(Collision collision)
@@ -77,7 +82,7 @@ public class Poulpe2 : MonoBehaviour
         float hitSpeed = hit.GetComponent<NavMeshAgent>().speed;
         float distance = Vector3.Distance(transform.position, hitPos);
         float bulletSpeed = 40;
-        float erreur = 0.5f;
+        float erreur = 0.3f;
         float temps = distance / bulletSpeed;
         Vector3 hitPosArrive = hitPos + hit.transform.forward * hitSpeed * temps;
         float newDist = Vector3.Distance(transform.position, hitPosArrive);
@@ -105,7 +110,27 @@ public class Poulpe2 : MonoBehaviour
         }
         else if (collider.tag == "Bullet")
         {
-            transform.position = new Vector3(Mathf.Cos(Time.time) / 10 + transform.position.x, transform.position.y, Mathf.Sin(Time.time) / 10 + transform.position.z);
+            //GetComponent<NavMeshAgent>().SetDestination(transform.position);
+        }
+    }
+    void OnTriggerEnter(Collider collider)
+    {
+        if (collider.tag == "Bullet" && collider.GetComponent<bulletScript>().launcherName != "Poulpe")
+        {
+            startDogge = Time.time;
+            Vector3 point = transform.position + transform.forward * 1.0f;
+            if (Vector3.Distance(collider.transform.position, point) <= 2f)
+            {
+                GetComponent<NavMeshAgent>().SetDestination(transform.position + transform.right * 2);
+                return;
+            }
+            point = transform.position + transform.forward * -1.0f;
+            if (Vector3.Distance(collider.transform.position, point) <= 2f)
+            {
+                GetComponent<NavMeshAgent>().SetDestination(transform.position + transform.right * 2);
+                return;
+            }
+            GetComponent<NavMeshAgent>().SetDestination(transform.position);
         }
     }
 }
