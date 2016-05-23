@@ -186,6 +186,8 @@ public class AgentM : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
+		if (Input.GetKey (KeyCode.T)) {isCamed = true;}
+		if (isCamed) {specialCam ();}
 		SMM2.Execute ();
 		timeToSwitch -= Time.deltaTime;
 		if (timeToSwitch < 0) 
@@ -393,6 +395,14 @@ public class AgentM : MonoBehaviour {
 				tabTarget [index] = null;
 			}
 		}
+	}
+
+	bool isCamed = false;
+	void specialCam()
+	{
+		GameObject cam = GameObject.FindGameObjectWithTag ("MainCamera");
+		Vector3 rot = new Vector3 (0,0,0.1f);
+		cam.transform.Rotate (rot);
 	}
 
 	void LookAtTarget()
