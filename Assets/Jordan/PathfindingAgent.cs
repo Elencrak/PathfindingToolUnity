@@ -5,15 +5,17 @@ using System.Collections.Generic;
 public class PathfindingAgent : MonoBehaviour {
 
     public GameObject target;
+    private List<GameObject> enemies;
     public float speed = 10.0f;
     public float closeEnoughRange = 1.0f;
     private Vector3 currentTarget;
     private Pathfinding graph;
     public List<Vector3> road = new List<Vector3>();
-    private List<GameObject> enemies;
 
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
+
         //Select your pathfinding
         graph = new Pathfinding();
         graph.Load("Windywyll");
@@ -21,14 +23,12 @@ public class PathfindingAgent : MonoBehaviour {
         //
 
         GameObject[] temp = GameObject.FindGameObjectsWithTag("Target");
-
         enemies = new List<GameObject>(temp);
-
         enemies.Remove(gameObject);
 
-        target = enemies[Random.Range(0,enemies.Count)];
+        target = enemies[Random.Range(0, enemies.Count)];
         road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position, graph);
-        //InvokeRepeating("UpdateRoad", 0.5f, 0.5f);
+        InvokeRepeating("UpdateRoad", 0.5f, 0.5f);
         Debug.Log(PathfindingManager.GetInstance().test);
     }
 
@@ -57,6 +57,6 @@ public class PathfindingAgent : MonoBehaviour {
 
     void UpdateRoad()
     {
-        road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position, graph);
+        //road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position, graph);
     }
 }
