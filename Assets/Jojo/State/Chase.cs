@@ -18,7 +18,7 @@ namespace JojoKiller
             if (temp == this)
             {
                 Debug.Log("Fire");
-                member.shoot();
+                //member.shoot();
             }
             return temp;
         }

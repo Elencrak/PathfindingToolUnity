@@ -26,28 +26,30 @@ namespace JojoKiller
 
         [Header("Member")]
         public int teamCount;
+        public Member uniqueAgent;
 
         // Use this for initialization
         void Start()
-        {          
-            
+        {
+
             // initialize the agent
-            for(int i = 0; i < transform.childCount; i++)
+            /*for(int i = 0; i < transform.childCount; i++)
             {
                 agents.Add(transform.GetChild(i).GetComponent<Member>());
-            }
+            }*/
+            uniqueAgent = transform.GetChild(0).GetComponent<Member>();
 
             // State machine for member
             statePatrol = new StateMachine();
 
-            Idle monIdle = new Idle(myAgent);
-            Search monWalk = new Search(myAgent);
-            Chase monFire = new Chase(myAgent);
+            Idle monIdle = new Idle(uniqueAgent);
+            Search monWalk = new Search(uniqueAgent);
+            Chase monFire = new Chase(uniqueAgent);
 
             //from Idle to...
-            Transition transitionIdle = new Transition(myAgent.changeToWalk, monWalk);
-            Transition transitionWalk = new Transition(myAgent.canShoot, monFire);
-            Transition transitionFire = new Transition(myAgent.changeToIdle, monIdle);
+            Transition transitionIdle = new Transition(uniqueAgent.changeToWalk, monWalk);
+            Transition transitionWalk = new Transition(uniqueAgent.canShoot, monFire);
+            Transition transitionFire = new Transition(uniqueAgent.changeToIdle, monIdle);
 
             monIdle.addTransition(transitionIdle);
             monWalk.addTransition(transitionWalk);
