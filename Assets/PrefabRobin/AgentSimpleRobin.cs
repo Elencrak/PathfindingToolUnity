@@ -2,91 +2,101 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class AgentSimpleRobin : AgentRobinMathieu
+namespace IARobin
 {
 
-    [Header("GUN")]
-
-    public float RoF = 1.0f;
-    public List<GameObject> bullets;
-    public GameObject prefabBullet;
-    public GameObject predictionZone;
-
-    protected override void Start()
+    public class AgentSimpleRobin : AgentRobinMathieu
     {
-        base.Start();
-        bullets = new List<GameObject>();
-        if (prefabBullet == null)
+
+        [Header("GUN")]
+
+        public float RoF = 1.0f;
+        public List<GameObject> bullets;
+        public GameObject prefabBullet;
+        public GameObject predictionZone;
+
+        protected override void Start()
         {
-            prefabBullet = Resources.Load<GameObject>("Bullet");
-        }
-
-        predictionZone = transform.parent.Find("PredictionZone").gameObject;
-
-        StartCoroutine(Shoot());
-
-        InvokeRepeating("UpdateTarget", 0.0f, 0.5f);
-        InvokeRepeating("UpdateRoad", 0.0f, 0.8f);
-    }
-
-    protected override void UpdateRoad()
-    {
-        base.UpdateRoad();
-    }
-
-    protected override void UpdateTarget()
-    {
-        base.UpdateTarget();
-    }
-
-    void OnTriggerEnter(Collider coll)
-    {
-        if(coll.CompareTag("Bullet") && Random.Range(0f, 100.0f) > 15.0f)
-        {
-            //coll.GetComponent<bulletScript>().launcherName = AgentRobinMathieu.playerID;
-        }
-    }
-
-    IEnumerator Shoot()
-    {
-        bulletScript bullet = prefabBullet.GetComponent<bulletScript>();
-        while (isShooting)
-        {
-            if (nearTargetCollider)
+            base.Start();
+            bullets = new List<GameObject>();
+            if (prefabBullet == null)
             {
-                NavMeshAgent targ = nearestTarget.GetComponent<NavMeshAgent>();
+                prefabBullet = Resources.Load<GameObject>("Bullet");
+            }
 
-                Vector3 positionPredicted = nearTargetCollider.transform.position + Vector3.up * 0.5f;
+            predictionZone = transform.parent.Find("PredictionZone").gameObject;
 
-                float distanceParcourue = 0.0f;
+            StartCoroutine(Shoot());
+        }
 
-                while (Vector3.Distance(transform.position, positionPredicted) - distanceParcourue > float.Epsilon)
+        protected override void UpdateRoadEsquive()
+        {
+            base.UpdateRoadEsquive();
+        }
+
+        protected override void UpdateRoadRandom()
+        {
+            base.UpdateRoadRandom();
+        }
+
+        protected override void UpdateTarget()
+        {
+            base.UpdateTarget();
+        }
+
+        IEnumerator Shoot()
+        {
+            bulletScript bullet = prefabBullet.GetComponent<bulletScript>();
+            while (isShooting)
+            {
+                if (nearTargetCollider)
                 {
-                    positionPredicted += targ.velocity * Time.fixedDeltaTime;
-                    distanceParcourue += Time.fixedDeltaTime * bullet.speed;
-                }
+                    NavMeshAgent targ = nearestTarget.GetComponent<NavMeshAgent>();
+                    Agent targAgent = nearestTarget.GetComponent<Agent>();
 
-                RaycastHit hit;
+                    Vector3 positionPredicted = nearTargetCollider.transform.position + Vector3.up * 0.5f;
 
-                predictionZone.transform.position = positionPredicted;
-
-                Vector3 direction = (positionPredicted + nearTargetCollider.center) - transform.position;
-
-                if (Physics.Raycast(transform.position, direction.normalized, out hit, Vector3.Distance(positionPredicted, transform.position)))
-                {
-                    if (hit.collider.gameObject.CompareTag("Prediction") || hit.collider.gameObject.CompareTag("Target"))
+                    float distanceParcourue = 0.0f;
+                    if (targ)
                     {
+                        while (Vector3.Distance(transform.position, positionPredicted) - distanceParcourue > float.Epsilon)
+                        {
+                            positionPredicted += targ.velocity * Time.fixedDeltaTime;
+                            distanceParcourue += Time.fixedDeltaTime * bullet.speed;
+                        }
+                    }
+                    else if (targAgent)
+                    {
+                        while (Vector3.Distance(transform.position, positionPredicted) - distanceParcourue > float.Epsilon)
+                        {
+                            positionPredicted += (targAgent.target.transform.position - targAgent.transform.position) * Time.fixedDeltaTime;
+                            distanceParcourue += Time.fixedDeltaTime * bullet.speed;
+                        }
+                    }
 
-                        GameObject go = Instantiate(prefabBullet, transform.position + direction.normalized * 2.0f, Quaternion.LookRotation(direction.normalized)) as GameObject;
+                    RaycastHit hit;
 
-                        go.GetComponent<bulletScript>().launcherName = AgentRobinMathieu.playerID;
+                    predictionZone.transform.position = positionPredicted;
 
-                        bullets.Add(go);
-                        yield return new WaitForSeconds(RoF - RoF / 10.0f);
+                    Vector3 direction = (positionPredicted + nearTargetCollider.center) - transform.position;
+
+                    if (Physics.Raycast(transform.position, direction.normalized, out hit, Vector3.Distance(positionPredicted, transform.position)))
+                    {
+                        if (hit.collider.gameObject.CompareTag("Prediction") || hit.collider.gameObject.CompareTag("Target"))
+                        {
+
+                            GameObject go = Instantiate(prefabBullet, transform.position + direction.normalized * 2.0f, Quaternion.LookRotation(direction.normalized)) as GameObject;
+
+                            go.GetComponent<bulletScript>().launcherName = AgentRobinMathieu.playerID;
+
+                            bullets.Add(go);
+                            yield return new WaitForSeconds(RoF - RoF / 10.0f);
+                        }
                     }
                 }
+                yield return new WaitForSeconds(RoF / 10.0f);
             }
-            yield return new WaitForSeconds(RoF / 10.0f);
         }
     }
+
 }

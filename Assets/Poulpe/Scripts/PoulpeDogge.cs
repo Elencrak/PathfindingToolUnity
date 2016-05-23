@@ -18,6 +18,11 @@ public class PoulpeDogge : PoulpeState
         {
             transition.Check();
         }
-        player.GetComponent<NavMeshAgent>().SetDestination(player.transform.position + bullet);
+        int rand = Random.Range(0, 2);
+        if(rand == 0)
+        {
+            rand--;
+        }
+        player.GetComponent<NavMeshAgent>().SetDestination(player.transform.position + bullet * rand);
     }
 }
