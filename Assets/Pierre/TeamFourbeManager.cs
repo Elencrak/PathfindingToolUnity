@@ -16,7 +16,7 @@ public class TeamFourbeManager : MonoBehaviour {
             agent.stateMachine.currentState = new PierreCamp(agent.stateMachine);
         }
 
-        Invoke("BeginGame", 10);
+        Invoke("BeginGame", 1);
 
         InvokeRepeating("CheckStrat", 30, 20);
 

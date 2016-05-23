@@ -27,7 +27,7 @@ public class SW_Dodge : StateWill {
     
     void Dodge()
     {
-        if (timerLength + lastTime < Time.time || Vector3.Distance(player.transform.position, destination) < 0.5f)
+        if (timerLength + lastTime < Time.time || Vector3.Distance(player.transform.position, destination) <= 1)
         {
             lastTime = Time.time;
             defineDestination();
