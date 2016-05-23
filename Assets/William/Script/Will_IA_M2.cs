@@ -52,10 +52,17 @@ public class Will_IA_M2 : MonoBehaviour {
     public void shoot(GameObject targ)
     {
         GameObject spawnedBullet = (GameObject)Instantiate(bullet, transform.position, transform.rotation);
-        spawnedBullet.transform.LookAt(targ.transform.position);
+        spawnedBullet.transform.LookAt(targ.transform.position + targ.transform.forward);
         spawnedBullet.GetComponent<bulletScript>().launcherName = teamName;
 
         Physics.IgnoreCollision(GetComponent<BoxCollider>(), spawnedBullet.GetComponent<CapsuleCollider>());
         //Physics.IgnoreCollision(GetComponent<CharacterController>(), spawnedBullet.GetComponent<CapsuleCollider>());
+    }
+
+    public void move(Vector3 pos)
+    {
+        transform.position = Vector3.MoveTowards(transform.position, pos, speed * Time.deltaTime);
+        //playerController.SimpleMove(target.transform.position.normalized * speed * Time.deltaTime);
+        transform.LookAt(pos);
     }
 }
