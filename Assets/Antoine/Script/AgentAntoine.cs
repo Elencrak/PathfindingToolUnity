@@ -8,8 +8,10 @@ public class AgentAntoine : MonoBehaviour
     public float speed = 10.0f;
     public float closeEnoughRange = 1.0f;
     private Vector3 currentTarget;
+    private Vector3 tempTarget = Vector3.zero;
 
     public GameObject[] enemies;
+    public GameObject currentEnemy;
 
     public GameObject nodes;
 
@@ -46,6 +48,8 @@ public class AgentAntoine : MonoBehaviour
     private Vector3 lastPoint;
 
     StateMachineAntoine theStateMachine;
+
+    SelectorAntoine decisionTree;
 
     // Use this for initialization
     void Start()
@@ -93,13 +97,46 @@ public class AgentAntoine : MonoBehaviour
         canShoot = true;
         bullet = Resources.Load("Bullet") as GameObject;
         finished = false;
+
+        decisionTree = new SelectorAntoine();
+        SequenceAntoine s1 = new SequenceAntoine();
+        TaskAntoineDelegate delegateSeePlayer = new TaskAntoineDelegate(HaveTarget);
+        SelectorAntoine se1 = new SelectorAntoine();
+        SequenceAntoine s2 = new SequenceAntoine();
+        TaskAntoineDelegate delegateCanShoot = new TaskAntoineDelegate(GetCanShootDelegate);
+        TaskAntoineDelegate delegateShootBullet = new TaskAntoineDelegate(ShootBullet);
+        TaskAntoineDelegate delegateDodge = new TaskAntoineDelegate(DelegateDodge);
+        SelectorAntoine se2 = new SelectorAntoine();
+        SequenceAntoine s4 = new SequenceAntoine(); 
+        TaskAntoineDelegate delegateDistance = new TaskAntoineDelegate(DelegateDistance);
+        TaskAntoineDelegate delegateChase = new TaskAntoineDelegate(DelegateChase);
+        TaskAntoineDelegate delegatePatrol = new TaskAntoineDelegate(DelegatePatrol); 
+
+        decisionTree.AddNode(s1);
+        decisionTree.AddNode(se2);
+
+        s1.AddNode(delegateSeePlayer);
+        s1.AddNode(se1);
+
+        se1.AddNode(s2);
+        se1.AddNode(delegateDodge);
+
+        s2.AddNode(delegateCanShoot);
+        s2.AddNode(delegateShootBullet);
+
+        se2.AddNode(s4);
+        se2.AddNode(delegatePatrol);
+
+        s4.AddNode(delegateDistance);
+        s4.AddNode(delegateChase);
     }
 
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(theStateMachine.GetCurrentState().currentType);
-        theStateMachine.Update();
+        //Debug.Log(theStateMachine.GetCurrentState().currentType);
+       // theStateMachine.Update();
+        decisionTree.Execute();
 
         offset = 7 * Mathf.Sin(Time.time * 5);
 
@@ -199,6 +236,68 @@ public class AgentAntoine : MonoBehaviour
         }
     }
 
+    public bool DelegateDodge()
+    {
+        //Debug.Log("dodge Delegate");
+        float dodgeRate = 20.0f;
+        float rand = Random.Range(0, 1.0f);
+        if (rand > 0.7f || tempTarget == Vector3.zero)
+        {
+            tempTarget = road[0] + new Vector3(Random.Range(-dodgeRate, dodgeRate), 0.0f, Random.Range(-dodgeRate, dodgeRate));
+            
+        }
+        transform.position = Vector3.MoveTowards(transform.position, tempTarget, speed * Time.deltaTime);
+        return true;
+    }
+
+    public bool DelegateDistance()
+    {
+       // Debug.Log("distance Delegate");
+        tempTarget = Vector3.zero;
+        if (currentEnemy != null && Vector3.Distance(currentEnemy.transform.position, transform.position) <= 20.0f)
+            return true;
+        return false;
+    }
+
+    public bool DelegateChase()
+    {
+       // Debug.Log("chase Delegate");
+        tempTarget = Vector3.zero;
+        road = PathfindingManager.GetInstance().GetRoad(transform.position, currentEnemy.transform.position, graph);
+        road = PathfindingManager.GetInstance().SmoothRoad(road);
+        return true;
+    }
+
+    public bool DelegatePatrol()
+    {
+       // Debug.Log("patrol Delegate");
+        tempTarget = Vector3.zero;
+        if (Vector3.Distance(transform.position, target.transform.position) <= 0.1f)
+        {
+            //Debug.Log("change target");
+            int rand = Random.Range(0, nodes.transform.childCount - 1);
+
+            target = nodes.transform.GetChild(rand).gameObject;
+
+            road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position, graph);
+            road = PathfindingManager.GetInstance().SmoothRoad(road);
+        }
+        else if (Vector3.Distance(transform.position, road[0]) <= 0.1f)
+        {
+            // Debug.Log("change point");
+            road.RemoveAt(0);
+
+        }
+        else if(tempTarget == Vector3.zero)
+        {
+            // Debug.Log("move to point");
+            transform.position = Vector3.MoveTowards(transform.position, road[0], speed * Time.deltaTime);
+            transform.LookAt(road[0]);
+        }
+
+        return true;
+    }
+
     public bool NoTarget()
     {
        // Debug.Log("no target");
@@ -216,9 +315,33 @@ public class AgentAntoine : MonoBehaviour
         return true;
     }
 
+    public bool HaveTarget()
+    {
+        foreach (GameObject g in enemies)
+        {
+            RaycastHit hit;
+            if (g != null && Physics.Raycast(spawnBullet.transform.position, (g.transform.position - transform.position).normalized, out hit, 10000.0f))
+            {
+                if (hit.transform.tag == "Target" && hit.transform.gameObject != bro1 && hit.transform.gameObject != bro2 && hit.transform.gameObject != gameObject)
+                {
+                    currentEnemy = g;
+                    return true;
+                }
+            }
+        }
+        currentEnemy = null;
+        return false;
+    }
+
     public bool HaveShoot()
     {
         return !canShoot;
+    }
+
+    public bool GetCanShootDelegate()
+    {
+       // Debug.Log("GetCan Shoot Delegate");
+        return canShoot;
     }
 
     public bool GetCanShoot()
@@ -237,6 +360,20 @@ public class AgentAntoine : MonoBehaviour
         go.transform.LookAt(target.transform.position + target.transform.forward);
         canShoot = false;
         lastShoot = 0.0f;
+    }
+
+    public bool ShootBullet()
+    {
+        //Debug.Log("shoot Bullet Delegate");
+        spawnBulletRotation.transform.LookAt(currentEnemy.transform.position);
+        isShooting = true;
+
+        GameObject go = Instantiate(bullet, spawnBullet.transform.position, Quaternion.identity) as GameObject;
+        // go.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
+        go.transform.LookAt(currentEnemy.transform.position + currentEnemy.transform.forward);
+        canShoot = false;
+        lastShoot = 0.0f;
+        return true;
     }
 
     void ChangeColor()
@@ -266,7 +403,7 @@ public class AgentAntoine : MonoBehaviour
             FindInTargets(other.gameObject);
         }*/
 
-        if (other.gameObject.tag == "Bullet" && other.transform.GetComponent<bulletScript>().launcherName != transform.parent.GetComponent<TeamNumber>().teamName)
+        if (other.gameObject.tag == "Bullet" /*&& other.transform.GetComponent<bulletScript>().launcherName != transform.parent.GetComponent<TeamNumber>().teamName*/)
         {
             transform.position = SpawnPos;
             int rand = Random.Range(0, nodes.transform.childCount - 1);
