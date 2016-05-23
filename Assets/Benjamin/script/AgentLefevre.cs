@@ -79,6 +79,7 @@ public class AgentLefevre : MonoBehaviour
             target = targets[Random.Range(0, targets.Count)];
         }
         road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position, graph);
+        road = PathfindingManager.GetInstance().SmoothRoad(road);
     }
 
     void OnCollisionEnter(Collision col)
