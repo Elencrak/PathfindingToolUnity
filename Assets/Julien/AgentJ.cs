@@ -7,38 +7,60 @@ public class AgentJ : MonoBehaviour
 {
     Vector3 startPosition;
 
-    public List<Transform> playerList;
+    RaycastHit testVisibility;
+
+    bool canShoot = true;
+
+    int reloadDelay;
+    int reload;
+
 
     public Transform target;
+
     NavMeshAgent agent;
 
+    GameObject player;
+    GameObject player2;
+    GameObject player3;
+
+    public List<Transform> playerList;
+
+    public List<GameObject> possibleTargets;
+
+
+    public List<GameObject> mySquad;
 
 
     // Use this for initialization
    void Start()
     {
+        player = this.gameObject;
         agent = GetComponent<NavMeshAgent>();
         startPosition = this.gameObject.transform.position;
 
-        GameObject[] playerArray;
-        playerArray = GameObject.FindGameObjectsWithTag("Target");
-        
-        foreach(GameObject temp in playerArray)
+        //GameObject[] playerArray;
+        //playerArray = GameObject.FindGameObjectsWithTag("Target");
+
+        /*foreach (GameObject temp in playerArray)
         {
             if(temp != this.gameObject)
             {
                 playerList.Add(temp.transform);
             }
-        }
+        }*/
+
+        getTarget();
+        listTargeTransform();
 
         InvokeRepeating("FindTarget", 0.5f, 3.0f);
-        InvokeRepeating("FireBullet", 0.01f, 1.0f);
+        InvokeRepeating("FireBullet", 0.5f, 1.0f);
     }
 
 
     // Update is called once per frame
     void Update()
     {
+       transform.LookAt(target);
     }
 
 
@@ -77,23 +99,23 @@ public class AgentJ : MonoBehaviour
                 agent.Stop();
             }
         }
-
         if (col.gameObject.tag == "Bullet")
         {
             Death();
         }
-
     }
 
 
     void FireBullet()
     {
-        Vector3 relativePos = target.position - transform.position;
-        Quaternion rotation = Quaternion.LookRotation(relativePos);
 
-        GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position + transform.forward*2.0f, rotation) as GameObject;
-        bullet.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
-        Physics.IgnoreCollision(this.GetComponent<BoxCollider>(), bullet.GetComponent<CapsuleCollider>());
+            Vector3 relativePos = target.position - transform.position;
+            Quaternion rotation = Quaternion.LookRotation(relativePos);
+
+            GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position + transform.forward * 1.0f, rotation) as GameObject;
+            bullet.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
+            Physics.IgnoreCollision(this.GetComponent<BoxCollider>(), bullet.GetComponent<CapsuleCollider>());
+
     }
 
     void Death()
@@ -104,6 +126,30 @@ public class AgentJ : MonoBehaviour
     void DodgeMovement()
     {
 
+    }
+
+    void getTarget()
+    {
+        GameObject[] bite = GameObject.FindGameObjectsWithTag("Target");
+        foreach (GameObject go in bite)
+        {
+            AgentJ chatte = go.GetComponent<AgentJ>();
+            if (!chatte)
+            {
+                possibleTargets.Add(go);
+
+            }
+
+        }
+
+    }
+
+    void listTargeTransform()
+    {
+        foreach (GameObject temp in possibleTargets)
+        {
+            playerList.Add(temp.transform);
+        }
     }
 }
 
