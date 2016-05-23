@@ -16,6 +16,10 @@ public class PoulpeStateMachine : PoulpeState
 
     public override void Step()
     {
+        foreach (PoulpeTransition transition in transitions)
+        {
+            transition.Check();
+        }
         currentState.Step();
     }
 

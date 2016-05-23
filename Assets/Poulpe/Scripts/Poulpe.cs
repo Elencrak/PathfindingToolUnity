@@ -23,6 +23,8 @@ public class Poulpe : MonoBehaviour
     List<PoulpeTransition> shootTransitions;
     List<PoulpeTransition> doggeTransitions;
     List<PoulpeTransition> idleTransitions;
+    List<PoulpeTransition> secondTransitions;
+    List<PoulpeTransition> firstTransitions;
 
     PoulpeMove move;
     PoulpeShoot shoot;
@@ -30,6 +32,9 @@ public class Poulpe : MonoBehaviour
     PoulpeIdle idle;
 
     Vector3 begin;
+
+    PoulpeStateMachine firstStateMachine;
+    PoulpeStateMachine secondStateMachine;
 
     void Start()
     {
@@ -43,6 +48,8 @@ public class Poulpe : MonoBehaviour
             }
         }
 
+        #region WhitoutHierarchie
+        /*
         states = new List<PoulpeState>();
         moveTransitions = new List<PoulpeTransition>();
         shootTransitions = new List<PoulpeTransition>();
@@ -60,7 +67,7 @@ public class Poulpe : MonoBehaviour
         states.Add(shoot);
         states.Add(dogge);
         states.Add(idle);
-        stateMachine = new PoulpeStateMachine(/*states, */move);
+        stateMachine = new PoulpeStateMachine(move);
 
         PoulpeTransition toDogge = new PoulpeTransition(CanDogge, dogge, stateMachine);
         PoulpeTransition toIdle = new PoulpeTransition(EnemySpotted, idle, stateMachine);
@@ -81,10 +88,62 @@ public class Poulpe : MonoBehaviour
         idleTransitions.Add(toDogge);
         idleTransitions.Add(toShoot);
         idleTransitions.Add(toMove);
+        idle.SetTransitions(idleTransitions);*/
+        #endregion
+
+        #region WhitHierarchie
+        states = new List<PoulpeState>();
+        moveTransitions = new List<PoulpeTransition>();
+        shootTransitions = new List<PoulpeTransition>();
+        doggeTransitions = new List<PoulpeTransition>();
+        idleTransitions = new List<PoulpeTransition>();
+        secondTransitions = new List<PoulpeTransition>();
+        firstTransitions = new List<PoulpeTransition>();
+
+        startShoot = 0;
+        startDogge = 0;
+        begin = transform.position;
+        move = new PoulpeMove(this.gameObject, this.GetComponent<NavMeshAgent>());
+        shoot = new PoulpeShoot(this.gameObject);
+        dogge = new PoulpeDogge(this.gameObject);
+        idle = new PoulpeIdle(this.gameObject, this.GetComponent<NavMeshAgent>());
+        states.Add(move);
+        states.Add(idle);
+        secondStateMachine = new PoulpeStateMachine(move);
+
+        states = new List<PoulpeState>();
+        states.Add(secondStateMachine);
+        states.Add(dogge);
+        states.Add(shoot);
+        firstStateMachine = new PoulpeStateMachine(secondStateMachine);
+        firstStateMachine.SetTransitions(firstTransitions);
+
+
+        PoulpeTransition toDogge = new PoulpeTransition(CanDogge, dogge, firstStateMachine);
+        PoulpeTransition toShoot = new PoulpeTransition(CanShoot, shoot, firstStateMachine);
+        secondTransitions.Add(toDogge);
+        secondTransitions.Add(toShoot);
+        secondStateMachine.SetTransitions(secondTransitions);
+
+        PoulpeTransition toChase = new PoulpeTransition(HasDogge, secondStateMachine, firstStateMachine);
+        doggeTransitions.Add(toChase);
+        dogge.SetTransitions(doggeTransitions);
+
+        PoulpeTransition toIdle2 = new PoulpeTransition(CoolDownDelay, secondStateMachine, firstStateMachine);
+        shootTransitions.Add(toIdle2);
+        shoot.SetTransitions(shootTransitions);
+        
+        PoulpeTransition toIdle = new PoulpeTransition(EnemySpotted, idle, secondStateMachine);
+        moveTransitions.Add(toIdle);
+        move.SetTransitions(moveTransitions);
+
+        PoulpeTransition toMove = new PoulpeTransition(EnemyNotSpotted, move, secondStateMachine);
+        idleTransitions.Add(toMove);
         idle.SetTransitions(idleTransitions);
+        #endregion
     }
 
-	void Update ()
+    void Update ()
     {
         if(target != null)
         {
@@ -93,7 +152,7 @@ public class Poulpe : MonoBehaviour
         }
         startShoot -= Time.deltaTime;
         startDogge -= Time.deltaTime;
-        stateMachine.Step();
+        firstStateMachine.Step();
     }
 
     bool EnemyNotSpotted()
