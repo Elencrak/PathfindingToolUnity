@@ -7,7 +7,7 @@ public class MovementStateBenoitV : StateBenoitV
     public override void Execute(GameObject parAgent)
     {
         parAgent.GetComponent<AgentFunctions>().Move();
-        Debug.Log("Move");
+        //Debug.Log(parAgent + "Move");
     }
 
 }

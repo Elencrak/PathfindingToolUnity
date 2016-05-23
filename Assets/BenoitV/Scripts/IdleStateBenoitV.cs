@@ -8,7 +8,7 @@ public class IdleStateBenoitV : StateBenoitV
     public override void Execute(GameObject parAgent)
     {
         parAgent.GetComponent<AgentFunctions>().StandBy();
-        Debug.Log("Idle");
+        Debug.Log(parAgent + "Idle");
     }
 
 }

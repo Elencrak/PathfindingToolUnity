@@ -24,7 +24,7 @@ public class TeamAgentValentin : MonoBehaviour {
         road = PathfindingManager.GetInstance().GetRoad(transform.position, target.transform.position, graph);
         road = PathfindingManager.GetInstance().SmoothRoad(road);
         // InvokeRepeating("UpdateRoad", 0.5f, 0.5f);
-        Debug.Log(PathfindingManager.GetInstance().test);
+
     }
 
     void Update()
