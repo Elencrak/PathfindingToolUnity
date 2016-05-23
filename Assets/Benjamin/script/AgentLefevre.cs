@@ -94,14 +94,14 @@ public class AgentLefevre : MonoBehaviour
     {
         Debug.Log("FIRE");
         lastFire = Time.time;
-        target = GetTarget();
+        /*target = GetTarget();
         if (target == null)
-            return;
-        Vector3 relativePos = target.transform.position - transform.position;
+            return;*/
+        /*Vector3 relativePos = target.transform.position - transform.position;
         Quaternion rotation = Quaternion.LookRotation(relativePos);
         GameObject instanceBul = Instantiate(bullet, transform.position + relativePos.normalized * 2f, rotation) as GameObject;
-        instanceBul.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
-        //StartCoroutine(fireRoutine());
+        instanceBul.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;*/
+        StartCoroutine(fireRoutine());
     }
 
     public IEnumerator fireRoutine()

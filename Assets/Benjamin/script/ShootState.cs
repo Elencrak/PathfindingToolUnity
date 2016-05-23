@@ -12,7 +12,6 @@ namespace benjamin
         public override void Init()
         {
             agent = controller.GetComponent<AgentLefevre>();
-            Debug.Log(agent.gameObject.name + " Init ShootState");
             AddTransition(new LostTarget());
 
             agent.CancelInvoke();
