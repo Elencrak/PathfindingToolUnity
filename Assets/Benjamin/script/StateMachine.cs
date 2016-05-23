@@ -9,11 +9,13 @@ namespace benjamin
 
         List<AbstractState> stateList = new List<AbstractState>();
         AbstractState currentState;
+        public GameObject controller;
         
 
 	    public void AddState(AbstractState state)
         {
             stateList.Add(state);
+            state.controller = controller;
         }
 
         public List<AbstractState> GetStateList()
@@ -24,6 +26,7 @@ namespace benjamin
         public void SetCurrentState(AbstractState state)
         {
             currentState = state;
+            currentState.controller = controller;
             currentState.Init();
         }
 

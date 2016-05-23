@@ -8,21 +8,23 @@ namespace benjamin
     {
         AgentLefevre agent;
 
-
+        
         public override void Init()
         {
-            Debug.Log("InitShootState");
-            agent = AgentLefevre.instance;
+            agent = controller.GetComponent<AgentLefevre>();
+            Debug.Log(agent.gameObject.name + " Init ShootState");
             AddTransition(new LostTarget());
 
             agent.CancelInvoke();
-            agent.InvokeRepeating("Fire", 0f, 1f);
         }
 
         // Update is called once per frame
         public override void StateUpdate()
         {
-            Debug.Log("currentState = ShootState");
+            if(Time.time > agent.lastFire+1f)
+            {
+                agent.Fire();
+            }
 
         }
 

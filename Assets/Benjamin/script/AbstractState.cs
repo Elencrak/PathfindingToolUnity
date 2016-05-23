@@ -11,6 +11,7 @@ namespace benjamin
 
         public void AddTransition(ITransition trans)
         {
+            trans.SetController(controller);
             transitionList.Add(trans);
         }
 
@@ -22,7 +23,7 @@ namespace benjamin
             foreach (ITransition trans in transitionList)
             {
                 if (trans.Check())
-                    AgentLefevre.instance.sm.SetCurrentState(trans.GetNextState());
+                    trans.GetController().GetComponent<AgentLefevre>().sm.SetCurrentState(trans.GetNextState());
             }
         }
     }

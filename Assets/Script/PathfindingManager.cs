@@ -66,7 +66,7 @@ public class PathfindingManager  {
             resultPath.Insert(0, startPosition);
         if (destination != endNode.getPosition())
             resultPath.Add(destination);
-        return resultPath;
+        return SmoothRoad(resultPath);
 
     }
 

@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System;
 
 namespace benjamin
 {
@@ -10,46 +9,29 @@ namespace benjamin
 
         public override void Init()
         {
-            Debug.Log("InitMoveToState");
+            agent = controller.GetComponent<AgentLefevre>();
+            Debug.Log(agent.gameObject.name + " Init ShootState");
             AddTransition(new SeeTarget());
 
-
-            agent = AgentLefevre.instance;
-
-            //Select your pathfinding
-            agent.graph = new Pathfinding();
-            agent.graph.Load("benPath");
-            agent.graph.setNeighbors();
-            //
-            
-            float dist = Mathf.Infinity;
-            GameObject[] test = GameObject.FindGameObjectsWithTag("Target");
-            foreach (GameObject obj in test)
-            {
-                if (obj == agent.gameObject)
-                    continue;
-                float tmp = Vector3.Distance(agent.transform.position, obj.transform.position);
-                if (tmp < dist)
-                {
-                    dist = tmp;
-                    agent.target = obj;
-                }
-                agent.targets.Add(obj);
-
-            }
-            agent.road = PathfindingManager.GetInstance().GetRoad(agent.transform.position, agent.target.transform.position, agent.graph);
-            agent.InvokeRepeating("UpdateRoad", 0.5f, 0.5f);
+            agent.RefreshTargets();
+            agent.target = agent.targets[Random.Range(0, agent.targets.Count)];
+            agent.CancelInvoke();
+            agent.InvokeRepeating("UpdateRoad", 0f, 0.5f);
         }
 
         // Update is called once per frame
         public override void StateUpdate ()  {
-            Debug.Log("currentState = MoveToState");
+            
+            if (agent.target == null || agent.road == null)
+                return;
             if (agent.road.Count > 0)
             {
                 agent.currentTarget = agent.road[0];
                 if (Vector3.Distance(agent.transform.position, agent.currentTarget) < agent.closeEnoughRange)
                 {
                     agent.road.RemoveAt(0);
+                    if (agent.road.Count == 0)
+                        return;
                     agent.currentTarget = agent.road[0];
                 }
                 else
