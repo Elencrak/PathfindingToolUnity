@@ -12,16 +12,27 @@ public class TeamFourbeManager : MonoBehaviour {
 	    foreach(NewPierreAgent agent in GetComponentsInChildren<NewPierreAgent>())
         {
             agents.Add(agent);
+
+            agent.stateMachine.currentState = new PierreCamp(agent.stateMachine);
         }
 
-        InvokeRepeating("CheckStrat", 20, 20);
+        Invoke("BeginGame", 10);
+
+        InvokeRepeating("CheckStrat", 30, 20);
 
 	}
 	
 	// Update is called once per frame
 	void Update () {
-	
-	}
+
+    }
+
+    void BeginGame()
+    {
+        agents[0].stateMachine.currentState = new PierreOffensif(agents[0].stateMachine);
+        agents[1].stateMachine.currentState = new PierreDefensif(agents[1].stateMachine);
+        agents[2].stateMachine.currentState = new PierreRandom(agents[2].stateMachine);
+    }
 
     void CheckStrat()
     {
