@@ -6,7 +6,7 @@ namespace JojoBehaviourTree
 {
     public class SeeOpponent : AgentNode
     {
-        
+
         public SeeOpponent(BehaviourTreeAgent p_agent)
         {
             agent = p_agent;
@@ -14,9 +14,24 @@ namespace JojoBehaviourTree
 
         public override bool execute()
         {
-            Debug.Log("SeeOpponentTask");
-            bool temp = Input.GetKeyDown(KeyCode.A);
-            return temp;
+            foreach (Transform g in agent.targets)
+            {
+                if (g.GetInstanceID() != agent.gameObject.GetInstanceID())
+                {
+                    Vector3 relativePosition;
+                    relativePosition = g.position - agent.transform.position;
+                    RaycastHit hit;
+                    Debug.DrawRay(agent.transform.position, relativePosition.normalized *10,Color.red);
+                    if (Physics.Raycast(agent.transform.position, relativePosition.normalized, out hit, 1000))
+                    {
+                        if (hit.transform.tag == "Target")
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
         }
     }
 }

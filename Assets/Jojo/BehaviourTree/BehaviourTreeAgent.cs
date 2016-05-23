@@ -2,51 +2,93 @@
 using System.Collections;
 using System.Collections.Generic;
 
-using JojoBehaviourTree;
-public class BehaviourTreeAgent : MonoBehaviour {
+namespace JojoBehaviourTree { 
+    public class BehaviourTreeAgent : MonoBehaviour {
 
 
-    [Header("Internal")]
-    bool doOnce = true;
-    private List<Transform> targets = new List<Transform>();
-    public Transform currentTarget;
-    private Selector rootSelector;
+        [Header("Internal")]
+        public List<Transform> targets = new List<Transform>();
+        public Transform currentTarget;
+        public NavMeshAgent currentNavMeshAgent;
+        public float nextShoot;
+        public float fireRate = 1f;
 
-    // Use this for initialization
-    void Start () {
+        private bool doOnce = true;
+        private Selector rootSelector;
+        public Vector3 startPosition;
 
-        rootSelector = new Selector();
-        Sequence seeSequence = new Sequence();
+        // Use this for initialization
+        void Start () {
+            startPosition = transform.position;
 
-        SeeOpponent seeOpponent = new SeeOpponent(this);
-        Shoot shoot = new Shoot(this);
-        Move move = new Move(this);
+            nextShoot = fireRate;
 
-        seeSequence.addElementIncomposite(seeOpponent);
-        seeSequence.addElementIncomposite(shoot);
+            currentNavMeshAgent = GetComponent<NavMeshAgent>();
 
-        rootSelector.addElementIncomposite(seeSequence);
-        rootSelector.addElementIncomposite(move);
+            rootSelector = new Selector();
+            Sequence loadedSequence = new Sequence();
+            Selector moveTo = new Selector();        
+            Sequence seeSequence = new Sequence();
+        
+            SeeOpponent seeOpponent = new SeeOpponent(this);
+            Shoot shoot = new Shoot(this);
+            Move move = new Move(this);
+            Wait wait = new Wait(this);
+            Loaded loaded = new Loaded(this);
 
+            rootSelector.addElementIncomposite(loadedSequence);
+            rootSelector.addElementIncomposite(wait);
 
-    }
-	
-	// Update is called once per frame
-	void Update () {
-        //Récupération des target
-        if (doOnce)
-        {
-            doOnce = false;
-            GameObject[] tempArray;
-            tempArray = GameObject.FindGameObjectsWithTag("Target");
-            foreach (GameObject g in tempArray)
-            {
-                if (g.GetInstanceID() != gameObject.GetInstanceID())
-                {
-                    targets.Add(g.transform);
-                }
-            }
+            loadedSequence.addElementIncomposite(loaded);
+            loadedSequence.addElementIncomposite(moveTo);
+
+            moveTo.addElementIncomposite(seeSequence);
+            moveTo.addElementIncomposite(move);
+
+            seeSequence.addElementIncomposite(seeOpponent);
+            seeSequence.addElementIncomposite(shoot);
+
         }
-        rootSelector.execute();
+	
+	    // Update is called once per frame
+	    void Update () {
+            //Récupération des target
+            if (doOnce)
+            {
+                doOnce = false;
+                GameObject[] tempArray;
+                tempArray = GameObject.FindGameObjectsWithTag("Target");
+                foreach (GameObject g in tempArray)
+                {
+                    if (g.GetInstanceID() != gameObject.GetInstanceID())
+                    {
+                        if(!g.GetComponent<BehaviourTreeAgent>())
+                            targets.Add(g.transform);
+                    }
+                }                        
+            }
+
+            if (nextShoot >= 0)
+            {
+                nextShoot -= Time.deltaTime;
+            }
+            rootSelector.execute();
+        }
+
+        public bool canShoot()
+        {
+            return nextShoot <= 0;
+        }
+
+        public void resetShoot()
+        {
+            nextShoot = fireRate;
+        }
+
+        void OnCollisionEnter(Collision collision)
+        {
+ 
+                currentNavMeshAgent.Warp(startPosition);
+        }
     }
 }
