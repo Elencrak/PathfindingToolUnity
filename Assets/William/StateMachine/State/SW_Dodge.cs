@@ -27,41 +27,34 @@ public class SW_Dodge : StateWill {
     
     void Dodge()
     {
-        
-
-        
-
-        if (timerLength + lastTime < Time.time || Vector3.Distance(player.transform.position, destination) <2)
+        if (timerLength + lastTime < Time.time || Vector3.Distance(player.transform.position, destination) <= 1)
         {
             lastTime = Time.time;
             defineDestination();
         }
         else
         {
-            player.transform.position = Vector3.MoveTowards(player.transform.position, destination, speed * Time.deltaTime);
-            //playerController.SimpleMove(target.transform.position.normalized * speed * Time.deltaTime);
-            player.transform.LookAt(destination);
+            player.GetComponent<Will_IA_M2>().move(destination);
+            
         }
     }
 
+
     void defineDestination()
     {
-        Vector3 targetDist = TeamManagerWill.instance.mainTarget.transform.position; 
-        if (Vector3.Distance(targetDist, player.transform.position) < distance)
-        {
-            destination = targetDist;
-            destination += (player.transform.position - destination) * distance;
-            destination.y = player.transform.position.y;
-            return;
-        }
 
-        RaycastHit hit;        
-        if (Physics.Raycast(player.transform.position, player.transform.right, out hit, distance))
+        RaycastHit hitRight;
+        RaycastHit hitLeft;
+        if (Physics.Raycast(player.transform.position, player.transform.right, out hitRight, distance))
         {
-            //Debug.Log(hit.collider.gameObject.layer);
-            if (hit.collider.gameObject.layer == 20)
+            if (Physics.Raycast(player.transform.position, player.transform.right * -1, out hitLeft, distance))
             {
-                destination = TeamManagerWill.instance.mainTarget.transform.position;
+                if (Random.Range(0, 2) == 1)
+                {
+                    destination = hitRight.point;
+                }
+                else
+                destination = hitLeft.point;
             }
             else
             {
@@ -73,5 +66,39 @@ public class SW_Dodge : StateWill {
             destination = player.transform.position + (player.transform.right * distance);
         }
         
+
     }
+
+
+    //void defineDestination()
+    //{
+    //    Vector3 targetDist = TeamManagerWill.instance.mainTarget.transform.position; 
+    //    if (Vector3.Distance(targetDist, player.transform.position) < distance)
+    //    {
+    //        destination = player.transform.position;
+    //        destination = (player.transform.position - targetDist) * distance;
+    //        destination.y = player.transform.position.y;
+    //        return;
+    //    }
+
+    //    RaycastHit hit;        
+    //    if (Physics.Raycast(player.transform.position, player.transform.right, out hit, 0.5f))
+    //    {
+    //            //Debug.Log(hit.collider.gameObject.layer);
+    //        if (hit.collider.gameObject.layer == 20)
+    //        {
+    //            //destination = player.transform.position + (player.transform.right*-1 * distance);
+    //            destination = TeamManagerWill.instance.mainTarget.transform.position;
+    //        }
+    //        else
+    //        {
+    //            destination = player.transform.position + (player.transform.right * distance);
+    //        }
+    //    }
+    //    else
+    //    {
+    //        destination = player.transform.position + (player.transform.right * distance);
+    //    }
+
+    //}
 }
