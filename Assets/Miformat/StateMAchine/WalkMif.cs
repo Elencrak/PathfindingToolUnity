@@ -18,7 +18,7 @@ public class WalkMif : StateMif {
 
 	Vector3 getVect(int MID, int MState)
 	{
-		Debug.Log ("WalkToPoint");
+		//Debug.Log ("WalkToPoint");
 		if (MID == 0) 
 		{
 			if (MState == 0) {return  new Vector3 (-73, 1, -16);} 
