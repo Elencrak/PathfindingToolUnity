@@ -147,10 +147,11 @@ namespace IARobin
         bool hasWin = false;
 
         public List<GameObject> _bullets;
+        protected GameObject TargetBullet;
 
         [Header("Values")]
 
-        public bool isShooting = true;
+        public static bool isShooting = true;
         public static string playerID = "Squad Robin";
         TeamNumber parentNumber;
 
@@ -177,6 +178,7 @@ namespace IARobin
                 }
             }
             InvokeRepeating("UpdateSM", 0.1f, 0.2f);
+            StartCoroutine(Shoot());
         }
 
         void UpdateSM()
@@ -190,11 +192,11 @@ namespace IARobin
             _stateMachine = new StateMachine();
             _stateMachine.name = "Machine";
 
-            State.Action randomAction = new State.Action(() => 
+            State.Action randomAction = new State.Action(() =>
             {
                 UpdateRoadRandom();
             });
-            State.Action esquiveAction = new State.Action(() => 
+            State.Action esquiveAction = new State.Action(() =>
             {
                 UpdateRoadEsquive();
             });
@@ -291,9 +293,56 @@ namespace IARobin
             agent.Warp(startPoint);
         }
 
+        IEnumerator Shoot()
+        {
+            while(isShooting)
+            {
+                _bullets = _bullets.Where(bull => bull != null).ToList();
+                if (_bullets.Count > 1)
+                {
+                    Debug.Log("Try Shoot Bullet");
+                    yield return ShootBullet();
+                }
+                else
+                {
+                    Debug.Log("Try Shoot Enemy");
+                    yield return ShootEnemy();
+                }
+            }
+        }
+
+        protected void ForceUpdateTargetBullet()
+        {
+            GameObject target = _bullets[Random.Range(0, _bullets.Count - 1)];
+
+            if (target)
+            {
+                TargetBullet = target;
+            }
+            else
+            {
+                TargetBullet = null;
+            }
+        }
+
+        protected virtual void UpdateTargetBullet()
+        {
+
+        }
+
+        protected virtual IEnumerator ShootEnemy()
+        {
+            yield return 0;
+        }
+
+        protected virtual IEnumerator ShootBullet()
+        {
+            yield return 0;
+        }
+
         void OnCollisionEnter(Collision coll)
         {
-            if (coll.gameObject.CompareTag("Bullet") && coll.gameObject.GetComponent<bulletScript>().launcherName != playerID)
+            if (coll.gameObject.CompareTag("Bullet"))
             {
                 Respawn();
             }
@@ -304,17 +353,14 @@ namespace IARobin
             if (coll.CompareTag("Bullet") && coll.GetComponent<bulletScript>().launcherName != playerID)
             {
                 _bullets.Add(coll.gameObject);
-                //coll.GetComponent<bulletScript>().launcherName = AgentRobinMathieu.playerID;
             }
         }
 
         void OnTriggerExit(Collider coll)
         {
-            //_bullets = _bullets.Where(bull => bull != null).ToList();
             if (coll.CompareTag("Bullet") && coll.GetComponent<bulletScript>().launcherName != playerID)
             {
                 _bullets.Remove(coll.gameObject);
-                //coll.GetComponent<bulletScript>().launcherName = AgentRobinMathieu.playerID;
             }
         }
     }
