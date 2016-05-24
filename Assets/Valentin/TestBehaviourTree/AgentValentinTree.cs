@@ -16,7 +16,6 @@ public class AgentValentinTree : MonoBehaviour {
     float cdShootMax = 1f;
     public float cdShoot = 1f;
     public bool rightOrNot = true;
-    float needToChange = 0f;
 
     // Use this for initialization
     void Start()
@@ -76,7 +75,6 @@ public class AgentValentinTree : MonoBehaviour {
         #endregion
 
         InvokeRepeating("checkTree", 0, 0.1f);
-        changeDirection();
     }
 
     void checkTree()
@@ -123,14 +121,6 @@ public class AgentValentinTree : MonoBehaviour {
         {
             cdShoot = Mathf.Max(0f, cdShoot - Time.deltaTime);
         }
-        if (cdShoot != 0)
-        {
-            needToChange = Mathf.Max(0f, needToChange - Time.deltaTime);
-        }
-        else
-        {
-            changeDirection();
-        }
     }
 
     #region pour le tree
@@ -164,58 +154,15 @@ public class AgentValentinTree : MonoBehaviour {
     }
     public bool shoot()
     {
-        NavMeshAgent ag = target.GetComponent<NavMeshAgent>();
-        if (ag != null)
-        {
-            Vector3 direction = target.transform.position - transform.position;
-            direction.Normalize();
-            GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position + direction * 2 / 3, Quaternion.identity) as GameObject;
-            float t = Vector3.Distance(transform.position, target.transform.position) / (bullet.GetComponent<bulletScript>().speed);
-            Vector3 temp = target.transform.position + (target.GetComponent<NavMeshAgent>().velocity * (t));
-            direction = temp - transform.position;
-
-            Ray ray = new Ray(transform.position + direction * 2 / 3, direction);
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit, 100f))
-            {
-                if (hit.transform.tag == "Target")
-                {
-                    if (listJoueurs.Contains(hit.transform.gameObject))
-                    {
-
-
-                    }
-                    else
-                    {
-                        direction = target.transform.position - transform.position;
-                        direction.Normalize();
-                    }
-
-                }
-            }
-            cdShoot = cdShootMax;
-
-            bullet.GetComponent<bulletScript>().launcherName = "PapaValentin";
-            bullet.transform.LookAt(temp);
-        }
-        else
-        {
-            Vector3 direction = target.transform.position - transform.position;
-            direction.Normalize();
-            GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position + direction*2/3, Quaternion.identity) as GameObject;
-            bullet.GetComponent<bulletScript>().launcherName = "PapaValentin";
-            bullet.transform.LookAt(target.transform.position);
-            cdShoot = cdShootMax;
-        }
+        Vector3 direction = target.transform.position - transform.position;
+        direction.Normalize();
+        GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position + direction, Quaternion.identity) as GameObject;
+        bullet.GetComponent<bulletScript>().launcherName = "PapaValentin";
+        bullet.transform.LookAt(target.transform.position);
+        cdShoot = cdShootMax;
+        rightOrNot = !rightOrNot;
         return true;
     }
-
-    void changeDirection()
-    {
-        needToChange = Random.Range(0.5f, 2.5f);
-        rightOrNot = !rightOrNot;
-    }
-
     public bool esquive()
     {
         Vector3 direction = target.transform.position - transform.position;
@@ -251,6 +198,122 @@ public class AgentValentinTree : MonoBehaviour {
     }
 
 
+    /* public void seekPlayer()
+     {
+         agent.SetDestination(target.transform.position);
+     }
+
+     public void shootPlayer()
+     {
+         Vector3 direction = target.transform.position - transform.position;
+         direction.Normalize();
+         GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position + direction, Quaternion.identity) as GameObject;
+         bullet.GetComponent<bulletScript>().launcherName = "TeamValentinPharhaLaunchRocket";
+         bullet.transform.LookAt(target.transform.position);
+         cdShoot = cdShootMax;
+         rightOrNot = !rightOrNot;
+
+
+     }
+
+     public void chasePlayer()
+     {
+         Debug.Log("chase");
+         Vector3 direction = target.transform.position - transform.position;
+         direction.Normalize();
+         transform.LookAt(target.transform);
+         if (rightOrNot)
+         {
+             agent.SetDestination(transform.position - transform.right * 2 - direction * 2);
+         }
+         else
+         {
+             agent.SetDestination(transform.position + transform.right * 2 - direction * 2);
+         }
+     }
+
+     public void idlePlayer()
+     {
+         Debug.Log("idle");
+     }
+
+     public void attaquePlayer()
+     {
+         Debug.Log("attaqueState");
+     }
+
+     public void shootDefensifPlayer()
+     {
+         Debug.Log("attaqueDefensive");
+         cdShoot = cdShootMax;
+     }
+
+     public bool shootIsGone()
+     {
+         return cdShoot != 0;
+     }
+
+     public bool canIOffensiveShoot()
+     {
+         if ( cdShoot == 0)
+         {
+             return true;
+         }
+         else
+             return false;
+     }
+
+     public bool canIDefensiveShoot()
+     {
+         if (shootDefLol && cdShoot == 0)
+         {
+             return true;
+         }
+         else
+             return false;
+     }
+
+
+     public bool seeEnnemy()
+     {
+         Vector3 direction = target.transform.position - transform.position;
+         direction.Normalize(); ;
+         Ray ray = new Ray(transform.position + direction * 2 / 3, direction);
+         RaycastHit hit;
+         if (Physics.Raycast(ray, out hit, 100f))
+         {
+             if (hit.transform.tag == "Target")
+             {
+                 return true;
+             }
+         }
+         return false;
+     }
+
+     public bool dontSeeEnnemy()
+     {
+         Vector3 direction = target.transform.position - transform.position;
+         direction.Normalize(); ;
+         Ray ray = new Ray(transform.position + direction * 2 / 3, direction);
+         RaycastHit hit;
+         if (Physics.Raycast(ray, out hit, 100f))
+         {
+             if (hit.transform.tag == "Target")
+             {
+                 return false;
+             }
+         }
+         return true;
+     }
+
+     bool canIShoot()
+     {
+         return cdShoot == 0;
+     }
+     public bool isBulletNearly()
+     {
+         return true;
+     }*/
     #endregion
 
 
