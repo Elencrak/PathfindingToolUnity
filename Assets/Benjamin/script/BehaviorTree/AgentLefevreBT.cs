@@ -82,10 +82,20 @@ public class AgentLefevreBT : MonoBehaviour {
         GameObject[] tmp = GameObject.FindGameObjectsWithTag("Target");
         foreach (GameObject obj in tmp)
         {
-            if (obj.transform.parent.GetComponent<TeamNumber>().teamName.Equals(transform.parent.GetComponent<TeamNumber>().teamName))
-                continue;
+            if(obj.transform.parent.parent)
+            {
+                if (obj.transform.parent.parent.GetComponent<TeamNumber>().teamName.Equals(transform.parent.GetComponent<TeamNumber>().teamName))
+                    continue;
+                else
+                    targets.Add(obj);
+            }
             else
-                targets.Add(obj);
+            {
+                if (obj.transform.parent.GetComponent<TeamNumber>().teamName.Equals(transform.parent.GetComponent<TeamNumber>().teamName))
+                    continue;
+                else
+                    targets.Add(obj);
+            }
         }
     }
     public bool Fire()
