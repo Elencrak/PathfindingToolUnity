@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using Rodrigue;
 public class RodrigueAgent : MonoBehaviour {
 
-    public float speed = 10.0f;
-    public float acceleration = 20.0f;
+    float speed = 10.0f;
+    float acceleration = 20.0f;
+    GameObject rodriguePoints;
     public GameObject[] targetPossible;
     public NavMeshAgent navMeshAgent;
     float distance;
@@ -12,118 +14,78 @@ public class RodrigueAgent : MonoBehaviour {
     public GameObject currentTarget;
     public Vector3 spawnPoint;
     public List<GameObject> listOfTarget = new List<GameObject>();
-
-    public GameObject[] interestPoints = new GameObject[2];
+    public List<GameObject> listOfFriends = new List<GameObject>();
+    public List<GameObject> interestPoints;
 
     public List<GameObject> listOfBullets = new List<GameObject>();
     public float rateOfFire;
 
     public bool canShoot;
     public bool isDodging;
+    public float timeSinLastShot;
 
     public string teamName = "RektByRodrigue";
-    
+
+    public int nbOfDeath;
 
     // Use this for initialization
     void Start () {
-        interestPoints[0] = GameObject.Find("left plateforme");
-        interestPoints[1] = GameObject.Find("right plateforme");
+        timeSinLastShot = 0;
         canShoot = true;
+        rodriguePoints = GameObject.Find("RodriguePoints");
         targetPossible = GameObject.FindGameObjectsWithTag("Target");
-        foreach(GameObject temp in targetPossible)
+        interestPoints = new List<GameObject>();
+        nbOfDeath = 0;
+        foreach (Transform child in rodriguePoints.transform)
+        {
+            interestPoints.Add(child.gameObject);
+        }
+
+        foreach (GameObject temp in targetPossible)
         {
             if(temp != this.gameObject)
             {
+
                 if(temp.transform.parent.GetComponent<TeamNumber>().teamName != "RektByRodrigue")
                 {
                   listOfTarget.Add(temp);
                 }
+                else
+                {
+                    listOfFriends.Add(temp);
+                }
             }
         }
         //InvokeRepeating("GetTarget", 0.5f, 0.5f);
-        currentTarget = targetPossible[0];
+        currentTarget = listOfTarget[0];
         navMeshAgent = GetComponent<NavMeshAgent>();
         navMeshAgent.speed = speed;
         navMeshAgent.acceleration = acceleration;
 
         spawnPoint = transform.position;
-        navMeshAgent.SetDestination(interestPoints[0].transform.position);
         rateOfFire = 1;
+        //InvokeRepeating("Patrol", 0.1f, 0.1f);
         InvokeRepeating("FindTarget", 0.1f, 0.1f);
         isDodging = false;
+
+        navMeshAgent.SetDestination(interestPoints[Random.Range(0, interestPoints.Count)].transform.position);
     }
 	
-    //void OnTriggerEnter(Collider parOther)
-    //{
-    //    if(parOther.tag == "Bullet" && parOther.GetComponent<bulletScript>().launcherName !="RektByRodrigue")
-    //    {
-    //        listOfBullets.Add(parOther.gameObject);
-    //        Vector3 bulletForward = parOther.transform.forward;
-    //        RaycastHit hit;
-    //        Debug.DrawRay(parOther.transform.position, bulletForward*100, Color.red, 0.5f);
-    //        if(Physics.Raycast(parOther.transform.position, bulletForward, out hit, 100))
-    //        {
-
-    //        }
-    //        else
-    //        {
-                
-    //            StartCoroutine(Dodge());
-    //        }
-    //    }
-    //}
-
-    //IEnumerator Dodge()
-    //{
-    //    isDodging = true;
-    //    navMeshAgent.Stop();
-    //    yield return new WaitForSeconds(1f);
-    //    navMeshAgent.Resume();
-    //    isDodging = false;
-    //}
-
-    //void OnTriggerExit(Collider parOther)
-    //{
-    //    if (parOther.tag == "Bullet" && parOther.GetComponent<bulletScript>().launcherName != "RektByRodrigue")
-    //    {
-    //        listOfBullets.Remove(parOther.gameObject);
-    //    }
-    //}
-
 	// Update is called once per frame
 	void Update () {
-        if (Vector3.Distance(transform.position, interestPoints[0].transform.position) < 1 && !isDodging)
-        {
-            navMeshAgent.SetDestination(interestPoints[1].transform.position);
-        }
-        else if (Vector3.Distance(transform.position, interestPoints[1].transform.position) < 1 && !isDodging)
-        {
-            navMeshAgent.SetDestination(interestPoints[0].transform.position);
-        }
+        timeSinLastShot += Time.deltaTime;
         transform.LookAt(currentTarget.transform);
     }
 
 
-    void OnCollisionEnter(Collision collision)
-    {
-        //if (collision.collider.tag == "Target")
-        //{
-        //    for (int i = 0; i < listOfTarget.Count; i++)
-        //    {
-        //        if(listOfTarget[i] == collision.gameObject)
-        //        {
-        //            listOfTarget.RemoveAt(i);
-        //        } 
-        //    }
-        //    ChangeTarget();
-        //}
-
-        if (collision.gameObject.tag == "Bullet")
-        {
-            navMeshAgent.Warp(spawnPoint);
-            navMeshAgent.SetDestination(interestPoints[0].transform.position);
-        }
-    }
+    //void OnCollisionEnter(Collision collision)
+    //{
+    //    if (collision.gameObject.tag == "Bullet")
+    //    {
+    //        navMeshAgent.Warp(spawnPoint);
+    //        navMeshAgent.SetDestination(currentTarget.transform.position);
+    //    }
+    //}
 
     void FindTarget()
     {
@@ -132,13 +94,12 @@ public class RodrigueAgent : MonoBehaviour {
             RaycastHit hit;
             if (Physics.Raycast(transform.position, direction, out hit, 100))
             {
-                if(hit.transform.tag == "Target")
+                if(hit.transform.tag == "Target" && hit.transform.gameObject.GetComponentInParent<TeamNumber>().teamName != "RektByRodrigue")
                 {
                     if (Vector3.Distance(transform.position, player.transform.position) < Vector3.Distance(transform.position, currentTarget.transform.position))
                     {
                         transform.LookAt(player.transform);
                         currentTarget = player;
-                        
                     }
                     if (canShoot)
                     {
@@ -151,16 +112,72 @@ public class RodrigueAgent : MonoBehaviour {
 
     IEnumerator Shoot(GameObject target)
     {
+        timeSinLastShot = 0;
         canShoot = false;
         GameObject bullets = Instantiate(Resources.Load("Bullet"), transform.position + transform.forward*2.0f + new Vector3(0, 1.5f, 0), Quaternion.identity) as GameObject;
         Physics.IgnoreCollision(this.GetComponent<BoxCollider>(), bullets.GetComponent<CapsuleCollider>());
-        Vector3 velocity = target.GetComponent<Rigidbody>().velocity;
-        float t = Vector3.Distance(transform.position, target.transform.position) / 40f;
-
-        bullets.transform.LookAt(target.transform.position + velocity * t);
+        //Vector3 velocity = target.GetComponent<Rigidbody>().velocity;
+        //float t = Vector3.Distance(transform.position, target.transform.position) / 40f
+        //bullets.transform.LookAt(target.transform.position + velocity * t);
+        Vector3 temp;
+        float t = Vector3.Distance(transform.position, target.transform.position) / (bullets.GetComponent<bulletScript>().speed);
+        if (target.GetComponent<NavMeshAgent>())
+        {
+            temp = target.transform.position + (target.GetComponent<NavMeshAgent>().velocity * (t));
+        }
+        else
+        {
+            temp = target.GetComponent<Rigidbody>().velocity;
+        }
+        bullets.transform.LookAt(temp);
         bullets.GetComponent<bulletScript>().launcherName = teamName;
         yield return new WaitForSeconds(rateOfFire);
         canShoot = true;
+    }
+
+    public void Patrol()
+    {
+        
+        for(int i =0; i < interestPoints.Count; i++)
+        {
+            if (Vector3.Distance(transform.position, interestPoints[i].transform.position) < 1)
+            {
+                if (i != interestPoints.Count - 1)
+                {
+                    if (!isDodging)
+                    {
+                        
+                        navMeshAgent.SetDestination(interestPoints[i + 1].transform.position);
+                    }
+                    
+                }
+                else
+                {
+                    if (!isDodging)
+                    {
+                        navMeshAgent.SetDestination(interestPoints[0].transform.position);
+                    }
+                }
+            }
+        }
+    }
+
+    public bool Active()
+    {
+        return true;
+    }
+
+    public void SearchAndDestroy()
+    {
+        if (!isDodging)
+        {
+            navMeshAgent.SetDestination(currentTarget.transform.position);
+        }
+    }
+
+    public void Idle()
+    {
+        navMeshAgent.Stop();
     }
 
     void GetTarget()
@@ -178,7 +195,21 @@ public class RodrigueAgent : MonoBehaviour {
                 currentTarget = listOfTarget[i];
             }
         }
-        navMeshAgent.SetDestination(currentTarget.transform.position);
+        //navMeshAgent.SetDestination(currentTarget.transform.position);
+    }
+
+    public void Regroup()
+    {
+        float dist = 0;
+        foreach(GameObject parObject in listOfFriends)
+        {
+            if(Vector3.Distance(transform.position, parObject.transform.position) > dist)
+            {
+                navMeshAgent.SetDestination(parObject.transform.position);
+                dist = Vector3.Distance(transform.position, parObject.transform.position);
+                
+            }
+        }
     }
 
     void ChangeTarget()
@@ -193,7 +224,7 @@ public class RodrigueAgent : MonoBehaviour {
                 
             }
         }
-        navMeshAgent.SetDestination(currentTarget.transform.position);
+        //navMeshAgent.SetDestination(currentTarget.transform.position);
         if(listOfTarget.Count == 0)
         {
             Debug.Log("Rodrigue > All");

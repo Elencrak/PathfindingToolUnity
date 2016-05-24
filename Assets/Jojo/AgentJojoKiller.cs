@@ -1,123 +1,127 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
-public class AgentJojoKiller : MonoBehaviour {
+namespace JojoKiller
+{
+    public class TeamLeader : MonoBehaviour
+    {
 
+        //Target
+        [Header("Target")]
+        private List<Transform> targets = new List<Transform>();
 
-    bool doOnce = true;
-    public List<Transform> targets;
-    public Transform targetPosition;
-    bool touch;
-    NavMeshAgent currentNavMeshAgent;
-    public bool needToChangeTarget;
-    float fireRate = 1;
-    float nextShoot;
-    public Vector3 startPosition;
-    private float nextMove = 5;
-    private float move;
+        [Header("Internal")]
+        bool doOnce = true;
 
-    // Use this for initialization
-    void Start () {
-        currentNavMeshAgent = GetComponent<NavMeshAgent>();
-        needToChangeTarget = true;
-        startPosition = transform.position;    
-    }
-	
-	// Update is called once per frame
-	void Update () {
-        if (doOnce)
+        [Header("State Machine")]
+        public StateMachine stateTactic;
+        public StateMachine statePatrol;
+        public List<Member> agents = new List<Member>();
+
+        public bool doTransitionToReform;
+        public bool doTransitionToRegroup;
+        public bool doTransitionToPatrol;
+
+        [Header("Member")]
+        public int teamCount;
+        public Member uniqueAgent;
+
+        // Use this for initialization
+        void Start()
         {
-            doOnce = false;
-            GameObject[] tempArray;
-            tempArray = GameObject.FindGameObjectsWithTag("Target");
-            foreach(GameObject g in tempArray)
+
+            // initialize the agent
+            /*for(int i = 0; i < transform.childCount; i++)
             {
-                if(g.GetInstanceID() != gameObject.GetInstanceID())
-                {
-                    targets.Add(g.transform);
-                }
-            }
+                agents.Add(transform.GetChild(i).GetComponent<Member>());
+            }*/
+            uniqueAgent = transform.GetChild(0).GetComponent<Member>();
+
+            // State machine for member
+            statePatrol = new StateMachine();
+
+            Idle monIdle = new Idle(uniqueAgent);
+            Search monWalk = new Search(uniqueAgent);
+            Chase monFire = new Chase(uniqueAgent);
+
+            //from Idle to...
+            Transition transitionIdle = new Transition(uniqueAgent.changeToWalk, monWalk);
+            Transition transitionWalk = new Transition(uniqueAgent.canShoot, monFire);
+            Transition transitionFire = new Transition(uniqueAgent.changeToIdle, monIdle);
+
+            monIdle.addTransition(transitionIdle);
+            monWalk.addTransition(transitionWalk);
+            monFire.addTransition(transitionFire);
+
+            statePatrol.currentState = monIdle;
+
+            // State machine for team
+            stateTactic = new StateMachine();
+
+            Regroup regroup = new Regroup(this);
+            Reform reform = new Reform(this);
+            StateMachineWrapper stateWrapper = new StateMachineWrapper(statePatrol);
+
+            Transition transitionRegroup = new Transition(checkNeedToReform, reform);
+            Transition transitionReform = new Transition(() => { return doTransitionToPatrol; }, stateWrapper);
+            Transition transitionPatrol = new Transition(() => { return doTransitionToRegroup; }, regroup);
+
+            regroup.addTransition(transitionRegroup);
+            reform.addTransition(transitionReform);
+            stateWrapper.addTransition(transitionPatrol);
+
+            stateTactic.currentState = regroup;
         }
 
-        if (needToChangeTarget || nextMove <= 0) {
-            targetPosition = targets[0];
-            foreach (Transform g in targets)
+        public bool checkNeedToReform()
+        {
+
+
+            return false;
+        }
+
+        public bool patrol()
+        {
+            if (teamCount < 2)
+                Debug.Log(teamCount < 2);
+            return teamCount < 2;
+        }
+
+        public void reformAction()
+        {
+            Debug.Log("reformAction");
+        }
+
+        public void regroupAction()
+        {
+            Debug.Log("regroupAction");
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+            //Récupération des target
+            if (doOnce)
             {
-                if (g.GetInstanceID() != gameObject.GetInstanceID())
+                doOnce = false;
+                GameObject[] tempArray;
+                tempArray = GameObject.FindGameObjectsWithTag("Target");
+                foreach (GameObject g in tempArray)
                 {
-                    Vector3 relativePosition;
-                    Vector3 relativePositionTarget;
-                    relativePosition  = g.position - transform.position;
-                    relativePositionTarget = targetPosition.position - transform.position;                      
-                    if (relativePositionTarget.magnitude > relativePosition.magnitude)
+                    if (g.GetInstanceID() != gameObject.GetInstanceID())
                     {
-                        targetPosition = g;                     
+                        targets.Add(g.transform);
                     }
                 }
             }
-            needToChangeTarget = false;
-            nextMove = move;
 
-            currentNavMeshAgent.SetDestination(targetPosition.position);
+            stateTactic.execution();
+
+            doTransitionToPatrol = false;
+            doTransitionToReform = false;
+            doTransitionToRegroup = false;
         }
-        else
-        {
-            nextMove -= Time.deltaTime;
-        } 
-
-        if (nextShoot <= 0)
-        {
-            foreach (Transform g in targets)
-            {
-                if (g.GetInstanceID() != gameObject.GetInstanceID())
-                {
-                    Vector3 relativePosition;                    
-                    relativePosition = g.position - transform.position;
-                    RaycastHit hit;
-                    if ( Physics.Raycast(transform.position, relativePosition.normalized, out hit, 1000))
-                    {
-                        if(hit.transform.tag == "Target")
-                        {
-                            Debug.DrawRay(transform.position, relativePosition.normalized *5, Color.red, 1);
-                            GameObject temp = Instantiate(Resources.Load("Bullet"), transform.position + relativePosition.normalized * 10, Quaternion.identity) as GameObject;
-
-                            //Anticipation
-                            float t = Vector3.Distance(g.position, transform.position) / temp.GetComponent<bulletScript>().speed;
-                            Vector3 tempPosition = g.position + (g.GetComponent<NavMeshAgent>().velocity * t);
-                            temp.transform.LookAt(tempPosition);
-
-                            temp.GetComponentInParent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
-                            nextShoot = fireRate;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        else
-        {
-            nextShoot -= Time.deltaTime;
-        }
-    }
-
-    void OnCollisionEnter(Collision collision)
-    {
-        if (collision.transform.GetInstanceID() != transform.GetInstanceID() && collision.transform.tag == "Target")
-        {
-            needToChangeTarget = true;
-            targetPosition.position = new Vector3(100000, 100000, 100000);        
-        } else if(collision.transform.tag == "Bullet")
-        {
-            toto();
-        }
-    }
-
-    void toto()
-    {
- 
-        //transform.position = startPosition;
-        currentNavMeshAgent.Warp(startPosition);
-        needToChangeTarget = true;
     }
 }
