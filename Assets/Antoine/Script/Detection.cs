@@ -8,7 +8,7 @@ public class Detection : MonoBehaviour {
         Collider[] c = Physics.OverlapSphere(transform.position, 20.0f);
         foreach(Collider col in c)
         {
-            if (col.tag == "Bullet" && col.GetComponent<bulletScript>() != null && col.GetComponent<bulletScript>().launcherName != transform.parent.GetComponent<TeamNumber>().teamName)
+            if (col != null && col.tag == "Bullet" && col.GetComponent<bulletScript>() != null && col.GetComponent<bulletScript>().launcherName != transform.parent.GetComponent<TeamNumber>().teamName)
             {
                 
                 Vector3 v = col.transform.right;

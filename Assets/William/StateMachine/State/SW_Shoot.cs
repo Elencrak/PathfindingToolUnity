@@ -25,19 +25,18 @@ public class SW_Shoot : StateWill {
 
     public override StateWill execute()
     {
-        
-        StateWill next = checkTransition();
-        if (next != null)
-            return next;
-
         if (lastShoot + shootCooldown > Time.time)
         {
-            if(dodge!=null)
+            
+            if (dodge!=null)
             dodge.execute();
         }
         else
         {
             shoot();
+            StateWill next = checkTransition();
+            if (next != null)
+                return next;
         }
 
         return null;
