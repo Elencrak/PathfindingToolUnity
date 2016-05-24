@@ -16,7 +16,6 @@ public class MyAgentChefBenoitV : MonoBehaviour {
     TransitionBenoitV _patrolToIdle;
 
     public bool itsSecure;
-    public bool death;
     public bool patrol;
 
     NavMeshAgent _agent;
@@ -43,7 +42,7 @@ public class MyAgentChefBenoitV : MonoBehaviour {
         _patrolToIdle = new TransitionBenoitV(Death, myIdleState);
         myPatrolState._listOfTransitions.Add(_patrolToIdle);
 
-
+        GetComponent<AgentFunctions>().InvokeRepeating("FindTarget", 0.1f, 0.1f);
     }
 
     void Update()
@@ -53,7 +52,7 @@ public class MyAgentChefBenoitV : MonoBehaviour {
 
     bool CanMove()
     {
-        return itsSecure && !death;
+        return itsSecure && !GetComponent<AgentFunctions>().death;
     }
 
     bool Stop()
@@ -63,12 +62,12 @@ public class MyAgentChefBenoitV : MonoBehaviour {
 
     bool Death()
     {
-        return death;
+        return GetComponent<AgentFunctions>().death;
     }
 
     bool CanPatrol()
     {
-        return patrol && !death;
+        return patrol && !GetComponent<AgentFunctions>().death;
     }
 
     

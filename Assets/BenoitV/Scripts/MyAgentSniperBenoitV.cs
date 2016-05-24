@@ -11,8 +11,7 @@ public class MyAgentSniperBenoitV : MonoBehaviour {
     
     TransitionBenoitV _moveToGroup;
     TransitionBenoitV _groupToCover;
-
-    public bool death;
+    
     public bool bossDeath;
     
 

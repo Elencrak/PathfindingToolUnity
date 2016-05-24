@@ -19,8 +19,8 @@ public class MyAgentGuardBenoitV : MonoBehaviour {
 
     TransitionBenoitV _SM1toGroup;
     TransitionBenoitV _GrouptoSM1;
+    TransitionBenoitV _moveToIdleDeath;
 
-    public bool death;
     public bool bossDeath;
     public bool cover;
 
@@ -43,6 +43,8 @@ public class MyAgentGuardBenoitV : MonoBehaviour {
         _currentPointOfInterest = _pointsOfInterest[0];
         GetComponent<AgentFunctions>()._target = _currentPointOfInterest;
 
+        _moveToIdleDeath = new TransitionBenoitV(Death, myIdleState);
+        myStateMachine._listOfTransitions.Add(_moveToIdleDeath);
 
         _SM1toGroup = new TransitionBenoitV(Group, myGroupState);
         myStateMachine._listOfTransitions.Add(_SM1toGroup);
@@ -59,6 +61,8 @@ public class MyAgentGuardBenoitV : MonoBehaviour {
 
         _coverToIdle = new TransitionBenoitV(Stop,myIdleState);
         myCoverState._listOfTransitions.Add(_coverToIdle);
+
+        GetComponent<AgentFunctions>().InvokeRepeating("FindTarget", 0.1f, 0.1f);
     }
 	
 	// Update is called once per frame
@@ -78,12 +82,12 @@ public class MyAgentGuardBenoitV : MonoBehaviour {
 
     bool CanMove()
     {
-        return GetComponent<AgentFunctions>().DistanceWithOtherAgent(GetComponent<AgentFunctions>()._boss, this.transform) < 3.0f && !death;
+        return GetComponent<AgentFunctions>().DistanceWithOtherAgent(GetComponent<AgentFunctions>()._boss, this.transform) < 3.0f && !GetComponent<AgentFunctions>().death;
     }
 
     bool Death()
     {
-        return death;
+        return GetComponent<AgentFunctions>().death;
     }
 
     bool Cover()
