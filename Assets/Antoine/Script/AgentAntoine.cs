@@ -246,7 +246,7 @@ public class AgentAntoine : MonoBehaviour
             tempTarget = road[0] + new Vector3(Random.Range(-dodgeRate, dodgeRate), 0.0f, Random.Range(-dodgeRate, dodgeRate));
             
         }
-        transform.position = Vector3.MoveTowards(transform.position, tempTarget, speed * Time.deltaTime);
+       // transform.position = Vector3.MoveTowards(transform.position, tempTarget, speed * Time.deltaTime);
         return true;
     }
 
@@ -369,7 +369,7 @@ public class AgentAntoine : MonoBehaviour
         isShooting = true;
 
         GameObject go = Instantiate(bullet, spawnBullet.transform.position, Quaternion.identity) as GameObject;
-        // go.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
+        go.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
         go.transform.LookAt(currentEnemy.transform.position + currentEnemy.transform.forward);
         canShoot = false;
         lastShoot = 0.0f;
@@ -457,7 +457,7 @@ public class AgentAntoine : MonoBehaviour
         }
     }*/
 
-    public void Dodge(Vector3 pos, Vector3 v, Vector3 forward)
+    /*public void Dodge(Vector3 pos, Vector3 v, Vector3 forward)
     {
         if (canShoot && (!target || Vector3.Distance(transform.position, target.transform.position) > Vector3.Distance(transform.position, pos)))
         {
@@ -469,16 +469,17 @@ public class AgentAntoine : MonoBehaviour
         }
         else if(esquive != true)
         {
-            esquive = true;
+            Debug.Log("lol");
+            esquive = true; 
             StartCoroutine(Esquive(v));
         }
-    }
+    }*/
 
-    IEnumerator Esquive(Vector3 v)
+    /*IEnumerator Esquive(Vector3 v)
     {
         GetComponent<NavMeshAgent>().SetDestination(transform.position + v * 10);
         yield return new WaitForSeconds(2f);
         GetComponent<NavMeshAgent>().SetDestination(points[index].transform.position);
         esquive = false;
-    }
+    }*/
 }

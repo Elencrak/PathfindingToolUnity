@@ -14,7 +14,7 @@ public class Detection : MonoBehaviour {
                 Vector3 v = col.transform.right;
                 if (Random.Range(0f, 1f) <= 0.5f)
                     v = -Vector3.right;
-                GetComponent<AgentAntoine>().Dodge(col.transform.position, v, col.transform.forward);
+              //  GetComponent<AgentAntoine>().Dodge(col.transform.position, v, col.transform.forward);
             }
         }
     }
