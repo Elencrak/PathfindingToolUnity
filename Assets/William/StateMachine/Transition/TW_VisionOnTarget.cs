@@ -20,7 +20,7 @@ public class TW_VisionOnTarget : TransitionWill {
         Debug.DrawRay(posPlayer, dir);
         if (Physics.Raycast(posPlayer, dir, out hit))
         {
-            Debug.Log("tag hit: " + hit.collider.tag + " /name: " + hit.collider.name);
+            //Debug.Log("tag hit: " + hit.collider.tag + " /name: " + hit.collider.name);
             if (hit.collider.name == target.name && isTrue)
             {
                 return nextState;
