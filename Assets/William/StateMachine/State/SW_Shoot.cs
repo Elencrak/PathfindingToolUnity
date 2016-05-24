@@ -25,7 +25,6 @@ public class SW_Shoot : StateWill {
 
     public override StateWill execute()
     {
-        Debug.Log("shoot");
         if (lastShoot + shootCooldown > Time.time)
         {
             

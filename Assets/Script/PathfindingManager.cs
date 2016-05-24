@@ -1,18 +1,20 @@
-﻿using System;
+﻿
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 [ExecuteInEditMode]
-public class PathfindingManager  {
+public class PathfindingManager
+{
 
     //Static members
     public static PathfindingManager instance = null;
-    
+
     public static PathfindingManager GetInstance()
     {
-        if(instance == null)
+        if (instance == null)
         {
             instance = new PathfindingManager();
         }
@@ -20,11 +22,11 @@ public class PathfindingManager  {
     }
 
     // protected Class comparer
-    protected class DuplicateKeyComparer<TKey>: 
+    protected class DuplicateKeyComparer<TKey> :
         IComparer<TKey> where TKey : IComparable
     {
         #region IComparer<TKey> Members
-        public int Compare(TKey x,TKey y)
+        public int Compare(TKey x, TKey y)
         {
             int result = x.CompareTo(y);
             if (result == 0)
@@ -43,7 +45,7 @@ public class PathfindingManager  {
 
     public void ResetHeuristic(List<Node> nodesToReset)
     {
-        foreach(Node node in nodesToReset)
+        foreach (Node node in nodesToReset)
         {
             node.heurystic = 9999f;
             node.distance = 9999f;
@@ -56,9 +58,9 @@ public class PathfindingManager  {
     public List<Vector3> GetRoad(Vector3 startPosition, Vector3 destination, Pathfinding path)
     {
         List<Vector3> road = new List<Vector3>();
-        Node startNode = FindNearNode(startPosition,path);
+        Node startNode = FindNearNode(startPosition, path);
         startNode.distance = 0;
-        Node endNode = FindNearNode(destination,path);
+        Node endNode = FindNearNode(destination, path);
 
         List<Vector3> resultPath = FindPathFromNode(startNode, endNode);
         if (startPosition != startNode.getPosition())
@@ -98,11 +100,11 @@ public class PathfindingManager  {
     {
         Node closestNode = null;
         float distMin = 9999f;
-        foreach(Node node in path.nodes)
+        foreach (Node node in path.nodes)
         {
             float dist = Vector3.Distance(position, node.getPosition());
             RaycastHit hit;
-            if (dist < distMin && !Physics.Raycast(position, new Vector3(node.positionX, node.positionY, node.positionZ) - position, out hit, Mathf.Infinity, ~(1<<20)))
+            if (dist < distMin && !Physics.Raycast(position, new Vector3(node.positionX, node.positionY, node.positionZ) - position, out hit, Mathf.Infinity, 20))
             {
                 distMin = dist;
                 closestNode = node;
@@ -127,20 +129,20 @@ public class PathfindingManager  {
         Node previousNode = startNode;
         List<Node> listNode;
         tryNode.Add(Vector3.Distance(startNode.getPosition(), endNode.getPosition()), startNode);
-        while((currentNode != endNode)&& tryNode.Count > 0)
+        while ((currentNode != endNode) && tryNode.Count > 0)
         {
             currentNode = tryNode.ElementAt(0).Value;
             tryNode.RemoveAt(0);
             listNode = currentNode.neighborsNode;
             foreach (Node node in listNode)
             {
-                if(!checkNode.Contains(node))
+                if (!checkNode.Contains(node))
                 {
                     currentDist = Vector3.Distance(previousNode.getPosition(), node.getPosition()) + previousNode.distance;
                     currentHeurystic = Vector3.Distance(node.getPosition(), endNode.getPosition());
 
                     cumule = currentDist + currentHeurystic;
-                    if(cumule < (node.heurystic+node.distance))
+                    if (cumule < (node.heurystic + node.distance))
                     {
                         node.heurystic = currentHeurystic;
                         node.distance = currentDist;
@@ -155,7 +157,7 @@ public class PathfindingManager  {
             checkNode.Add(currentNode);
 
         }
-        if(currentNode == endNode)
+        if (currentNode == endNode)
         {
             List<Vector3> tmp = ReturnRoad(currentNode);
             ResetHeuristic(nodesToReset);
