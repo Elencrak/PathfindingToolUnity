@@ -17,7 +17,7 @@ public class AvoidMif : StateMif
 
 	void Avoid()
 	{
-		Debug.Log ("Avoid");
+		//Debug.Log ("Avoid");
 		if (agent) 
 		{
 			Vector3 newDest = agent.transform.position;
