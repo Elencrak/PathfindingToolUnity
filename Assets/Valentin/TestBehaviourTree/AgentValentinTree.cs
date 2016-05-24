@@ -164,14 +164,14 @@ public class AgentValentinTree : MonoBehaviour {
     }
     public bool shoot()
     {
-        Vector3 direction = target.transform.position - transform.position;
-        direction.Normalize();
-        GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position + direction*2/3, Quaternion.identity) as GameObject;
-        NavMeshAgent agentTarget = target.GetComponent<NavMeshAgent>();
-        if (agentTarget != null)
+        NavMeshAgent ag = target.GetComponent<NavMeshAgent>();
+        if (ag != null)
         {
+            Vector3 direction = target.transform.position - transform.position;
+            direction.Normalize();
+            GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position + direction * 2 / 3, Quaternion.identity) as GameObject;
             float t = Vector3.Distance(transform.position, target.transform.position) / (bullet.GetComponent<bulletScript>().speed);
-            Vector3 temp = target.transform.position + (agentTarget.velocity * (t));
+            Vector3 temp = target.transform.position + (target.GetComponent<NavMeshAgent>().velocity * (t));
             direction = temp - transform.position;
 
             Ray ray = new Ray(transform.position + direction * 2 / 3, direction);
@@ -193,20 +193,20 @@ public class AgentValentinTree : MonoBehaviour {
 
                 }
             }
-            Debug.Log("tir");
+            cdShoot = cdShootMax;
+
+            bullet.GetComponent<bulletScript>().launcherName = "PapaValentin";
+            bullet.transform.LookAt(temp);
         }
-
-        
-
-        cdShoot = cdShootMax;
-
-
-
-
-        bullet.GetComponent<bulletScript>().launcherName = "PapaValentin";
-        bullet.transform.LookAt(direction);
-
-
+        else
+        {
+            Vector3 direction = target.transform.position - transform.position;
+            direction.Normalize();
+            GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position + direction*2/3, Quaternion.identity) as GameObject;
+            bullet.GetComponent<bulletScript>().launcherName = "PapaValentin";
+            bullet.transform.LookAt(target.transform.position);
+            cdShoot = cdShootMax;
+        }
         return true;
     }
 
