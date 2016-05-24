@@ -66,7 +66,6 @@ public class SW_Shoot : StateWill {
                 if(anyTarget!=null)
                 shootBullet(anyTarget);
             }
-
         }
 
     }

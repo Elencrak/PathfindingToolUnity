@@ -384,12 +384,12 @@ public class AgentM : MonoBehaviour {
 	{
 		if (distToTarget < 2) 
 		{
-			this.gameObject.GetComponent<BoxCollider> ().isTrigger = false;
+			//this.gameObject.GetComponent<BoxCollider> ().isTrigger = false;
 			Danger ();
 		} 
 		else 
 		{
-			this.gameObject.GetComponent<BoxCollider> ().isTrigger = true;
+			//this.gameObject.GetComponent<BoxCollider> ().isTrigger = true;
 		}
 	}
 
