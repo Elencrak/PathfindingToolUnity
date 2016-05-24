@@ -16,6 +16,7 @@ public class AgentLefevreBT : MonoBehaviour {
     public float speed = 10.0f;
     public float closeEnoughRange = 1.0f;
     public Vector3 currentTarget;
+    public NavMeshAgent agent;
 
     Vector3 spawn;
     float bulletSpeed = 40f;
@@ -30,6 +31,8 @@ public class AgentLefevreBT : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+        agent = GetComponent<NavMeshAgent>();
+
         graph = new Pathfinding();
         graph.Load("benPath");
         graph.setNeighbors();
@@ -49,6 +52,7 @@ public class AgentLefevreBT : MonoBehaviour {
 
         spawn = transform.position;
         Debug.Log("start");
+        Debug.Log(1 << 20);
         InvokeRepeating("UpdateRoad", 0f, 0.5f);
     }
 
@@ -69,7 +73,6 @@ public class AgentLefevreBT : MonoBehaviour {
         else
         {
             UpdateRoad();
-            transform.position = spawn;
         }
     }
 
@@ -88,9 +91,10 @@ public class AgentLefevreBT : MonoBehaviour {
     public bool Fire()
     {
         Debug.Log("FIRE");
+        agent.Stop();
         lastFire = Time.time;
         fireSuccess = false;
-        //StartCoroutine(fireRoutine());
+        StartCoroutine(fireRoutine());
         return fireSuccess;
     }
 
@@ -168,7 +172,7 @@ public class AgentLefevreBT : MonoBehaviour {
     void Respawn()
     {
         Debug.Log("respawn");
-        transform.position = spawn;
+        agent.Warp(spawn);
         lastRespawn = Time.time;
         UpdateRoad();
     }

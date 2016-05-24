@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public delegate bool check();
+
 
 public class TransitionMif
 {

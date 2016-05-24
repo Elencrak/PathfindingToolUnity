@@ -107,7 +107,7 @@ public class AgentJ : MonoBehaviour
             Quaternion rotation = Quaternion.LookRotation(relativePos);
 
             GameObject bullet = Instantiate(Resources.Load("Bullet"), transform.position + transform.forward * 1.0f, rotation) as GameObject;
-            //bullet.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
+            bullet.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
             Physics.IgnoreCollision(this.GetComponent<BoxCollider>(), bullet.GetComponent<CapsuleCollider>());   
     }
 
