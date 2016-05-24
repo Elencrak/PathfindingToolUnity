@@ -62,9 +62,9 @@ public class AgentAntoine : MonoBehaviour
 
         SpawnPos = transform.position;
 
-        int rand = Random.Range(0, nodes.transform.childCount - 1);
+        //int rand = Random.Range(0, nodes.transform.childCount - 1);
 
-        target = nodes.transform.GetChild(rand).gameObject;
+        //target = nodes.transform.GetChild(rand).gameObject;
 
         //PathPoint = points[index].transform.position;
 

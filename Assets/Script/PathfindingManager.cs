@@ -102,7 +102,7 @@ public class PathfindingManager  {
         {
             float dist = Vector3.Distance(position, node.getPosition());
             RaycastHit hit;
-            if (dist < distMin && !Physics.Raycast(position, new Vector3(node.positionX, node.positionY, node.positionZ) - position, out hit, Mathf.Infinity, 20))
+            if (dist < distMin && !Physics.Raycast(position, new Vector3(node.positionX, node.positionY, node.positionZ) - position, out hit, Mathf.Infinity, ~(1<<20)))
             {
                 distMin = dist;
                 closestNode = node;

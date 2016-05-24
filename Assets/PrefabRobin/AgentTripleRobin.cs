@@ -4,102 +4,137 @@ using System.Collections.Generic;
 
 namespace IARobin
 {
-    public class AgentTripleRobin : MonoBehaviour
+    public class AgentTripleRobin : AgentRobinMathieu
     {
-        GameObject Target;
 
         [Header("GUN")]
 
         public float RoF = 1.0f;
-        public List<GameObject> bullets;
         public GameObject prefabBullet;
         public GameObject predictionZone;
 
-
-        AgentSimpleRobin tankUnit;
-
-        protected void Start()
+        protected override void Start()
         {
-            bullets = new List<GameObject>();
             if (prefabBullet == null)
             {
                 prefabBullet = Resources.Load<GameObject>("Bullet");
             }
-            tankUnit = transform.parent.parent.GetComponent<AgentSimpleRobin>();
+            base.Start();
             predictionZone = GameObject.FindGameObjectWithTag("Prediction");
-            StartCoroutine(Shoot());
-
-            InvokeRepeating("UpdateTarget", 0.0f, 0.3f);
         }
 
-        private void ForceUpdateTarget()
+        protected override void UpdateTarget()
         {
-            GameObject target = tankUnit._bullets[Random.Range(0, tankUnit._bullets.Count - 1)];
+            GameObject target = targets[Random.Range(0, targets.Count - 1)];
 
             if (target)
             {
-                Target = target;
+                nearestTarget = target;
+                nearTargetCollider = target.GetComponent<BoxCollider>();
             }
             else
             {
-                Target = null;
+                nearestTarget = null;
+                nearTargetCollider = null;
             }
         }
 
-        void UpdateTarget()
+        protected override void UpdateTargetBullet()
         {
-            if (tankUnit._bullets.Count > 0 && !Target && !tankUnit._bullets.Contains(Target))
+            if (targets.Count > 0 && (!TargetBullet || !targets.Contains(TargetBullet)))
             {
-                ForceUpdateTarget();
+                ForceUpdateTargetBullet();
             }
         }
 
-        IEnumerator Shoot()
+        protected override IEnumerator ShootEnemy()
         {
-            //transform.position + transform.forward * Time.fixedDeltaTime * speed; direction && speed for bullet
-
             bulletScript bullet = prefabBullet.GetComponent<bulletScript>();
-
-            while (tankUnit.isShooting)
+            if (nearTargetCollider)
             {
-                if (Target)
+                NavMeshAgent targ = nearestTarget.GetComponent<NavMeshAgent>();
+                Agent targAgent = nearestTarget.GetComponent<Agent>();
+
+                Vector3 positionPredicted = nearTargetCollider.transform.position + Vector3.up * 0.5f;
+
+                float distanceParcourue = 0.0f;
+                if (targ)
                 {
-                    bulletScript targ = Target.GetComponent<bulletScript>();
-
-                    Vector3 positionPredicted = Target.transform.position + Vector3.up * 0.5f;
-
-                    float distanceParcourue = 0.0f;
                     while (Vector3.Distance(transform.position, positionPredicted) - distanceParcourue > float.Epsilon)
                     {
-                        positionPredicted += (targ.transform.position + targ.transform.forward) * Time.fixedDeltaTime * targ.speed;
+                        positionPredicted += targ.velocity * Time.fixedDeltaTime;
                         distanceParcourue += Time.fixedDeltaTime * bullet.speed;
                     }
-
-                    RaycastHit hit;
-
-                    predictionZone.transform.position = positionPredicted;
-
-                    Vector3 direction = positionPredicted - transform.position;
-
-                    if (Physics.Raycast(transform.position, direction.normalized, out hit, Vector3.Distance(positionPredicted, transform.position)))
+                }
+                else if (targAgent)
+                {
+                    while (Vector3.Distance(transform.position, positionPredicted) - distanceParcourue > float.Epsilon)
                     {
-                        if (hit.collider.gameObject.CompareTag("Prediction") || hit.collider.gameObject.CompareTag("Bullet"))
-                        {
-                            GameObject go = Instantiate(prefabBullet, transform.position + direction.normalized * 2.0f, Quaternion.LookRotation(direction.normalized)) as GameObject;
-
-                            go.GetComponent<bulletScript>().launcherName = AgentRobinMathieu.playerID;
-
-                            bullets.Add(go);
-                            yield return new WaitForSeconds(RoF - RoF / 10.0f);
-                        }
-                        else
-                        {
-                            ForceUpdateTarget();
-                        }
+                        positionPredicted += (targAgent.target.transform.position - targAgent.transform.position) * Time.fixedDeltaTime;
+                        distanceParcourue += Time.fixedDeltaTime * bullet.speed;
                     }
                 }
-                yield return new WaitForSeconds(RoF / 10.0f);
+
+                RaycastHit hit;
+
+                predictionZone.transform.position = positionPredicted;
+
+                Vector3 direction = (positionPredicted + nearTargetCollider.center) - transform.position;
+
+                if (Physics.Raycast(transform.position, direction.normalized, out hit, Vector3.Distance(positionPredicted, transform.position)))
+                {
+                    if (hit.collider.gameObject.CompareTag("Prediction") || (hit.collider.gameObject.CompareTag("Target") && !hit.collider.GetComponent<AgentRobinMathieu>()))
+                    {
+
+                        GameObject go = Instantiate(prefabBullet, transform.position + direction.normalized * 2.0f, Quaternion.LookRotation(direction.normalized)) as GameObject;
+
+                        go.GetComponent<bulletScript>().launcherName = AgentRobinMathieu.playerID;
+                        yield return new WaitForSeconds(RoF - RoF / 10.0f);
+                    }
+                }
             }
+            yield return new WaitForSeconds(RoF / 10.0f);
+        }
+
+        protected override IEnumerator ShootBullet()
+        {
+            bulletScript bullet = prefabBullet.GetComponent<bulletScript>();
+
+            if (TargetBullet)
+            {
+                bulletScript targ = TargetBullet.GetComponent<bulletScript>();
+
+                Vector3 positionPredicted = TargetBullet.transform.position + Vector3.up * 0.5f;
+
+                float distanceParcourue = 0.0f;
+                while (Vector3.Distance(transform.position, positionPredicted) - distanceParcourue > float.Epsilon)
+                {
+                    positionPredicted += (targ.transform.position + targ.transform.forward) * Time.fixedDeltaTime * targ.speed;
+                    distanceParcourue += Time.fixedDeltaTime * bullet.speed;
+                }
+
+                RaycastHit hit;
+
+                predictionZone.transform.position = positionPredicted;
+
+                Vector3 direction = positionPredicted - transform.position;
+
+                if (Physics.Raycast(transform.position, direction.normalized, out hit, Vector3.Distance(positionPredicted, transform.position)))
+                {
+                    if (hit.collider.gameObject.CompareTag("Prediction") || hit.collider.gameObject.CompareTag("Bullet"))
+                    {
+                        GameObject go = Instantiate(prefabBullet, transform.position + direction.normalized * 2.0f, Quaternion.LookRotation(direction.normalized)) as GameObject;
+
+                        go.GetComponent<bulletScript>().launcherName = AgentRobinMathieu.playerID;
+                        yield return new WaitForSeconds(RoF - RoF / 10.0f);
+                    }
+                    else
+                    {
+                        UpdateTargetBullet();
+                    }
+                }
+            }
+            yield return new WaitForSeconds(RoF / 10.0f);
         }
     }
 

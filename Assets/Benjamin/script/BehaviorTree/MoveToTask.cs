@@ -25,12 +25,19 @@ namespace BenjaminBehaviorTree
                 }
                 else
                 {
-                    _agent.transform.position = Vector3.MoveTowards(_agent.transform.position, _agent.currentTarget + Vector3.up, _agent.speed * Time.deltaTime);
+                    _agent.agent.Resume();
+                    _agent.agent.SetDestination(_agent.currentTarget);
                 }
             }
-            else
+            else 
             {
-                _agent.transform.position = Vector3.MoveTowards(_agent.transform.position, _agent.target.transform.position, _agent.speed * Time.deltaTime);
+                if (Vector3.Distance(_agent.transform.position, _agent.currentTarget) < 2f)
+                {
+                    _agent.agent.Resume();
+                    _agent.agent.SetDestination(_agent.currentTarget);
+                }
+                else
+                    _agent.agent.Stop();
             }
             return true;
         }
