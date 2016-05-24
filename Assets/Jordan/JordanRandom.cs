@@ -90,8 +90,8 @@ public class JordanRandom : MonoBehaviour {
     {
         startFireCoolDown = Time.time;
         Object temp = Instantiate(bullet);
-        ((GameObject)temp).transform.LookAt(target.position + target.forward * nav.speed * Vector3.Distance(transform.position, target.position));
         ((GameObject)temp).transform.position = this.transform.position + target.forward;
+        ((GameObject)temp).transform.LookAt(target.position + target.forward * nav.speed * Vector3.Distance(transform.position, target.position));
         ((GameObject)temp).GetComponent<bulletScript>().launcherName = "Pelolance";
     }
 
