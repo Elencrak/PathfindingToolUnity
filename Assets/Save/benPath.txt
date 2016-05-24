@@ -98,6 +98,8 @@
     <Node positionX="-67.78372" positionY="0.5" positionZ="4.97933245" nodeId="109" />
     <Node positionX="-67.83481" positionY="0.5" positionZ="1.900651" nodeId="110" />
     <Node positionX="-36.88149" positionY="0.5" positionZ="17.09333" nodeId="111" />
+    <Node positionX="-72.3711243" positionY="0.5" positionZ="0.913008451" nodeId="112" />
+    <Node positionX="-29.2981186" positionY="0.5" positionZ="-1.3232305" nodeId="113" />
   </Nodes>
   <Edges>
     <Edge firstNodeId="71" secondNodeId="72" />
@@ -389,5 +391,11 @@
     <Edge firstNodeId="74" secondNodeId="109" />
     <Edge firstNodeId="74" secondNodeId="110" />
     <Edge firstNodeId="75" secondNodeId="111" />
+    <Edge firstNodeId="41" secondNodeId="112" />
+    <Edge firstNodeId="112" secondNodeId="38" />
+    <Edge firstNodeId="37" secondNodeId="112" />
+    <Edge firstNodeId="112" secondNodeId="41" />
+    <Edge firstNodeId="22" secondNodeId="113" />
+    <Edge firstNodeId="113" secondNodeId="67" />
   </Edges>
 </Pathfinding>
