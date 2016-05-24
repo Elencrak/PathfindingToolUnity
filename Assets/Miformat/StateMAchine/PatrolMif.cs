@@ -21,7 +21,7 @@ public class PatrolMif : StateMif
 
 	void Patrol()
 	{
-		Debug.Log ("Patrol");
+		//Debug.Log ("Patrol");
 		if (agent) 
 		{
 			if (state == 0){state = 1;} 
