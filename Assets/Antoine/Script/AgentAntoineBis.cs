@@ -2,319 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class AgentAntoine : MonoBehaviour
+public class AgentAntoineBis : MonoBehaviour
 {
     public GameObject target;
-    public float speed = 10.0f;
-    public float closeEnoughRange = 1.0f;
-    private Vector3 currentTarget;
-    private Vector3 tempTarget = Vector3.zero;
-
-    public GameObject[] enemies;
-    public GameObject currentEnemy;
-
-    public GameObject nodes;
-
-    public float rate = 1.0f;
-    public float lastShoot = 0.0f;
-    private bool canShoot = true;
-    private bool isShooting = false;
-
-    bool finished = false;
-
-    public Material cube;
-
-    public Vector3 SpawnPos;
-
-    public GameObject[] points;
-    private int index = 0;
-    private Vector3 PathPoint;
-
-    public GameObject bullet;
-    public GameObject spawnBullet;
-    public GameObject spawnBulletRotation;
-
-    private bool esquive;
-
-    private float offset = 0;
-
-    public GameObject bro1;
-    public GameObject bro2;
-
-    private Pathfinding graph;
-    public List<Vector3> road = new List<Vector3>();
-
-    private bool isMoving = false;
-    private Vector3 lastPoint;
-
-    //StateMachineAntoine theStateMachine;
-
-    SelectorAntoine decisionTree;
-
-    // Use this for initialization
-    void Start()
-    {
-        //theStateMachine = new StateMachineAntoine(gameObject);
-
-        graph = new Pathfinding();
-        graph.Load("antoinePathFinding");
-        graph.setNeighbors();
-
-        SpawnPos = transform.position;
-
-        int rand = Random.Range(0, nodes.transform.childCount - 1);
-
-        target = nodes.transform.GetChild(rand).gameObject;
-
-        //PathPoint = points[index].transform.position;
-
-
-        enemies = GameObject.FindGameObjectsWithTag("Target");
-
-        for (int i = 0; i < enemies.Length; i++)
-        {
-            if (enemies[i] == gameObject)
-            {
-                enemies[i] = null;
-            }
-            else if (enemies[i] == bro1)
-            {
-                enemies[i] = null;
-            }
-            else if (enemies[i] == bro2)
-            {
-                enemies[i] = null;
-            }
-        }
-
-        InvokeRepeating("ChangeColor", 0.5f, 0.1f);
-
-        InvokeRepeating("FindNewTarget", 0f, 0.5f);
-
-        InvokeRepeating("Calc", 0f, 1.0f);
-
-        
-
-        isMoving = false;
-        isShooting = false;
-        canShoot = true;
-        bullet = Resources.Load("Bullet") as GameObject;
-        finished = false;
-
-        decisionTree = new SelectorAntoine();
-        SequenceAntoine s1 = new SequenceAntoine();
-        FiltreAntoine f1 = new FiltreAntoine(DelegateInvertBool);
-        TaskAntoineDelegate delegateSeePlayer = new TaskAntoineDelegate(HaveTarget);
-        SelectorAntoine se1 = new SelectorAntoine();
-        SequenceAntoine s2 = new SequenceAntoine();
-        TaskAntoineDelegate delegateCanShoot = new TaskAntoineDelegate(GetCanShootDelegate);
-        TaskAntoineDelegate delegateShootBullet = new TaskAntoineDelegate(ShootBullet);
-        TaskAntoineDelegate delegateDodge = new TaskAntoineDelegate(DelegateDodge);
-        SelectorAntoine se2 = new SelectorAntoine();
-        SequenceAntoine s4 = new SequenceAntoine();
-        TaskAntoineDelegate delegateDistance = new TaskAntoineDelegate(DelegateDistance);
-        TaskAntoineDelegate delegateChase = new TaskAntoineDelegate(DelegateChase);
-        TaskAntoineDelegate delegatePatrol = new TaskAntoineDelegate(DelegatePatrol);
-
-        decisionTree.AddNode(s1);
-        decisionTree.AddNode(se2);
-
-        //s1.AddNode(f1);
-        s1.AddNode(delegateSeePlayer);
-        s1.AddNode(se1);
-
-        // f1.AddNode(delegateSeePlayer);
-
-        se1.AddNode(s2);
-        se1.AddNode(delegateDodge);
-
-        s2.AddNode(delegateCanShoot);
-        s2.AddNode(delegateShootBullet);
-
-        se2.AddNode(s4);
-        se2.AddNode(delegatePatrol);
-
-        s4.AddNode(delegateDistance);
-        s4.AddNode(delegateChase);
-    }
-
-    void FindNewTarget()
-    {
-        float dist = Mathf.Infinity;
-        for (int i = 0; i < enemies.Length; i++)
-        {
-            if(enemies[i]!= null && Vector3.Distance(transform.position, enemies[i].transform.position) <= dist)
-            {
-                currentEnemy = enemies[i];
-                dist = Vector3.Distance(transform.position, enemies[i].transform.position);
-            }
-        }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        decisionTree.Execute();
-        
-        if(!canShoot)
-        {
-            lastShoot += Time.deltaTime;
-            if(lastShoot >= rate)
-            {
-                canShoot = true;
-                lastShoot = 0.0f;
-            }
-        }
-    }
-
-    public bool DelegateInvertBool(bool inBool)
-    {
-        return !inBool;
-    }
-
-    public bool DelegateDodge()
-    {
-        Debug.Log("dodge Delegate");
-        if(currentEnemy)
-            Dodge(currentEnemy.transform.position, -currentEnemy.transform.right, currentEnemy.transform.forward);
-        return true;
-    }
-
-    public bool DelegateDistance()
-    {
-        Debug.Log("distance Delegate");
-        tempTarget = Vector3.zero;
-        if (currentEnemy != null && Vector3.Distance(currentEnemy.transform.position, transform.position) <= 50.0f)
-            return false;
-        return false;
-    }
-
-    public bool DelegateChase()
-    {
-        Debug.Log("chase Delegate");
-        tempTarget = Vector3.zero;
-        road = PathfindingManager.GetInstance().GetRoad(transform.position, currentEnemy.transform.position, graph);
-        road = PathfindingManager.GetInstance().SmoothRoad(road);
-        return true;
-    }
-
-    public bool DelegatePatrol()
-    {
-        // Debug.Log("patrol Delegate");
-        if(currentEnemy)
-        {
-            transform.LookAt(currentEnemy.transform.position);
-            GetComponent<NavMeshAgent>().SetDestination(currentEnemy.transform.position);
-        }
-        else
-        {
-            FindNewTarget();
-            transform.LookAt(currentEnemy.transform.position);
-            GetComponent<NavMeshAgent>().SetDestination(currentEnemy.transform.position);
-        }
-        
-        if(Vector3.Distance(transform.position, currentEnemy.transform.position) <= 20.0f)
-        {
-            GetComponent<NavMeshAgent>().SetDestination(transform.position);
-        }
-
-        return true;
-    }
-
-    public bool HaveTarget()
-    {
-        RaycastHit hit;
-        if (currentEnemy != null && Physics.Raycast(spawnBullet.transform.position, (currentEnemy.transform.position - transform.position).normalized, out hit, 10000.0f))
-        {
-            if (hit.transform.gameObject == currentEnemy)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public bool HaveShoot()
-    {
-        return !canShoot;
-    }
-
-    public bool GetCanShootDelegate()
-    {
-        // Debug.Log("GetCan Shoot Delegate");
-        return canShoot;
-    }
-
-    public bool GetCanShoot()
-    {
-        return canShoot;
-    }
-
-    public bool ShootBullet()
-    {
-        Debug.Log("shoot Bullet Delegate");
-        spawnBulletRotation.transform.LookAt(currentEnemy.transform.position);
-        isShooting = true;
-
-        GameObject go = Instantiate(bullet, spawnBullet.transform.position, Quaternion.identity) as GameObject;
-        go.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
-        go.transform.LookAt(currentEnemy.transform.position + currentEnemy.transform.forward);
-        canShoot = false;
-        lastShoot = 0.0f;
-
-        return true;
-    }
-
-    void ChangeColor()
-    {
-        if (!finished)
-            GetComponent<MeshRenderer>().material.color = new Color(Random.Range(0f, 1), Random.Range(0f, 1), Random.Range(0f, 1));
-    }
-
-    void OnCollisionEnter(Collision other)
-    {
-
-        if (other.gameObject.tag == "Bullet")
-        {
-           // transform.position = SpawnPos;
-            //int rand = Random.Range(0, nodes.transform.childCount - 1);
-
-           // target = nodes.transform.GetChild(rand).gameObject;
-
-            //Calc();
-            GetComponent<NavMeshAgent>().Warp(SpawnPos);
-            GetComponent<NavMeshAgent>().SetDestination(currentEnemy.transform.position);
-        }
-    }
-
-
-    public void Dodge(Vector3 pos, Vector3 v, Vector3 forward)
-    {
-        if (canShoot && (!target || Vector3.Distance(transform.position, target.transform.position) > Vector3.Distance(transform.position, pos)))
-        {
-            spawnBulletRotation.transform.LookAt(pos);
-            GameObject go = Instantiate(bullet, spawnBullet.transform.position, Quaternion.identity) as GameObject;
-            go.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
-            go.transform.LookAt(pos + forward);
-            canShoot = false;
-        }
-        else
-        {
-            StartCoroutine(Esquive(v));
-        }
-    }
-
-    IEnumerator Esquive(Vector3 v)
-    {
-        currentTarget = transform.position + v * 10;
-        GetComponent<NavMeshAgent>().SetDestination(currentTarget);
-        yield return new WaitForSeconds(2f);
-        //currentTarget = road[0];
-        GetComponent<NavMeshAgent>().SetDestination(currentEnemy.transform.position);
-        esquive = false;
-    }
-
-    /*public GameObject target;
     public float speed = 10.0f;
     public float closeEnoughRange = 1.0f;
     private Vector3 currentTarget;
@@ -731,9 +421,9 @@ public class AgentAntoine : MonoBehaviour
         else
         {
             FindInTargets(other.gameObject);
-        }
+        }*/
 
-        if (other.gameObject.tag == "Bullet")
+        if (other.gameObject.tag == "Bullet" /*&& other.transform.GetComponent<bulletScript>().launcherName != transform.parent.GetComponent<TeamNumber>().teamName*/)
         {
             transform.position = SpawnPos;
             int rand = Random.Range(0, nodes.transform.childCount - 1);
@@ -746,6 +436,46 @@ public class AgentAntoine : MonoBehaviour
         }
     }
 
+    /*void FindInTargets(GameObject obj)
+    {
+        for (int i = 0; i < enemies.Length; i++)
+        {
+            if (obj == enemies[i])
+            {
+                enemies[i] = null;
+            }
+        }
+    }*/
+
+    /*void FindNewTarget()
+    {
+        target = null;
+        float dist = Mathf.Infinity;
+
+        for (int i = 0; i < enemies.Length; i++)
+        {
+            if (enemies[i] != null)
+            {
+                float tempDist = Vector3.Distance(transform.position, enemies[i].transform.position);
+                if (enemies[i] == gameObject)
+                {
+                    enemies[i] = null;
+                }
+                else if (tempDist < dist)
+                {
+                    Vector3 fwd = enemies[i].transform.position - transform.position;
+                    RaycastHit hit;
+                    if (Physics.Raycast(transform.position, fwd, out hit) && hit.transform.tag == "Target" && hit.transform.gameObject != bro1 && hit.transform.gameObject != bro2)
+                    {
+                        target = enemies[i];
+                        //transform.LookAt(target.transform.position);
+                        spawnBulletRotation.transform.LookAt(target.transform.position);
+                        dist = tempDist;
+                    }
+                }
+            }
+        }
+    }*/
 
     public void Dodge(Vector3 pos, Vector3 v, Vector3 forward)
     {
@@ -769,5 +499,5 @@ public class AgentAntoine : MonoBehaviour
         yield return new WaitForSeconds(2f);
         currentTarget = road[0];
         esquive = false;
-    }*/
+    }
 }

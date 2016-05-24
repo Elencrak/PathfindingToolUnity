@@ -12,6 +12,6 @@ public class WalkAntoine : StateAntoine
 
     public override void Execute(GameObject pl)
     {
-        pl.GetComponent<AgentAntoine>().Chase();
+       // pl.GetComponent<AgentAntoine>().Chase();
     }
 }

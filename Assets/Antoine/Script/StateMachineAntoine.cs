@@ -16,7 +16,7 @@ public class StateMachineAntoine : StateAntoine
         player = pl;
         states = new List<StateAntoine>();
         InitStateMachine();
-        InitTransitions();
+        //InitTransitions();
         currentState = states[0];
     }
 
@@ -60,7 +60,7 @@ public class StateMachineAntoine : StateAntoine
         }
     }
     
-    public void InitTransitions()
+   /* public void InitTransitions()
     {
         TransitionAntoine idleToChase = new TransitionAntoine(player.GetComponent<AgentAntoine>().MustChase, states[1], 0);
         TransitionAntoine idleToPatrol = new TransitionAntoine(player.GetComponent<AgentAntoine>().NoTarget, states[2], 1);
@@ -74,5 +74,5 @@ public class StateMachineAntoine : StateAntoine
         TransitionAntoine patrolToChase = new TransitionAntoine(player.GetComponent<AgentAntoine>().MustChase, states[1], 0);
         states[2].AddTransition(patrolToChase);
         states[2].AddTransition(patrolToIdle);
-    }
+    }*/
 }

@@ -12,6 +12,6 @@ public class PatrolAntoine : StateAntoine
 
     public override void Execute(GameObject pl)
     {
-        pl.GetComponent<AgentAntoine>().Patrol();
+        //pl.GetComponent<AgentAntoine>().Patrol();
     }
 }
