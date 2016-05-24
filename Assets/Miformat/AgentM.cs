@@ -222,7 +222,7 @@ public class AgentM : MonoBehaviour {
 		if (target != null)
         {
 			LookAtTarget ();
-            Cheat ();
+            Dodge ();
             //agent.destination = target.transform.position;
         }
 		if (currentBullet != null) {Dunk ();}
@@ -361,8 +361,6 @@ public class AgentM : MonoBehaviour {
 		}
 	}
 
-
-
 	GameObject FindCloseTarget()
 	{
 		GameObject T = null;
@@ -382,7 +380,7 @@ public class AgentM : MonoBehaviour {
 		return T;
 	}
 
-	void Cheat()
+	void Dodge()
 	{
 		if (distToTarget < 2) 
 		{
@@ -486,6 +484,7 @@ public class AgentM : MonoBehaviour {
 	void Shoot()
 	{
 		Vector3 asmodunk = this.gameObject.transform.position;
+		asmodunk += this.gameObject.transform.forward;
 		asmodunk.y += 1.8f;
 		currentBullet = Instantiate (bullet, asmodunk, Quaternion.identity) as GameObject;
 		target = FindCloseTarget();
