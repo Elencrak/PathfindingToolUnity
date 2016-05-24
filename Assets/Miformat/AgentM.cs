@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 public class AgentM : MonoBehaviour {
 
+	//blabla
 	//public GameObject cancer;
 	GameObject bullet;
     GameObject target;
@@ -11,7 +12,7 @@ public class AgentM : MonoBehaviour {
 	GameObject currentBullet = null;
 	float distToTarget;
 	NavMeshAgent agent;
-	Vector3 startPos = new Vector3(-70,1,-20);
+	Vector3 startPos;
 	float fireRate = 1;
 	public int ID;
 	int state = 1;
@@ -20,7 +21,7 @@ public class AgentM : MonoBehaviour {
 	GameObject toAvoid = null;
 
 
-
+	public bool isDown;
 	bool isPatrol = false;
 	bool isWalk = true;
 	TransitionMif TtoPatrol;
@@ -37,6 +38,8 @@ public class AgentM : MonoBehaviour {
 	// Use this for initialization
 	void Start () 
 	{
+		startPos = new Vector3(-28,1,19);
+		if (isDown) {startPos = new Vector3(-70,1,-20);}
 		patrol = new PatrolMif ();
 		walk = new WalkMif ();
 		avoid = new AvoidMif ();
@@ -92,20 +95,41 @@ public class AgentM : MonoBehaviour {
 
 	Vector3 getVect(int MID, int MState)
 	{
-		if (MID == 0) 
+		if (isDown) 
 		{
-			if (MState == 0) {return  new Vector3 (-73, 1, -16);} 
-			else {return new Vector3 (-65, 1, -16);}
+			if (MID == 0) 
+			{
+				if (MState == 0) {return  new Vector3 (-73, 1, -16);} 
+				else {return new Vector3 (-65, 1, -16);}
+			}
+			else if (MID == 1) 
+			{
+				if (MState == 0) {return  new Vector3 (-52,1,-14);} 
+				else {return new Vector3 (-52,1,-22);}
+			}
+			else if (MID == 2) 
+			{
+				if (MState == 0) {return  new Vector3 (-62,1,-8);} 
+				else {return new Vector3 (-43,1,-18);}
+			}
 		}
-		else if (MID == 1) 
+		else
 		{
-			if (MState == 0) {return  new Vector3 (-52,1,-14);} 
-			else {return new Vector3 (-52,1,-22);}
-		}
-		else if (MID == 2) 
-		{
-			if (MState == 0) {return  new Vector3 (-62,1,-8);} 
-			else {return new Vector3 (-43,1,-18);}
+			if (MID == 0) 
+			{
+				if (MState == 0) {return  new Vector3 (-30, 1, 14);} 
+				else {return new Vector3 (-36, 1, 14);}
+			}
+			else if (MID == 1) 
+			{
+				if (MState == 0) {return  new Vector3 (-49,1,11);} 
+				else {return new Vector3 (-49,1,19);}
+			}
+			else if (MID == 2) 
+			{
+				if (MState == 0) {return  new Vector3 (-36,1,4);} 
+				else {return new Vector3 (-60,1,15);}
+			}
 		}
 		return Vector3.zero;
 	}
@@ -186,6 +210,8 @@ public class AgentM : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
+		if (Input.GetKey (KeyCode.T)) {isCamed = !isCamed;}
+		if (isCamed) {specialCam ();}
 		SMM2.Execute ();
 		timeToSwitch -= Time.deltaTime;
 		if (timeToSwitch < 0) 
@@ -205,14 +231,14 @@ public class AgentM : MonoBehaviour {
 		if (distToTarget < 15) 
 		{
 			SphereCollider ball = this.gameObject.transform.GetChild (0).gameObject.GetComponent<SphereCollider> ();
-			ball.enabled = false;
+			if (ball) {ball.enabled = false;}
 			if (fireRate < 0 && TargetOnSight ()) 
 			{
 				Coloring (this.gameObject);
 				fireRate = 1;
 				Shoot ();
 			}
-			ball.enabled = true;
+			if (ball) {ball.enabled = true;}
 		}
 		else 
 		{
@@ -378,8 +404,11 @@ public class AgentM : MonoBehaviour {
 
 	void Danger()
 	{
-		Vector3 dir = target.GetComponent<NavMeshAgent> ().destination;
-		agent.destination = this.transform.position + dir;
+		if (target.GetComponent<NavMeshAgent> ()) 
+		{
+			Vector3 dir = target.GetComponent<NavMeshAgent> ().destination;
+			agent.destination = this.transform.position + dir;
+		}
 	}
 
 	void RemoveTargetFromTab(GameObject toRemove)
@@ -393,6 +422,14 @@ public class AgentM : MonoBehaviour {
 				tabTarget [index] = null;
 			}
 		}
+	}
+
+	bool isCamed = false;
+	void specialCam()
+	{
+		GameObject cam = GameObject.FindGameObjectWithTag ("MainCamera");
+		Vector3 rot = new Vector3 (0,0,0.1f);
+		cam.transform.Rotate (rot);
 	}
 
 	void LookAtTarget()

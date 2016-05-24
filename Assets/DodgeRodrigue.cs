@@ -3,10 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 public class DodgeRodrigue : MonoBehaviour {
     public List<GameObject> listOfBullets = new List<GameObject>();
+    public List<GameObject> listOfFriends = new List<GameObject>();
     RodrigueAgent parent;
     // Use this for initialization
     void Start () {
-        parent = GameObject.Find("RodrigueAgent").GetComponent<RodrigueAgent>();
+        parent = transform.parent.GetComponent<RodrigueAgent>();
 	}
 	
 	// Update is called once per frame
@@ -15,14 +16,19 @@ public class DodgeRodrigue : MonoBehaviour {
 
     void OnTriggerEnter(Collider parOther)
     {
+        if(parOther.gameObject.transform.parent != null && parOther.gameObject.transform.parent.GetComponent<RodrigueAgent>() && parOther.gameObject.transform.parent.GetComponent<RodrigueAgent>().teamName == "RektByRodrigue")
+        {
+            listOfFriends.Add(parOther.gameObject.transform.parent.gameObject);
+        }
+
         if (parOther.tag == "Bullet" && parOther.GetComponent<bulletScript>().launcherName != "RektByRodrigue")
         {
             listOfBullets.Add(parOther.gameObject);
-            Vector3 bulletForward = parOther.transform.forward;
+            Vector3 bulletForward = parOther.transform.forward;            
             RaycastHit hit;
             if (Physics.Raycast(parOther.transform.position, bulletForward, out hit, 100))
             {
-               if(hit.transform.name != "RodrigueAgent")
+               if(hit.transform.name != transform.parent.name)
                 {
                     StartCoroutine(Dodge());
                 }
@@ -30,11 +36,13 @@ public class DodgeRodrigue : MonoBehaviour {
         }
     }
 
+
+
     IEnumerator Dodge()
     {
         parent.isDodging = true;
         parent.navMeshAgent.Stop();
-        yield return new WaitForSeconds(.3f);
+        yield return new WaitForSeconds(.5f);
         parent.navMeshAgent.Resume();
         parent.isDodging = false;
     }
@@ -44,6 +52,11 @@ public class DodgeRodrigue : MonoBehaviour {
         if (parOther.tag == "Bullet" && parOther.GetComponent<bulletScript>().launcherName != "RektByRodrigue")
         {
             listOfBullets.Remove(parOther.gameObject);
+        }
+
+        if (parOther.gameObject.transform.parent != null && parOther.gameObject.transform.parent.GetComponent<RodrigueAgent>() && parOther.gameObject.transform.parent.GetComponent<RodrigueAgent>().teamName == "RektByRodrigue")
+        {
+            listOfFriends.Remove(parOther.gameObject.transform.parent.gameObject);
         }
     }
 }
