@@ -6,6 +6,7 @@ public class JordanAgentF : MonoBehaviour {
 
     private StateMachineJordan statemachine;
     private float startAttack, delayAttack;
+    private float delayDodge, startDelayDodge;
     private GameObject currentTarget, bullet;
     private List<GameObject> enemies;
     private Vector3 initPos;
@@ -16,10 +17,11 @@ public class JordanAgentF : MonoBehaviour {
         if (col.gameObject.tag == "Bullet")
         {
             transform.position = initPos;
+            currentTarget = enemies[Random.Range(0, enemies.Count)];
         }
     }
 
-    void OnTriggerStay(Collider col)
+    void OnTriggerEnter(Collider col)
     {
         if (col.gameObject.tag == "Bullet")
         {
@@ -42,6 +44,7 @@ public class JordanAgentF : MonoBehaviour {
         bulletInRange = false;
         startAttack = -10.0f;
         delayAttack = 1.0f;
+        delayDodge = 0.1f;
 
         initPos = this.transform.position;
 
@@ -53,7 +56,12 @@ public class JordanAgentF : MonoBehaviour {
 
         GameObject[] temp = GameObject.FindGameObjectsWithTag("Target");
         enemies = new List<GameObject>(temp);
-        enemies.Remove(gameObject);
+        for(int i = 0; i<temp.Length; i++)
+        {
+            if (temp[i].name == "FWindy")
+                enemies.Remove(temp[i]);
+        }
+
         currentTarget = enemies[Random.Range(0, enemies.Count)];
 
         StateMoveJordan move = new StateMoveJordan();
@@ -116,7 +124,7 @@ public class JordanAgentF : MonoBehaviour {
 
     public bool checkFireAttack()
     {
-        if (startAttack + delayAttack < Time.time)
+        if (startAttack + delayAttack < Time.time && Vector3.Distance(transform.position, currentTarget.transform.position) < 7.0f)
         {
             startAttack = Time.time;
             return true;
@@ -134,12 +142,15 @@ public class JordanAgentF : MonoBehaviour {
 
     public bool checkStartDodge()
     {
+        startDelayDodge = Time.time;
         return bulletInRange;
     }
 
     public bool checkStopDodge()
     {
-        return !bulletInRange;
+        if(!bulletInRange || delayDodge + startDelayDodge < Time.time)
+            return true;
+        return false;
     }
 
     public bool checkTrue()

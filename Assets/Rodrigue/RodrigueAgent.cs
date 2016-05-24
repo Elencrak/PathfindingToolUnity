@@ -124,7 +124,7 @@ public class RodrigueAgent : MonoBehaviour {
         }
         else
         {
-            temp = target.GetComponent<Rigidbody>().velocity;
+            temp = target.transform.position + target.GetComponent<Rigidbody>().velocity;
         }
         bullets.transform.LookAt(temp);
         bullets.GetComponent<bulletScript>().launcherName = teamName;
