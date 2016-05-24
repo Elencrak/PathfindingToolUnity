@@ -46,7 +46,7 @@ public class RodrigueAgent : MonoBehaviour {
             if(temp != this.gameObject)
             {
                 listOfTarget.Add(temp);
-                if (temp.transform.parent.GetComponent<TeamNumber>() && temp.transform.parent.GetComponent<TeamNumber>().teamName == "RektByRodrigue")
+				if (temp.transform.parent.parent && temp.transform.parent.parent.GetComponent<TeamNumber>() && temp.transform.parent.parent.GetComponent<TeamNumber>().teamName == "RektByRodrigue")
                 {
                     listOfTarget.Remove(temp);
                     listOfFriends.Add(temp);
