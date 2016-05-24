@@ -24,7 +24,7 @@ namespace JojoBehaviourTree
                     Debug.DrawRay(agent.transform.position, relativePosition.normalized *10,Color.red);
                     if (Physics.Raycast(agent.transform.position, relativePosition.normalized, out hit, 1000))
                     {
-                        if (hit.transform.tag == "Target")
+                        if (hit.transform.tag == "Target" && agent.targets.Find(x => x.transform == hit.transform) != null)
                         {
                             return true;
                         }

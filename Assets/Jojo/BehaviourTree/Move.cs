@@ -24,6 +24,11 @@ namespace JojoBehaviourTree
                     relativePositionTarget = agent.currentTarget.position - agent.transform.position;
                     if (relativePositionTarget.magnitude > relativePosition.magnitude)
                     {
+                        if (agent.currentTarget != g) { 
+                            agent.speedTarget = Vector3.zero;
+                            agent.calculSpeed = true;
+                        }
+
                         agent.currentTarget = g;
                     }
                 }

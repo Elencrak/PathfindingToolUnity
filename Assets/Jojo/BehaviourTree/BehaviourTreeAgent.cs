@@ -11,11 +11,16 @@ namespace JojoBehaviourTree {
         public Transform currentTarget;
         public NavMeshAgent currentNavMeshAgent;
         public float nextShoot;
-        public float fireRate = 1f;
+        public float fireRate = 0f;
 
         private bool doOnce = true;
         private Selector rootSelector;
         public Vector3 startPosition;
+
+        public Vector3 speedTarget;
+        public Vector3 previousPosition;
+        public bool calculSpeed;
+        public int nbFrame;
 
         // Use this for initialization
         void Start () {
@@ -68,6 +73,20 @@ namespace JojoBehaviourTree {
                 }                        
             }
 
+            if (nbFrame > 2 && calculSpeed == true)
+            {
+                if(nbFrame == 0)
+                {
+                    previousPosition = currentTarget.position;
+                }
+                if (nbFrame == 1)
+                {
+                    speedTarget = currentTarget.position - previousPosition  / Time.deltaTime;
+                    calculSpeed = false;
+                }                 
+                nbFrame++;
+            }
+
             if (nextShoot >= 0)
             {
                 nextShoot -= Time.deltaTime;
@@ -87,8 +106,10 @@ namespace JojoBehaviourTree {
 
         void OnCollisionEnter(Collision collision)
         {
- 
-                currentNavMeshAgent.Warp(startPosition);
+            if (collision.transform.tag == "Bullet")
+            {
+              currentNavMeshAgent.Warp(startPosition);
+            }
         }
     }
 }
