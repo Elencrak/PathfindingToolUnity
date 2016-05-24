@@ -111,7 +111,7 @@ public class RodrigueAgent : MonoBehaviour {
     {
         timeSinLastShot = 0;
         canShoot = false;
-        GameObject bullets = Instantiate(Resources.Load("Bullet"), transform.position + transform.forward*2.0f + new Vector3(0, 1.5f, 0), Quaternion.identity) as GameObject;
+        GameObject bullets = Instantiate(Resources.Load("Bullet"), transform.position + transform.forward*1.5f + new Vector3(0, 1.5f, 0), Quaternion.identity) as GameObject;
         Physics.IgnoreCollision(this.GetComponent<BoxCollider>(), bullets.GetComponent<CapsuleCollider>());
         //Vector3 velocity = target.GetComponent<Rigidbody>().velocity;
         //float t = Vector3.Distance(transform.position, target.transform.position) / 40f
