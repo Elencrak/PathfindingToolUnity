@@ -51,10 +51,15 @@ public class Will_IA_M2 : MonoBehaviour {
 
     public void shoot(GameObject targ)
     {
+        Vector3 futureDist=Vector3.zero;
         float temps = Vector3.Distance(transform.position, targ.transform.position) / bullet.GetComponent<bulletScript>().speed;
-        Vector3 speed = targ.GetComponent<NavMeshAgent>().velocity;
-        speed.y = 0;
-        Vector3 futureDist =(targ.transform.forward* temps * speed.magnitude);
+        if (targ.GetComponent<NavMeshAgent>())
+        {
+            Vector3 speed = targ.GetComponent<NavMeshAgent>().velocity;
+            speed.y = 0;
+            futureDist = (targ.transform.forward * temps * speed.magnitude);
+        }
+        
 
         GameObject spawnedBullet = (GameObject)Instantiate(bullet, transform.position, transform.rotation);
         spawnedBullet.transform.LookAt(targ.transform.position + futureDist);
