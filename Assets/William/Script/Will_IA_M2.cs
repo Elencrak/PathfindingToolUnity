@@ -16,6 +16,10 @@ public class Will_IA_M2 : MonoBehaviour {
     GameObject bullet;
     public float shootSpeed=1;
 
+    [Header("Dodge")]
+    public float distanceDodge=4;
+    public float timeToPos=1;
+
     Rigidbody rigid;
     MainStateMachineWill machine;
     
@@ -26,7 +30,7 @@ public class Will_IA_M2 : MonoBehaviour {
         teamName = GetComponentInParent<TeamNumber>().teamName;
 
         // STATE
-        SW_Dodge dodge = new SW_Dodge(id, speed,4,1, graphName);
+        SW_Dodge dodge = new SW_Dodge(id, speed, distanceDodge, timeToPos, graphName);
         SW_Shoot shoot = new SW_Shoot(id, bullet, shootSpeed, dodge);
         //FightStateMachineWill fight = new FightStateMachineWill(id, shoot);
         SW_Walk walk = new SW_Walk(id, speed, closeEnoughRange, graphName);
@@ -47,11 +51,24 @@ public class Will_IA_M2 : MonoBehaviour {
 
     public void shoot(GameObject targ)
     {
+        float temps = Vector3.Distance(transform.position, targ.transform.position) / bullet.GetComponent<bulletScript>().speed;
+        Vector3 speed = targ.GetComponent<NavMeshAgent>().velocity;
+        speed.y = 0;
+        Vector3 futureDist =(targ.transform.forward* temps * speed.magnitude);
+
         GameObject spawnedBullet = (GameObject)Instantiate(bullet, transform.position, transform.rotation);
-        spawnedBullet.transform.LookAt(targ.transform.position);
+        spawnedBullet.transform.LookAt(targ.transform.position + futureDist);
         spawnedBullet.GetComponent<bulletScript>().launcherName = teamName;
+
 
         Physics.IgnoreCollision(GetComponent<BoxCollider>(), spawnedBullet.GetComponent<CapsuleCollider>());
         //Physics.IgnoreCollision(GetComponent<CharacterController>(), spawnedBullet.GetComponent<CapsuleCollider>());
+    }
+
+    public void move(Vector3 pos)
+    {
+        transform.position = Vector3.MoveTowards(transform.position, pos, speed * Time.deltaTime);
+        //playerController.SimpleMove(target.transform.position.normalized * speed * Time.deltaTime);
+        transform.LookAt(pos);
     }
 }
