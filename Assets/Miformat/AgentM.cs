@@ -11,7 +11,7 @@ public class AgentM : MonoBehaviour {
 	GameObject currentBullet = null;
 	float distToTarget;
 	NavMeshAgent agent;
-	Vector3 startPos = new Vector3(58,1,-38);
+	Vector3 startPos = new Vector3(-70,1,-20);
 	float fireRate = 1;
 	public int ID;
 	int state = 1;
@@ -19,41 +19,180 @@ public class AgentM : MonoBehaviour {
 	bool isAvoiding = false;
 	GameObject toAvoid = null;
 
+
+
+	bool isPatrol = false;
+	bool isWalk = true;
+	TransitionMif TtoPatrol;
+	TransitionMif TtoWalk;
+	TransitionMif TtoAvoid;
+	PatrolMif patrol;
+	WalkMif walk;
+	AvoidMif avoid;
+	List<TransitionMif> trans;
+	StateMachineMif SMM;
+	StateMachineMif SMM2;
+
+
 	// Use this for initialization
 	void Start () 
 	{
+		patrol = new PatrolMif ();
+		walk = new WalkMif ();
+		avoid = new AvoidMif ();
+		TtoPatrol = new TransitionMif(patrol, CheckPatrol);
+		TtoWalk = new TransitionMif(walk, CheckWalk);
+		TtoAvoid = new TransitionMif(avoid, CheckAvoid);
+		trans = new List<TransitionMif>();
+		trans.Add (TtoWalk);
+		trans.Add (TtoAvoid);
+		patrol.Init (trans);
+		trans = new List<TransitionMif>();
+		trans.Add (TtoPatrol);
+		trans.Add (TtoAvoid);
+		walk.Init (trans);
+		trans = new List<TransitionMif>();
+		trans.Add (TtoPatrol);
+		trans.Add (TtoWalk);
+		avoid.Init (trans);
+		SMM = new StateMachineMif (walk);
+		SMM2 = new StateMachineMif (SMM);
+
 		bullet = Resources.Load ("Bullet") as GameObject;
 		//startPos = this.gameObject.transform.position;
 		agent = GetComponent<NavMeshAgent>();
 		tabTarget = GameObject.FindGameObjectsWithTag ("Target");
 		RemoveTargetFromTab (this.gameObject);
 		target = FindCloseTarget();
-		while (target.GetComponent<AgentM> ()) 
+		while (target.GetComponent<AgentM> () != null) 
 		{
 			RemoveTargetFromTab (target);
 			target = FindCloseTarget();
 		}
-		switch (ID) 
+		/*switch (ID) 
 		{
 			case 0:
-				agent.destination = new Vector3 (74,1,-5); 
+				agent.destination = new Vector3 (-73, 1, -16);
 				break;
 			case 1:
-				agent.destination = new Vector3 (51,1,-4);
+				agent.destination = new Vector3 (-52,1,-14);
 				break;
 			case 2:
-				agent.destination = new Vector3 (58,1,-12);
+				agent.destination = new Vector3 (-62,1,-8);
 				break;
-		}
+		}*/
 		/*if (target != null) 
 		{
 			agent.destination = target.transform.position; 
 		}*/
+		agent.destination = getVect (ID, state);
+		getPoto ();
+		timeToSwitch = maxTimeSwitch;
     }
+
+	Vector3 getVect(int MID, int MState)
+	{
+		if (MID == 0) 
+		{
+			if (MState == 0) {return  new Vector3 (-73, 1, -16);} 
+			else {return new Vector3 (-65, 1, -16);}
+		}
+		else if (MID == 1) 
+		{
+			if (MState == 0) {return  new Vector3 (-52,1,-14);} 
+			else {return new Vector3 (-52,1,-22);}
+		}
+		else if (MID == 2) 
+		{
+			if (MState == 0) {return  new Vector3 (-62,1,-8);} 
+			else {return new Vector3 (-43,1,-18);}
+		}
+		return Vector3.zero;
+	}
+
+	bool CheckPatrol()
+	{
+		return isPatrol;
+	}
+
+	bool CheckWalk()
+	{
+		return isWalk;
+	}
+
+	bool CheckAvoid()
+	{
+		return isAvoiding;
+	}
+
+	GameObject M1;
+	GameObject M2;
+	GameObject M3;
+
+	void getPoto()
+	{
+		AgentM[] listM = GameObject.FindObjectsOfType<AgentM> ();
+		foreach (AgentM AM in listM) 
+		{
+			if (AM.ID == 0) {M1 = AM.gameObject;}
+			else if (AM.ID == 1) {M2 = AM.gameObject;}
+			else if (AM.ID == 2) {M3 = AM.gameObject;}
+		}
+		isPatrol = false;
+		isWalk = true;
+	}
 	
+	float timeToSwitch;
+	float maxTimeSwitch = 10;
+
+	void switchPoto()
+	{
+		int rnd1 = Random.Range (0,3);
+		int rnd2 = rnd1;
+		while (rnd2 == rnd1) {rnd2 = Random.Range (0,3);}
+		int tempID;
+		GameObject Mate1 = null;
+		switch(rnd1)
+		{
+			case 0:
+				Mate1 = M1;
+			break;
+			case 1:
+				Mate1 = M2;
+			break;
+			case 2:
+				Mate1 = M3;
+			break;
+		}
+		GameObject Mate2 = null;
+		switch(rnd2)
+		{
+			case 0:
+				Mate2 = M1;
+			break;
+			case 1:
+				Mate2 = M2;
+			break;
+			case 2:
+				Mate2 = M3;
+			break;
+		}
+		tempID = Mate1.GetComponent<AgentM> ().ID;
+		Mate1.GetComponent<AgentM> ().ID = Mate2.GetComponent<AgentM> ().ID;
+		Mate2.GetComponent<AgentM> ().ID = tempID;
+		getPoto ();
+	}
+
 	// Update is called once per frame
 	void Update () 
 	{
+		SMM2.Execute ();
+		timeToSwitch -= Time.deltaTime;
+		if (timeToSwitch < 0) 
+		{
+			switchPoto (); 
+			timeToSwitch = maxTimeSwitch;
+		}
 		if (target != null)
         {
 			LookAtTarget ();
@@ -62,11 +201,27 @@ public class AgentM : MonoBehaviour {
         }
 		if (currentBullet != null) {Dunk ();}
 		fireRate -= Time.deltaTime;
-		if (fireRate < 0) 
+		distToTarget = Vector3.Distance (this.gameObject.transform.position, target.transform.position);
+		if (distToTarget < 15) 
 		{
-			Coloring (this.gameObject);
-			fireRate = 1;
-			Shoot ();
+			SphereCollider ball = this.gameObject.transform.GetChild (0).gameObject.GetComponent<SphereCollider> ();
+			ball.enabled = false;
+			if (fireRate < 0 && TargetOnSight ()) 
+			{
+				Coloring (this.gameObject);
+				fireRate = 1;
+				Shoot ();
+			}
+			ball.enabled = true;
+		}
+		else 
+		{
+			target = FindCloseTarget();
+			while (target.GetComponent<AgentM> ()) 
+			{
+				RemoveTargetFromTab (target);
+				target = FindCloseTarget();
+			}
 		}
 		if (target == null) 
 		{
@@ -83,28 +238,57 @@ public class AgentM : MonoBehaviour {
 
 	void Patrol()
 	{
-		switch (ID) 
+		/*switch (ID) 
 		{
 		case 0:
-			agent.destination = new Vector3 (74,1,-5); 
-			break;
-		case 1:
-			agent.destination = new Vector3 (51,1,-4);
-			break;
-		case 2:
+			//agent.destination = new Vector3 (-73, 1, -16);
+			//agent.destination = new Vector3 (-65, 1, -16);
 			if (state == 0) 
 			{
-				agent.destination = new Vector3 (50,1,-24);
+				agent.destination = new Vector3 (-73, 1, -16);
 				state = 1;
 			} 
 			else 
 			{
-				agent.destination = new Vector3 (58,1,-12);
+				agent.destination = new Vector3 (-65, 1, -16);
 				state = 0;
 			}
-			isArrived = false;
+			//isArrived = false;
 			break;
-		}
+		case 1:
+			//agent.destination = new Vector3 (-52,1,-14);
+			if (state == 0) 
+			{
+				agent.destination = new Vector3 (-52,1,-14);
+				state = 1;
+			} 
+			else 
+			{
+				agent.destination = new Vector3 (-52,1,-22);
+				state = 0;
+			}
+			//isArrived = false;
+			break;
+		case 2:
+			if (state == 0) 
+			{
+				agent.destination = new Vector3 (-62,1,-8);
+				state = 1;
+			} 
+			else 
+			{
+				agent.destination = new Vector3 (-43,1,-18);
+				state = 0;
+			}
+			//isArrived = false;
+			break;
+		}*/
+		isPatrol = true;
+		isWalk = false;
+		if (state == 0){state = 1;} 
+		else {state = 0;}
+		agent.destination = getVect (ID, state);
+		isArrived = false;
 	}
 
 	void Suicide()
@@ -116,6 +300,14 @@ public class AgentM : MonoBehaviour {
 			float distBull = Vector3.Distance (this.gameObject.transform.position, go.transform.position);
 			if (go.GetComponent<bulletScript> ().launcherName != "OSOK" && distBull < 2) {Death ();}
 		}
+	}
+
+	bool TargetOnSight()
+	{
+		RaycastHit hit;
+		Physics.Raycast (this.gameObject.transform.position, this.gameObject.transform.forward, out hit);
+		if (hit.collider.gameObject.tag == "Target" && !hit.collider.gameObject.GetComponent<AgentM> ()) {return true;}
+		else {return false;}
 	}
 
 	void Avoid()
@@ -166,7 +358,6 @@ public class AgentM : MonoBehaviour {
 
 	void Cheat()
 	{
-		distToTarget = Vector3.Distance (this.gameObject.transform.position, target.transform.position);
 		if (distToTarget < 2) 
 		{
 			this.gameObject.GetComponent<BoxCollider> ().isTrigger = false;
@@ -220,7 +411,7 @@ public class AgentM : MonoBehaviour {
 
 	void Dunk()
 	{
-		currentBullet.transform.localScale += currentBullet.transform.localScale * Time.deltaTime * 2;
+		currentBullet.transform.localScale += currentBullet.transform.localScale * Time.deltaTime;
 	}
 
 	void OnCollisionEnter(Collision collision) 
@@ -251,6 +442,8 @@ public class AgentM : MonoBehaviour {
 		this.gameObject.transform.position = startPos;
 		target = FindCloseTarget();
 		agent.destination = target.transform.position;
+		isPatrol = false;
+		isWalk = true;
 	}
 
 	void Shoot()

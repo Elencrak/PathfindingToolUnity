@@ -13,10 +13,9 @@ public class SW_Walk : StateWill {
     Pathfinding graph;
     float timerUpdateRoad = 1f;
     float lastUpdate;
-    SW_Walk it;
+
     public SW_Walk(int id, float pSpeed, float pRange, string graphName):base(id)
     {
-        it = this;
         target = TeamManagerWill.instance.mainTarget;
         closeEnoughRange = pRange;
         speed = pSpeed;
@@ -64,21 +63,15 @@ public class SW_Walk : StateWill {
             {
                 Vector3 pos = currentTarget;
                 pos.y += 0.5f;
-                player.transform.position = Vector3.MoveTowards(player.transform.position, pos, speed * Time.deltaTime);
-                player.transform.LookAt(pos);
+                player.GetComponent<Will_IA_M2>().move(pos);
                 //playerController.SimpleMove(player.transform.forward * speed * Time.deltaTime);
-                
+
             }
         }
         else
         {
-            player.transform.position = Vector3.MoveTowards(player.transform.position, target.transform.position, speed * Time.deltaTime);
-            //playerController.SimpleMove(target.transform.position.normalized * speed * Time.deltaTime);
-            player.transform.LookAt(target.transform.position);
+            player.GetComponent<Will_IA_M2>().move(target.transform.position);
         }
-
-
-        
 
     }
 
