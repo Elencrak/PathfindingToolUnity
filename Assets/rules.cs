@@ -39,6 +39,13 @@ public class rules : MonoBehaviour {
             _instance = this;
         }
         scoreBoardDisplay = GameObject.FindGameObjectWithTag("ScoreBoard").GetComponent<Text>();
+
+        Invoke("stopMatch", 2*60);
+    }
+
+    void stopMatch()
+    {
+        Time.timeScale = 0;
     }
 	
 	// Update is called once per frame
@@ -98,6 +105,7 @@ public class rules : MonoBehaviour {
     private void addFF(string teamName)
     {
         updateMap(ffBoard,teamName);
+        updateScore(teamName, -1);
     }
 
     private void addKill(string teamName)
