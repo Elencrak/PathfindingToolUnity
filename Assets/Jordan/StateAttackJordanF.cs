@@ -16,8 +16,15 @@ public class StateAttackJordanF : StateJordan {
         if (currentTarget == null)
             return;
 
-        transform.LookAt(currentTarget.transform.position);
-        transform.gameObject.GetComponent<JordanAgentF>().fire();
+        RaycastHit hit;
+
+        Physics.Raycast(transform.position, currentTarget.transform.position, out hit);
+
+        if (hit.collider.name != "FWindy")
+        {
+            transform.LookAt(currentTarget.transform.position);
+            transform.gameObject.GetComponent<JordanAgentF>().fire();
+        }
     }
 
     public override StateJordan check()

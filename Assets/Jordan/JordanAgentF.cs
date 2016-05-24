@@ -16,6 +16,7 @@ public class JordanAgentF : MonoBehaviour {
         if (col.gameObject.tag == "Bullet")
         {
             transform.position = initPos;
+            currentTarget = enemies[Random.Range(0, enemies.Count)];
         }
     }
 
@@ -53,7 +54,12 @@ public class JordanAgentF : MonoBehaviour {
 
         GameObject[] temp = GameObject.FindGameObjectsWithTag("Target");
         enemies = new List<GameObject>(temp);
-        enemies.Remove(gameObject);
+        for(int i = 0; i<temp.Length; i++)
+        {
+            if (temp[i].name == "FWindy")
+                enemies.Remove(temp[i]);
+        }
+
         currentTarget = enemies[Random.Range(0, enemies.Count)];
 
         StateMoveJordan move = new StateMoveJordan();
@@ -116,7 +122,7 @@ public class JordanAgentF : MonoBehaviour {
 
     public bool checkFireAttack()
     {
-        if (startAttack + delayAttack < Time.time)
+        if (startAttack + delayAttack < Time.time && Vector3.Distance(transform.position, currentTarget.transform.position) < 7.0f)
         {
             startAttack = Time.time;
             return true;
