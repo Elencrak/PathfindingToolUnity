@@ -21,11 +21,11 @@ public class TW_VisionOnTarget : TransitionWill {
         if (Physics.Raycast(posPlayer, dir, out hit))
         {
             //Debug.Log("tag hit: " + hit.collider.tag + " /name: " + hit.collider.name);
-            if (hit.collider.tag == target.tag && isTrue)
+            if (hit.collider.name == target.name && isTrue)
             {
                 return nextState;
             }
-            else if (hit.collider.tag != target.tag && !isTrue&& hit.collider.tag != "Bullet")
+            else if (hit.collider.name != target.name && !isTrue&& hit.collider.tag != "Bullet")
             {
                 return nextState;
             }
