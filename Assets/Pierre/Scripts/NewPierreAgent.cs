@@ -48,7 +48,10 @@ public class NewPierreAgent : MonoBehaviour {
         
         InvokeRepeating("UpdateRoad", 0.1f, 0.1f);
         //Debug.Log(PathfindingManager.GetInstance().test);
-        InvokeRepeating("Fire", 0f, 1f);
+
+        StartCoroutine(FireGestion());
+
+        //InvokeRepeating("Fire", 0f, 1f);
     } 
 
     void InitStateMachine()
@@ -67,6 +70,31 @@ public class NewPierreAgent : MonoBehaviour {
                 stateMachine.currentState = new PierreRandom(stateMachine);
                 break;
         }
+    }
+
+    IEnumerator FireGestion()
+    {
+        float timer = Time.time;
+
+        RaycastHit hit;
+
+        bool b;
+
+        while (true)
+        {
+            transform.LookAt(currentTarget);
+
+            b = !(Physics.Raycast(transform.position, transform.forward, out hit, 200) && hit.transform.GetComponent<NewPierreAgent>());
+            b = b && !(Physics.Raycast(transform.position, transform.forward, out hit, 1000) && hit.transform.tag != "Target");
+            
+            if (Time.time - timer > 1f && b)
+            {
+                timer = Time.time;
+                Fire();
+            }
+            yield return null;
+        }
+
     }
 
     void Fire()

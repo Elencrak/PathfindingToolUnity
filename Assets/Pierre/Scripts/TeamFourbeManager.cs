@@ -16,7 +16,7 @@ public class TeamFourbeManager : MonoBehaviour {
             agent.stateMachine.currentState = new PierreCamp(agent.stateMachine);
         }
 
-        Invoke("BeginGame", 10);
+        Invoke("BeginGame", 0);
 
         InvokeRepeating("CheckStrat", 30, 20);
 
@@ -50,6 +50,13 @@ public class TeamFourbeManager : MonoBehaviour {
             }
         }
 
-        badAgent.stateMachine.currentState = bestAgent.stateMachine.currentState;
+        /*if(badAgent.nbTimeTouched > 20)
+        {
+            badAgent.stateMachine.currentState = new PierreCamp(badAgent.stateMachine);
+        }
+        else*/
+        //{
+            badAgent.stateMachine.currentState = bestAgent.stateMachine.currentState;
+        //}
     }
 }
