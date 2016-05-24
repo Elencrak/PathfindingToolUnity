@@ -9,8 +9,11 @@ public class Poulpe : MonoBehaviour
 
     public Vector3 lastTargetPos;
     public Vector3 targetPos;
+    public Vector3 destination;
 
-    float startShoot;
+    public GameObject bullet;
+
+    public float startShoot;
     float delayShoot = 1.0f;
     float startDogge;
     float delayDogge = 0.3f;
@@ -35,6 +38,10 @@ public class Poulpe : MonoBehaviour
 
     PoulpeStateMachine firstStateMachine;
     PoulpeStateMachine secondStateMachine;
+
+    public bool thereIsBullet;
+
+    PoulpeSelector tree;
 
     void Start()
     {
@@ -92,7 +99,7 @@ public class Poulpe : MonoBehaviour
         #endregion
 
         #region WhitHierarchie
-        states = new List<PoulpeState>();
+        /*states = new List<PoulpeState>();
         moveTransitions = new List<PoulpeTransition>();
         shootTransitions = new List<PoulpeTransition>();
         doggeTransitions = new List<PoulpeTransition>();
@@ -139,20 +146,55 @@ public class Poulpe : MonoBehaviour
 
         PoulpeTransition toMove = new PoulpeTransition(EnemyNotSpotted, move, secondStateMachine);
         idleTransitions.Add(toMove);
-        idle.SetTransitions(idleTransitions);
+        idle.SetTransitions(idleTransitions);*/
+        #endregion
+
+        #region BehaviorTree
+        begin = transform.position;
+        PoulpeTaskCoolDown cooldown = new PoulpeTaskCoolDown(this.gameObject);
+        PoulpeTaskEnemySpotted enemySpotted = new PoulpeTaskEnemySpotted(this.gameObject);
+        PoulpeTaskShoot shoot = new PoulpeTaskShoot(this.gameObject);
+        PoulpeTaskBullet taskBullet = new PoulpeTaskBullet(this.gameObject);
+        PoulpeTaskDodge dodge = new PoulpeTaskDodge(this.gameObject);
+        PoulpeTaskIdle idle = new PoulpeTaskIdle(this.gameObject);
+        PoulpeTaskMove move = new PoulpeTaskMove(this.gameObject);
+        PoulpeSequence sequence1 = new PoulpeSequence();
+        PoulpeSequence sequence2 = new PoulpeSequence();
+        PoulpeSequence sequence3 = new PoulpeSequence();
+        tree = new PoulpeSelector();
+        List<PoulpeNode> nodeTree = new List<PoulpeNode>();
+        List<PoulpeNode> nodeSequence1 = new List<PoulpeNode>();
+        List<PoulpeNode> nodeSequence2 = new List<PoulpeNode>();
+        List<PoulpeNode> nodeSequence3 = new List<PoulpeNode>();
+        nodeTree.Add(sequence1);
+        nodeTree.Add(sequence2);
+        nodeTree.Add(sequence3);
+        nodeTree.Add(move);
+        nodeSequence1.Add(cooldown);
+        nodeSequence1.Add(enemySpotted);
+        nodeSequence1.Add(shoot);
+        nodeSequence2.Add(taskBullet);
+        nodeSequence2.Add(dodge);
+        nodeSequence3.Add(enemySpotted);
+        nodeSequence3.Add(idle);
+        tree.SetNodes(nodeTree);
+        sequence1.SetNodes(nodeSequence1);
+        sequence2.SetNodes(nodeSequence2);
+        sequence3.SetNodes(nodeSequence3);
         #endregion
     }
 
     void Update ()
     {
-        if(target != null)
+        /*if(target != null)
         {
             lastTargetPos = targetPos;
             targetPos = target.transform.position;
         }
         startShoot -= Time.deltaTime;
         startDogge -= Time.deltaTime;
-        firstStateMachine.Step();
+        firstStateMachine.Step();*/
+        tree.DoIt();
     }
 
     bool EnemyNotSpotted()
@@ -234,14 +276,25 @@ public class Poulpe : MonoBehaviour
         }
     }
 
-    void OnTriggerEnter(Collider collider)
+    void OnTriggerStay(Collider collider)
+    {
+        thereIsBullet = false;
+        if (collider.tag == "Bullet")
+        {
+            bullet = collider.gameObject;
+            thereIsBullet = true;
+            return;
+        }
+    }
+
+    /*void OnTriggerEnter(Collider collider)
     {
         if (collider.tag == "Bullet")
         {
             dogge.bullet = collider.gameObject.transform.right;
             startDogge = delayDogge;
         }
-    }
+    }*/
 
     public GameObject Instantiation()
     {
