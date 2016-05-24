@@ -41,7 +41,7 @@ public class Poulpe : MonoBehaviour
 
     public bool thereIsBullet;
 
-    PoulpeSelector tree;
+    //PoulpeSelector tree;
 
     void Start()
     {
@@ -150,7 +150,7 @@ public class Poulpe : MonoBehaviour
         #endregion
 
         #region BehaviorTree
-        begin = transform.position;
+        /*begin = transform.position;
         PoulpeTaskCoolDown cooldown = new PoulpeTaskCoolDown(this.gameObject);
         PoulpeTaskEnemySpotted enemySpotted = new PoulpeTaskEnemySpotted(this.gameObject);
         PoulpeTaskShoot shoot = new PoulpeTaskShoot(this.gameObject);
@@ -180,7 +180,7 @@ public class Poulpe : MonoBehaviour
         tree.SetNodes(nodeTree);
         sequence1.SetNodes(nodeSequence1);
         sequence2.SetNodes(nodeSequence2);
-        sequence3.SetNodes(nodeSequence3);
+        sequence3.SetNodes(nodeSequence3);*/
         #endregion
     }
 
@@ -194,7 +194,7 @@ public class Poulpe : MonoBehaviour
         startShoot -= Time.deltaTime;
         startDogge -= Time.deltaTime;
         firstStateMachine.Step();*/
-        tree.DoIt();
+        //tree.DoIt();
     }
 
     bool EnemyNotSpotted()
