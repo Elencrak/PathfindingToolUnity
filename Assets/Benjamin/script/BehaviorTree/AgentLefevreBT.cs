@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using BenjaminBehaviorTree;
 
+
 public class AgentLefevreBT : MonoBehaviour {
 
     public float lastFire;
@@ -22,10 +23,10 @@ public class AgentLefevreBT : MonoBehaviour {
     float lastRespawn = 1f;
     bool fireSuccess = false;
 
-    Composite behaviorTree = new Selector();
-    Composite shootSequence = new Sequence();
-    Composite moveToTarget = new Sequence();
-    Composite moveToRandom = new Sequence();
+    BenjaminBehaviorTree.Composite behaviorTree = new BenjaminBehaviorTree.Selector();
+    BenjaminBehaviorTree.Composite shootSequence = new BenjaminBehaviorTree.Sequence();
+    BenjaminBehaviorTree.Composite moveToTarget = new BenjaminBehaviorTree.Sequence();
+    BenjaminBehaviorTree.Composite moveToRandom = new BenjaminBehaviorTree.Sequence();
 
     // Use this for initialization
     void Start () {
@@ -35,11 +36,11 @@ public class AgentLefevreBT : MonoBehaviour {
 
         bulletSpeed = bullet.GetComponent<bulletScript>().speed;
 
-        shootSequence.AddTask(new ChooseTargetTask(this));
-        shootSequence.AddTask(new CanShootCondition(this));
-        shootSequence.AddTask(new ShootTask(this));
-        moveToTarget.AddTask(new IsTargetValidCondition(this));
-        moveToTarget.AddTask(new MoveToTask(this));
+        shootSequence.AddTask(new BenjaminBehaviorTree.ChooseTargetTask(this));
+        shootSequence.AddTask(new BenjaminBehaviorTree.CanShootCondition(this));
+        shootSequence.AddTask(new BenjaminBehaviorTree.ShootTask(this));
+        moveToTarget.AddTask(new BenjaminBehaviorTree.IsTargetValidCondition(this));
+        moveToTarget.AddTask(new BenjaminBehaviorTree.MoveToTask(this));
         //moveToRandom.AddTask(new GetRandomNavigationPointTask(this));
         //moveToRandom.AddTask(new MoveToTask(this));
         behaviorTree.AddTask(shootSequence);
