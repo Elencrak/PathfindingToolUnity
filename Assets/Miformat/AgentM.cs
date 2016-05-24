@@ -230,14 +230,14 @@ public class AgentM : MonoBehaviour {
 		if (distToTarget < 15) 
 		{
 			SphereCollider ball = this.gameObject.transform.GetChild (0).gameObject.GetComponent<SphereCollider> ();
-			ball.enabled = false;
+			if (ball) {ball.enabled = false;}
 			if (fireRate < 0 && TargetOnSight ()) 
 			{
 				Coloring (this.gameObject);
 				fireRate = 1;
 				Shoot ();
 			}
-			ball.enabled = true;
+			if (ball) {ball.enabled = true;}
 		}
 		else 
 		{
