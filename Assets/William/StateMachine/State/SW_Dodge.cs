@@ -49,7 +49,7 @@ public class SW_Dodge : StateWill {
         {
             if (Physics.Raycast(player.transform.position, player.transform.right * -1, out hitLeft, distance))
             {
-                if (Random.Range(0, 2) == 1)
+                if (Vector3.Distance(player.transform.position, hitRight.point) > Vector3.Distance(player.transform.position, hitLeft.point))
                 {
                     destination = hitRight.point;
                 }
