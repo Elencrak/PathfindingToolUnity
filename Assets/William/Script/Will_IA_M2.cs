@@ -58,6 +58,14 @@ public class Will_IA_M2 : MonoBehaviour {
             Vector3 speed = targ.GetComponent<NavMeshAgent>().velocity;
             speed.y = 0;
             futureDist = (targ.transform.forward * temps * speed.magnitude);
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position, targ.transform.position+ futureDist, out hit))
+            {
+                if (hit.collider.tag != targ.tag)
+                {
+                    futureDist = Vector3.zero;
+                }
+            }
         }
         
 
