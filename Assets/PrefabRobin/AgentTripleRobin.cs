@@ -85,7 +85,6 @@ namespace IARobin
                 {
                     if (hit.collider.gameObject.CompareTag("Prediction") || (hit.collider.gameObject.CompareTag("Target") && !hit.collider.GetComponent<AgentRobinMathieu>()))
                     {
-                        Debug.Log("Shoot " + 3);
 
                         GameObject go = Instantiate(prefabBullet, transform.position + direction.normalized * 2.0f, Quaternion.LookRotation(direction.normalized)) as GameObject;
 
@@ -124,7 +123,6 @@ namespace IARobin
                 {
                     if (hit.collider.gameObject.CompareTag("Prediction") || hit.collider.gameObject.CompareTag("Bullet"))
                     {
-                        Debug.Log("Shoot Bullet " + 3);
                         GameObject go = Instantiate(prefabBullet, transform.position + direction.normalized * 2.0f, Quaternion.LookRotation(direction.normalized)) as GameObject;
 
                         go.GetComponent<bulletScript>().launcherName = AgentRobinMathieu.playerID;

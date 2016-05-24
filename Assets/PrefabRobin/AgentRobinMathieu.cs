@@ -305,7 +305,6 @@ namespace IARobin
                 }
                 else
                 {
-                    Debug.Log("Try Shoot Enemy");
                     yield return ShootEnemy();
                 }
             }
