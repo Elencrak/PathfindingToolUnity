@@ -94,13 +94,6 @@ public class AgentLefevre : MonoBehaviour
     {
         Debug.Log("FIRE");
         lastFire = Time.time;
-        /*target = GetTarget();
-        if (target == null)
-            return;*/
-        /*Vector3 relativePos = target.transform.position - transform.position;
-        Quaternion rotation = Quaternion.LookRotation(relativePos);
-        GameObject instanceBul = Instantiate(bullet, transform.position + relativePos.normalized * 2f, rotation) as GameObject;
-        instanceBul.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;*/
         StartCoroutine(fireRoutine());
     }
 
@@ -152,14 +145,6 @@ public class AgentLefevre : MonoBehaviour
                 instance = Instantiate(bullet, transform.position + relativePos.normalized * 2.0f, rotation) as GameObject;
             }
             instance.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;
-
-            // sans anticipation
-            /*Vector3 relativePos = target.transform.position + direction - transform.position;
-            Quaternion rotation = Quaternion.LookRotation(relativePos);
-            Debug.DrawLine(transform.position, posToShoot, Color.blue, 2f);
-            instance = Instantiate(bullet, transform.position + relativePos.normalized * 2.0f, rotation) as GameObject;
-            instance.GetComponent<bulletScript>().launcherName = transform.parent.GetComponent<TeamNumber>().teamName;*/
-
         }
         yield return null;
     }
